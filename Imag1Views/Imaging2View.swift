@@ -37,7 +37,7 @@ struct Imaging2View: View {
             .frame(width: 360, height: 500)
             VStack{
                 RoundedRectangle(cornerRadius: 7)
-                    .fill(Color(Color("LL_blue")).opacity(0.3))
+                    .fill(Color("LL_blue").opacity(0.3))
                 
                 // only as separator of VStacks
             }

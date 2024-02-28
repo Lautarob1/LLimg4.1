@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+//import UniformTypeIdentifiers
 
 struct TgtSelectSparseView: View {
     @State private var filePath: String = ""
@@ -29,9 +30,10 @@ struct TgtSelectSparseView: View {
                     openPanel.allowsMultipleSelection = false
                     openPanel.canChooseDirectories = false
                     openPanel.canChooseFiles = true
+//                    openPanel.allowedFileTypes = [".sparseimage"]
+//                    openPanel.allowedContentTypes = [UTType(filenameExtension: ".sparseimage") ?? .data]
                     
                     if openPanel.runModal() == .OK {
-   
                         openPanel.urls.forEach { url in
                             fileSelectionManager.addFileFolder(path: url.path)
                             FileSelectionManager.shared.addFileFolder(path: url.path)

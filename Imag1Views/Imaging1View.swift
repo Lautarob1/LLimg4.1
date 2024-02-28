@@ -17,6 +17,8 @@ struct Imaging1View: View {
     var onReview: () -> Void
     var onCancel: () -> Void
     
+//    @available(macOS 14.0, *)
+//    @available(macOS 14.0, *)
     var body: some View {
         
         HStack {
@@ -39,7 +41,7 @@ struct Imaging1View: View {
             .frame(width: 360, height: 500)
             VStack{
                 RoundedRectangle(cornerRadius: 7)
-                    .fill(Color(Color("LL_blue")).opacity(0.3))
+                    .fill(Color("LL_blue")).opacity(0.3)
                 
                 // only as separator of VStacks
             }

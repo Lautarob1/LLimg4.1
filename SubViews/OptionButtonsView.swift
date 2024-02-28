@@ -19,7 +19,7 @@ struct OptionButtonsView: View {
                     self.diskDataManager.selectedHashOption = name
                 }) {
                     Circle()
-                        .fill(self.diskDataManager.selectedHashOption == name ? Color(Color("LL_orange")) : Color.white)
+                        .fill(self.diskDataManager.selectedHashOption == name ? Color("LL_orange") : Color.white)
                         .frame(width: 15, height: 20) // Small, circular frame
                     Text(name)
                         .frame(width: 50, height: 20)

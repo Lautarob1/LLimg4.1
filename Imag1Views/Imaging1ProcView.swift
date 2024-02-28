@@ -51,7 +51,7 @@ struct Imaging1ProcView: View {
     @StateObject private var fileSizeChecker2 = FileSizeChecker()
     @ObservedObject private var fileSizeChecker3 = FileSizeChecker3()
     let procStep = ["Processing Sparse...", "Creating DMG...", "Hashing DMG...", "Processing Fineshed"]
-    let gradient = LinearGradient(gradient: Gradient(colors: [Color(Color("LL_orange")), Color.gray]),
+    let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color.gray]),
                       startPoint: .top,
                       endPoint: .bottom)
     var onComplete: () -> Void
@@ -117,7 +117,7 @@ struct Imaging1ProcView: View {
                     TextEditor(text: $sviewModel.output)
 //                    Text(sviewModel.output)
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
-                        .italic() // Make the text italic
+//                        .italic() 
                         .foregroundColor(.blue) // Set the text color
                         .frame(width: 800, height: 140, alignment: .leading)
                         .padding(5)
@@ -594,7 +594,7 @@ struct Imaging1ProcView: View {
 
 
 #Preview {
-    Imaging1ProcView(onComplete: {
-        // Dummy closure for preview
-    })
+        Imaging1ProcView(onComplete: {
+            // Dummy closure for preview
+        })
 }

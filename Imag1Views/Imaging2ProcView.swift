@@ -9,6 +9,7 @@ import SwiftUI
 
 
 
+
 struct Imaging2ProcView: View {
     @ObservedObject var authModel = AuthenticationViewModel()
     @ObservedObject var sviewModel = ConsoleViewModel()
@@ -47,7 +48,7 @@ struct Imaging2ProcView: View {
     @State private var logfilePathEx: String = ""
     @ObservedObject private var fileSizeChecker = FileSizeChecker()
     @ObservedObject private var fileSizeChecker3 = FileSizeChecker3()
-    let gradient = LinearGradient(gradient: Gradient(colors: [Color(Color("LL_orange")), Color.gray]),
+    let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color.gray]),
                       startPoint: .top,
                       endPoint: .bottom)
     @State var titleImgSize: String = "Image Size"
@@ -129,7 +130,7 @@ struct Imaging2ProcView: View {
                     TextEditor(text: $sviewModel.output)
                     //                    Text(sviewModel.output)
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
-                        .italic() // Make the text italic
+//                        .italic() 
                         .foregroundColor(.blue) // Set the text color
                         .frame(width: 800, height: 150, alignment: .leading)
                         .padding(5)
@@ -688,7 +689,8 @@ struct Imaging2ProcView: View {
 
 
 #Preview {
-    Imaging2ProcView(onComplete: {
-        // Dummy closure for preview
+
+        Imaging2ProcView(onComplete: {
+            // Dummy closure for preview
     })
 }

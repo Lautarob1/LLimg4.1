@@ -9,6 +9,7 @@ import SwiftUI
 
 
 
+//@available(macOS 14.0, *)
 struct Imaging3ProcView: View {
     @ObservedObject var authModel = AuthenticationViewModel()
     @ObservedObject var sviewModel = ConsoleViewModel()
@@ -47,7 +48,7 @@ struct Imaging3ProcView: View {
     @State private var logfilePathEx: String = ""
     @ObservedObject private var fileSizeChecker = FileSizeChecker()
     @ObservedObject private var fileSizeChecker3 = FileSizeChecker3()
-    let gradient = LinearGradient(gradient: Gradient(colors: [Color(Color("LL_orange")), Color.gray]),
+    let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color.gray]),
                       startPoint: .top,
                       endPoint: .bottom)
     @State var titleImgSize: String = "Image Size"
@@ -129,7 +130,7 @@ struct Imaging3ProcView: View {
                     TextEditor(text: $sviewModel.output)
                     //                    Text(sviewModel.output)
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
-                        .italic() // Make the text italic
+//                        .italic() 
                         .foregroundColor(.blue) // Set the text color
                         .frame(width: 680, height: 160, alignment: .leading)
                         .padding(5)
@@ -596,7 +597,6 @@ struct Imaging3ProcView: View {
 
 
 #Preview {
-    Imaging3ProcView(onComplete: {
-        // Dummy closure for preview
-    })
+        Imaging3ProcView(onComplete: {
+        })
 }
