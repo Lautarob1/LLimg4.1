@@ -37,53 +37,54 @@ struct CheckPasswordView: View {
             endRadius: 300
         )
         ZStack {
-           gradientRad
-        
-            VStack {
-                Spacer()
-                Text("An admin password for this computer is required:")
-                    .foregroundColor(.white)
-                    .font(.title)
-                SecureField("Password", text: $password)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .frame(width: 300, height: 20)
-                    .focused($isPasswordFieldFocused)
-                    .onSubmit {
-                        handlePasswordCheck()
-                    }
-                    .padding()
-                
-                VStack {
-                    Button("Enter")
-                    {
-                        handlePasswordCheck()
-                    }
-                    .font(.headline)
-                    .padding(.all, 5)
-                    .frame(width: 120, height: 30)
-                }
-                Spacer()
-                HStack (spacing: 80){
-                    Text("Type:\(authModel.licenseType) SN: \(authModel.licenseSerial)")
-                        .frame(width: 170)
-                        .padding(.horizontal, 5)
-                        .background(.white).opacity(0.7)
-                        .cornerRadius(6)
-//                    Spacer()
-                    Text("License exp date: \(authModel.licenseExpDate)")
-                        .frame(width: 200)
-                        .padding(.horizontal, 5)
-                        .background(.white).opacity(0.7)
-                        .cornerRadius(6)
-                }
-                
-                .padding()
-            }
-            .frame(width: 550, height: 350)
-            .background(gradient)
-            .cornerRadius(20)
-//            .padding(50)
-        }
+            gradientRad
+         
+             VStack {
+                 Spacer()
+                 Text("An admin password for this computer is required:")
+                     .foregroundColor(.white)
+                     .font(.title)
+                 SecureField("Password", text: $password)
+                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                     .frame(width: 300, height: 20)
+                     .focused($isPasswordFieldFocused)
+                     .onSubmit {
+                         handlePasswordCheck()
+                     }
+                     .padding()
+                 
+                 VStack {
+                     Button("Enter")
+                     {
+                         handlePasswordCheck()
+                     }
+                     .font(.headline)
+                     .padding(.all, 5)
+                     .frame(width: 120, height: 30)
+                 }
+                 Spacer()
+                 HStack (spacing: 80){
+                     Text("Type:\(authModel.licenseType) SN: \(authModel.licenseSerial)")
+                         .frame(width: 170)
+                         .padding(.horizontal, 5)
+                         .background(.white).opacity(0.7)
+                         .cornerRadius(6)
+ //                    Spacer()
+                     Text("License exp date: \(authModel.licenseExpDate)")
+                         .frame(width: 200)
+                         .padding(.horizontal, 5)
+                         .background(.white).opacity(0.7)
+                         .cornerRadius(6)
+                 }
+                 
+                 .padding()
+             }
+             .frame(width: 550, height: 350)
+             .background(gradient)
+             .cornerRadius(20)
+ //            .padding(50)
+         }
+        .frame(width: 900, height: 610)
         .background()
         .onAppear() {
             DispatchQueue.main.async {

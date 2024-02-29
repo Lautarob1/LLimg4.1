@@ -53,9 +53,6 @@ func calculateSHA256Hash(for filePath: String) -> String? {
     return sha256Digest.map { String(format: "%02hhx", $0) }.joined()
 }
 
-import CommonCrypto
-import Foundation
-
 func hashLargeFileMD5(filePath: String) -> String? {
     let bufferSize = 1024 * 1024 // 1 MB
     guard let file = FileHandle(forReadingAtPath: filePath) else { return nil }

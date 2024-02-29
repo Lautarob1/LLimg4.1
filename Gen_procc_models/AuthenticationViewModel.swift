@@ -19,11 +19,13 @@ class AuthenticationViewModel: ObservableObject {
     @Published var rootPassword: String = ""
     
     func ValidateLicense() -> String {
-        let licenseDetails = readLicense().components(separatedBy: "\n")
-        self.licenseType = licenseDetails[0]
-        self.licenseSerial = licenseDetails[1]
-        self.licenseExpDate = licenseDetails[2]
-        self.licenseStatus = checkLicense(dateRef: licenseDetails[2])
+          licenseStatus = "Expired"
+//        temp test (not working when using the app in other computer.
+//        let licenseDetails = readLicense().components(separatedBy: "\n")
+//        self.licenseType = licenseDetails[0]
+//        self.licenseSerial = licenseDetails[1]
+//        self.licenseExpDate = licenseDetails[2]
+//        self.licenseStatus = checkLicense(dateRef: licenseDetails[2])
         return licenseStatus
     }
     
