@@ -20,22 +20,22 @@ struct CustomAlertView: View {
 
     var body: some View {
         VStack (spacing: 0) {
-            Image("LLimager_Window2")
-                .resizable()
-                .frame(width: 320, height: 30)
-                .scaledToFit()
-                .padding(5)
-            Spacer()
-            VStack {
+//            Image("LLimager_Window2")
+//                .resizable()
+//                .frame(width: 320, height: 30)
+//                .scaledToFit()
+//                .padding(5)
+//            Spacer()
+            HStack {
                 Image(systemName: imageName)
                     .font(.largeTitle)
                     .foregroundColor(textColor)
                 .padding(10)
-            }
             Text(title)
                 .font(.system(size: fontSize1))
                 .foregroundColor(textColor)
                 .padding(10)
+            }
 
             Text(message)
                 .font(.system(size: fontSize2))
@@ -49,7 +49,7 @@ struct CustomAlertView: View {
             .foregroundColor(.white)
             .padding()
         }
-        .frame(width: 320, height: 270)
+        .frame(width: 320, height: 170)
         .background(backgroundColor)
         .cornerRadius(20)
         .shadow(radius: 10)

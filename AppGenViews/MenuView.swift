@@ -64,7 +64,7 @@ struct MenuView: View {
             )
         }
         .sheet(isPresented: binding (for: 3)) {
-            Imaging2View(onReview: {
+            Imaging3View(onReview: {
                 print("Review pressed. Status showViews[3] \(String(describing: showViews[3])), Status showViewsRev[3] set to \(String(describing: showViewsRev[3]))")
                 self.showViews[3] = false
                 self.showViewsRev[3] = true
@@ -74,7 +74,7 @@ struct MenuView: View {
             )
         }
         .sheet(isPresented: binding (for: 4)) {
-            Imaging2View(onReview: {
+            Imaging4View(onReview: {
                 print("Review pressed. Status showViews[4] \(String(describing: showViews[4])), Status showViewsRev[4] set to \(String(describing: showViewsRev[4]))")
                 self.showViews[4] = false
                 self.showViewsRev[4] = true
@@ -114,7 +114,7 @@ struct MenuView: View {
             )
         }
         .sheet(isPresented: bindingRev(for: 3)) {
-            Imaging1RevView(onProcess: {
+            Imaging3RevView(onProcess: {
                 self.showViewsRev[3] = false
                 self.showViewsProc[3] = true
             },
@@ -129,7 +129,7 @@ struct MenuView: View {
             )
         }
         .sheet(isPresented: bindingRev(for: 4)) {
-            Imaging2RevView(onProcess: {
+            Imaging4RevView(onProcess: {
                 self.showViewsRev[4] = false
                 self.showViewsProc[4] = true
             },
@@ -155,12 +155,12 @@ struct MenuView: View {
             })
         }
         .sheet(isPresented: bindingProc(for: 3)) {
-            Imaging1ProcView(onComplete: {
+            Imaging3ProcView(onComplete: {
                 self.showViewsProc[3] = false
             })
         }
         .sheet(isPresented: bindingProc(for: 4)) {
-            Imaging2ProcView(onComplete: {
+            Imaging4ProcView(onComplete: {
                 self.showViewsProc[4] = false
             })
         }
@@ -263,7 +263,9 @@ struct MenuView: View {
                 } else if showViewsRev[1] ?? false {
                     return AnyView(Imaging1RevView(
                         onProcess: {
-                            // Add your onProcess closure logic here
+                            self.showViews[1] = false
+                            self.showViewsRev[1] = false
+                            self.showViewsProc[1] = true
                         },
                         onModify: {
                             self.showViews[1] = true
@@ -292,7 +294,9 @@ struct MenuView: View {
                 } else if showViewsRev[2] ?? false {
                     return AnyView(Imaging2RevView(
                         onProcess: {
-                            // Add your onProcess closure logic here
+                            self.showViews[2] = false
+                            self.showViewsRev[2] = false
+                            self.showViewsProc[2] = true
                         },
                         onModify: {
                             self.showViews[2] = true
@@ -321,7 +325,9 @@ struct MenuView: View {
                 } else if showViewsRev[3] ?? false {
                     return AnyView(Imaging3RevView(
                         onProcess: {
-                            // Add your onProcess closure logic here
+                            self.showViews[3] = false
+                            self.showViewsRev[3] = false
+                            self.showViewsProc[3] = true
                         },
                         onModify: {
                             self.showViews[3] = true
@@ -350,7 +356,9 @@ struct MenuView: View {
                 } else if showViewsRev[4] ?? false {
                     return AnyView(Imaging4RevView(
                         onProcess: {
-                            // Add your onProcess closure logic here
+                            self.showViews[4] = false
+                            self.showViewsRev[4] = false
+                            self.showViewsProc[4] = true
                         },
                         onModify: {
                             self.showViews[4] = true

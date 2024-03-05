@@ -14,7 +14,7 @@ struct TgtSelectSparseView: View {
     @ObservedObject private var fileSelectionManager = FileSelectionManager()
     @State private var stillWorking = false
     let path2img: String = "Targeted sparse Image"
-//    let butlabel: String = (stillWorking ? "Working on it" : "Select Files/Folders")
+
     
     var body: some View {
         VStack {
@@ -35,48 +35,51 @@ struct TgtSelectSparseView: View {
                     
                     if openPanel.runModal() == .OK {
                         openPanel.urls.forEach { url in
-                            fileSelectionManager.addFileFolder(path: url.path)
-                            FileSelectionManager.shared.addFileFolder(path: url.path)
- 
+                            if url.path.contains("sparseimage") {
+                                fileSelectionManager.addFile(path: url.path)
+                                FileSelectionManager.shared.addFile(path: url.path)
+                            }
                         }
                     }
                     
                 })
                 {
-                    Text(stillWorking ? "Working on it" : "Select Sparse Imag")
+                    Text("Select Sparse Imag")
 
                       
                 }
-                .disabled(stillWorking)
+//                .disabled(stillWorking)
                 .frame(width:140, height: 25)
     
 
             }
             .onAppear() {
-                let butlabel: String = (stillWorking ? "Working on it" : "Select Files/Folders")
+//                let butlabel: String = ("Select sparse file")
             }
-            .background()
+//            .background(Color("LL_blue").opacity(0.3))
 
 
             List(selection: $selectedItems) {
-                ForEach(FileSelectionManager.shared.selectedFiFo, id: \.id) { file in
+                ForEach(FileSelectionManager.shared.selectedFiles, id: \.id) { file in
                     HStack {
                         Text(file.path)
                             .font(.subheadline)
-//                        Spacer()
-//                        Text("\(file.size) bytes")
-//                            .font(.caption)
+                        Spacer()
+                        Text("\(file.size) bytes")
+                            .font(.caption)
                     }
                 }
-//                HStack {
-//                    Text("Total Size")
-//                        .font(.caption)
-//                    Spacer()
-//                    Text("\(FileSelectionManager.shared.totalSize) bytes")
-//                        .font(.caption)
-//                }
+                HStack {
+                    Text("Total Size")
+                        .font(.caption)
+                    Spacer()
+                    Text("\(FileSelectionManager.shared.totalSize) bytes")
+                        .font(.caption)
+                }
     }
+      .listRowBackground(Color("LL_blue").opacity(0.3))
 //    .listStyle(SidebarListStyle())
+    
 
             HStack {
                 Button("Delete Selected") {

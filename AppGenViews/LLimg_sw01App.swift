@@ -31,7 +31,7 @@ struct LLimg_sw01App: App {
                         .onAppear {
                             let status = authModel.ValidateLicense()
 //                            print("result of ValidateLicense: \(status)")
-                                        if status == "Expired" {
+                                        if status == "Expired" || status == "File not found" {
                                             authModel.isLicenseValid = false
                                         } else {
                                             // Activate (to true) for triggering the app verif logic and quit if the license is expiered
@@ -39,7 +39,7 @@ struct LLimg_sw01App: App {
 //                                            showingAlert = true
                                         }
                             checkLicense = true
-                            // eliminafe the line below in production (it makes the license always valid
+                            // eliminafe the line below in production (it makes the license always valid)
                             authModel.isLicenseValid = true
                                     }
                         }

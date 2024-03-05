@@ -45,9 +45,14 @@ struct Imaging4RevView: View {
 //                        HardinfoViewRev()
                     }
                     .padding(.trailing, 25)
-                    VStack (spacing: 20){
+                    VStack (spacing: 50){
                         TgtSelect4HashViewRev()
-//                        TgtInfoViewRev()
+                        VStack (alignment: .leading){
+                        Text("Log file will be in:")
+                        Text(DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info")
+                        
+                        }
+                
                     }
  
                 }
@@ -68,7 +73,7 @@ struct Imaging4RevView: View {
                     Button(action: {
                         onProcess()
                     }) {
-                        Text("Create Image")
+                        Text("Process Hash")
                             .font(.custom("Helvetica Neue", size: 14))
                             .frame(width: 100, height: 20)
                             .foregroundColor(.white)
@@ -94,33 +99,21 @@ struct Imaging4RevView: View {
 
                 }
             }
+//        onAppear() {
+//            print("on appear with value \(DiskDataManager.shared.selectedStorageOption)")
+//            pathforhashlog()          
+//        }
  
         }
-        // show alert here
-//            if showAlertSize {
-//                CustomAlertView(
-//                    showAlert: $showAlertSize,
-//                    imageName: "exclamationmark.triangle",
-//                    title: "LLIMAGER Alert",
-//                    message: "Not enough space in the destination disk for the \(DiskDataManager.shared.selectedDskOption) image",
-//                    fontSize1: 14,
-//                    fontSize2: 12,
-//                    textColor: Color("LL_blue"),
-//                    backgroundColor: .white
-//                )
-//                .frame(width: 300, height: 250)
-//                .cornerRadius(15)
-//                .shadow(radius: 10)
-//                .opacity(showAlertSize ? 1 : 0) // Control visibility
-//                .animation(.easeInOut, value: showAlertSize)
-//             
-//            }
+
+    func pathforhashlog() {
+        print("in func path4log")
+        if DiskDataManager.shared.selectedStorageOption == "" {
+            DiskDataManager.shared.selectedStorageOption = "/Volumes/llimager/lldata"
+        }
+    }
             
-    } // here closes ZStack
-        
-//    }
-//
-//}
+    }
 
 #Preview {
     Imaging4RevView(onProcess: {}, onModify: {}, onCancel: {}

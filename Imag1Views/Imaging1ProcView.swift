@@ -13,6 +13,8 @@ struct Imaging1ProcView: View {
     @ObservedObject var diskDataManager = DiskDataManager()
     @ObservedObject var timer = ElapsedTimeTimer()
     @ObservedObject var dmgtimer = ElapsedTimeTimer()
+    @ObservedObject var hviewModel = HashingViewModel()
+    
     @State private var caseName: String = ""
     @State private var evidenceName: String = ""
     @State private var agentName: String = ""
@@ -45,8 +47,9 @@ struct Imaging1ProcView: View {
     @State var maxValue: CGFloat = 0.7
     @State var currentValue: CGFloat = 0.6
     @State var percentage: CGFloat = 0.6
-//    @State private var issparseMounted = false
     @State private var logfilePath: String = ""
+    @State private var logfilePathEx: String = ""
+//    @State private var issparseMounted = false
     @StateObject private var fileSizeChecker = FileSizeChecker()
     @StateObject private var fileSizeChecker2 = FileSizeChecker()
     @ObservedObject private var fileSizeChecker3 = FileSizeChecker3()
@@ -90,10 +93,13 @@ struct Imaging1ProcView: View {
                             
                             let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
                             print("LogfilePath: \(logfilePath)")
+                            logfilePathEx = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).LLeX"
                             
                             print("passw capt: \(AuthenticationViewModel.shared.rootPassword)")
                             acqlogHeader(filePath: logfilePath)
+                            acqlogHeader(filePath: logfilePathEx)
                             acqlogDeviceInfo(filePath: logfilePath)
+                            acqlogDeviceInfo(filePath: logfilePathEx)
                             acqlogDiskInfo(filePath: logfilePath)
                             sparseImagefullProcess()
                             print("after fullprocess--- END")
@@ -119,10 +125,10 @@ struct Imaging1ProcView: View {
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
 //                        .italic() 
                         .foregroundColor(.blue) // Set the text color
-                        .frame(width: 800, height: 140, alignment: .leading)
+                        .frame(width: 840, height: 140, alignment: .leading)
                         .padding(5)
-                        .background(Color("LL_blue").opacity(0.5)) // Set the background color
-                        .cornerRadius(14)
+                        .background(Color("LL_blue")) // .opacity(0.5)) // Set the background color
+                        .cornerRadius(10)
                     
                 }
                 .frame(width: 860, height: 170)
@@ -271,7 +277,7 @@ struct Imaging1ProcView: View {
         showProc = true
         anyprocIsRunning = true
         titleImgSize = "Temp Size Collection"
-        titleGauge = "% Sparse vs Total Disk"
+        titleGauge = "% Data vs Total Disk"
         // create sparse container
         sviewModel.output=createSparseContainer()
         print(sviewModel.output)
@@ -293,6 +299,8 @@ struct Imaging1ProcView: View {
         // Sparse Creation
         createsparseImage ()
         
+        print2Log(filePath: logfilePathEx, text2p: "Sparse Image process------------------------------------\n")
+        print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
         print("3rd process (create sparse Image) done....")
         
         // DMG creation
@@ -301,6 +309,9 @@ struct Imaging1ProcView: View {
             titleImgSize = "Creating DMG"
             titleGauge = "% DMG vs Total Disk"
             createdmgImage()
+            
+            print2Log(filePath: logfilePathEx, text2p: "Sparse Image process------------------------------------\n")
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             print("4th process (create dmg) done....")
         }
         else {
@@ -558,10 +569,10 @@ struct Imaging1ProcView: View {
         case "SHA256":
             print("switch case 256")
             let hash256 =
-            hashLargeFileSHA256 (filePath: pathFile)
+            hashLargeFileSHA256 (filePath: pathFile, viewModel: hviewModel)
             let hashTimeEnd = LLTimeManager.getCurrentTimeString()
             print2Log(filePath: logfilePath, text2p: "End time:       \(hashTimeEnd)")
-            print2Log(filePath: logfilePath, text2p: "SHA256 hash: \(String(describing: hash256)) \n")
+            print2Log(filePath: logfilePath, text2p: "SHA256 hash:    \(String(describing: hash256)) \n")
             
         case "SHA1":
             let hashsha1 =

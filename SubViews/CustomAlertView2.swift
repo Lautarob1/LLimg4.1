@@ -22,23 +22,23 @@ struct CustomAlertView2: View {
     
     var body: some View {
         VStack (spacing: 0) {
-            Spacer()
+//            Spacer()
             VStack (spacing: 0){
                 HStack {
                     Image(systemName: imageName)
                         .font(.largeTitle)
                         .foregroundColor(textColor)
-                        .padding(5)
+                        .padding(3)
                     Text(title)
                         .font(.system(size: fontSize1))
                         .foregroundColor(textColor)
                         .padding(.trailing, 5)
                 }
-                .padding(.vertical, 5)
+                .padding(.vertical, 2)
                 Text(message)
                     .font(.system(size: fontSize2))
                     .foregroundColor(textColor)
-                    .padding(3)
+                    .padding(.horizontal, 12)
                 
                 Button("OK") {
                     showAlert2 = false
@@ -47,9 +47,9 @@ struct CustomAlertView2: View {
                 .background(Color.blue)
                 .foregroundColor(.white)
                 .frame(width: 80)
-                .padding(5)
+                .padding(3)
             }
-            .frame(width: 320, height: 140)
+            .frame(width: 300, height: 120)
             .background(backgroundColor)
             .cornerRadius(20)
             .shadow(radius: 10)
@@ -65,7 +65,7 @@ struct CustomAlertView2: View {
         showAlert2: .constant(true),
                     imageName: "exclamationmark.triangle",
                     title: "Error",
-                    message: "Name is invalid! 🤔 ",
+                    message: "Name is invalid! a longer text will be seen as this ... more longer mo 🤔 ",
                     fontSize1: 20,
                     fontSize2: 14,
                     textColor: Color(.white),

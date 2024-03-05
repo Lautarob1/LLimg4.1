@@ -22,47 +22,7 @@ struct ImgInfoTgtView: View {
     var body: some View {
         
         VStack {
-            Text("Target files Information")
-                .font(.title)
-                .foregroundColor(Color("LL_blue"))
-            ZStack {
-                VStack {
-                    TextField("Enter image name", text: $imageName)
-                        .focused($nameFieldIsFocused)
-                        .border(isInputValid ? Color.clear : Color.red)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
-                    HStack {
-                        TgtSelectFFView()
-                    }
-                    HStack {
-                        FilePickerView(path2img: "path where image and temp files will be stored", butlabel: "Select..." ) { selectedPath in
-                            DiskDataManager.shared.selectedStorageOption = selectedPath}
-                    }  // Other UI elements
-                }
-                
-                if showCustomAlert {
-                    CustomAlertView2(
-                        showAlert2: $showCustomAlert,
-                        imageName: "exclamationmark.triangle",
-                        title: "Error",
-                        message: " 🤔 Invalid name! (It's blank or contains invalid chars)",
-                        fontSize1: 18,
-                        fontSize2: 12,
-                        textColor: Color(.white),
-                        backgroundColor: Color("LL_orange"),
-                        onDismiss: {
-                            nameFieldIsFocused = true
-                        })
-                    .offset(y: -150.0)
-                }
-            }
-            .onChange(of: nameFieldIsFocused) { isFocused in
-                if !isFocused {
-                    isInputValid = validateInput(name: imageName)
-                    showCustomAlert = !isInputValid
-                }
-            }
+
             VStack {
                 Text("Target files Information")
                     .font(.title)
@@ -88,23 +48,26 @@ struct ImgInfoTgtView: View {
                             showAlert2: $showCustomAlert,
                             imageName: "exclamationmark.triangle",
                             title: "Error",
-                            message: " 🤔 Invalid name! (It's blank or contains invalid chars)",
+                            message: " 🤔 Invalid image name! (It's blank or contains invalid chars)",
                             fontSize1: 18,
-                            fontSize2: 12,
+                            fontSize2: 11,
                             textColor: Color(.white),
                             backgroundColor: Color("LL_orange"),
                             onDismiss: {
                                 nameFieldIsFocused = true
                             })
-                        .offset(y: -150.0)
+                        .offset(y: -180.0)
                     }
                 }
-                .onChange(of: nameFieldIsFocused) { isFocused in
-                    if !isFocused {
-                        isInputValid = validateInput(name: imageName)
-                        showCustomAlert = !isInputValid
+                .onChange(of: imageName) { newValue in
+                        isInputValid = validateInput(name: newValue)
+                        if isInputValid {
+                            CaseInfoData.shared.imageName = newValue
+                        } else {
+                            showCustomAlert = true
+                            CaseInfoData.shared.imageName = "Image01"
+                        }
                     }
-                }
                 
                 VStack (alignment: .leading)
                 {

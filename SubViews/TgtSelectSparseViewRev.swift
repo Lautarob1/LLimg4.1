@@ -29,19 +29,19 @@ ScrollView {
                         HStack {
                             Text(file.path)
                                 .font(.caption)
-//                            Spacer()
-//                            Text("\(file.size) bytes")
-//                                .font(.caption)
+                            Spacer()
+                            Text("\(file.size) bytes")
+                                .font(.caption)
                         }
                     }
                     Spacer()
-//                    HStack {
-//                          Text("Total Size")
-//                            .font(.caption)
-//                          Spacer()
-//                          Text("\(FileSelectionManager.shared.totalSize) bytes")
-//                            .font(.caption)
-//                      }
+                    HStack {
+                          Text("Total Size")
+                            .font(.caption)
+                          Spacer()
+                          Text("\(FileSelectionManager.shared.totalSize) bytes")
+                            .font(.caption)
+                      }
                 }
 
             }

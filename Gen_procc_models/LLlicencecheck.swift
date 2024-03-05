@@ -54,13 +54,16 @@ func verifyHMAC(_ mac: Data, authenticating data: Data, using key: Data) -> Bool
 
 func licenseFile()  -> String {
     let filePath = "/Volumes/LLimager-Int/LLimager/llimager.lic"
-//    let filePath = "/Users/efi-admin/Desktop/llimager.lic"
     var fileContents: String = ""
     do {
         fileContents = try String(contentsOf: URL(fileURLWithPath: filePath), encoding: .utf8)
+        AuthenticationViewModel.shared.licenseFileFound = true
+        print("After read file \(AuthenticationViewModel.shared.licenseFileFound)")
         // Now fileContents contains the text of your file
     } catch {
-        return("Error reading file: \(error)")
+        print("in catch -no file found- \(AuthenticationViewModel.shared.licenseFileFound)")
+        fileContents = "Error reading file: \(error.localizedDescription)"
+//        return("Error reading file: \(error)")
     }
 //    print("From licenseFile func: \(fileContents)")
     return fileContents
@@ -78,26 +81,31 @@ func readLicense() -> String {
 //let fernetToken = Data(base64URL: "gAAAAABlczTRHJwJHsiDH3-QwuXHXQoTDK8IgEcW96rnnt-t82ZHrWQ1wYgD0J4fjQp5vf-HZGLxvC6hghEPLoCTO3gF-3o5pc5CZcXjzaLoPQwh0bUI4P4_FKNYB236JVJlFBEIgjBaTuNvcm2Mf8u31UUWkBe5oQ==")!
 //    print("before call the licenseFile func....")
     licenceFileCont = licenseFile()
-//    print("LicenseFileCont as return of func \n \(licenceFileCont)")
-    let fernetToken = Data(base64URL: licenceFileCont)!
-//    print("fernettoken: \(fernetToken)")
-//let fernetToken = Data(base64URL: "gAAAAABlczTRHJwJHsiDH3-QwuXHXQoTDK8IgEcW96rnnt-t82ZHrWQ1wYgD0J4fjQp5vf-HZGLxvC6hghEPLoCTO3gF-3o5pc5CZcXjzaLoPQwh0bUI4P4_FKNYB236JVJlFBEIgjBaTuNvcm2Mf8u31UUWkBe5oQ==")!
-    
-//    gAAAAABlczTRHJwJHsiDH3-QwuXHXQoTDK8IgEcW96rnnt-t82ZHrWQ1wYgD0J4fjQp5vf-HZGLxvC6hghEPLoCTO3gF-3o5pc5CZcXjzaLoPQwh0bUI4P4_FKNYB236JVJlFBEIgjBaTuNvcm2Mf8u31UUWkBe5oQ==
-    
-//    gAAAAABlczTRHJwJHsiDH3-QwuXHXQoTDK8IgEcW96rnnt-t82ZHrWQ1wYgD0J4fjQp5vf-HZGLxvC6hghEPLoCTO3gF-3o5pc5CZcXjzaLoPQwh0bUI4P4_FKNYB236JVJlFBEIgjBaTuNvcm2Mf8u31UUWkBe5oQ==
-    
-    let version     = Data([fernetToken[0]])
-    let timestamp   = fernetToken[1 ..< 9]
-    let iv          = fernetToken[9 ..< 25]
-    let ciphertext  = fernetToken[25 ..< fernetToken.count - 32]
-    let hmac        = fernetToken[fernetToken.count - 32 ..< fernetToken.count]
-
-    let plainText = decrypt(ciphertext: ciphertext, key: cryptoKey, iv: iv)
-//    print(plainText, String(data: plainText, encoding: .utf8) ?? "Non utf8")
-//    print(verifyHMAC(hmac, authenticating: version + timestamp + iv + ciphertext, using: signingKey))
-    return String(data: plainText, encoding: .utf8) ?? "Non utf8"
-
+    if !licenceFileCont.contains("Error reading file:") {
+        //    print("LicenseFileCont as return of func \n \(licenceFileCont)")
+        let fernetToken = Data(base64URL: licenceFileCont)!
+        //    print("fernettoken: \(fernetToken)")
+        //let fernetToken = Data(base64URL: "gAAAAABlczTRHJwJHsiDH3-QwuXHXQoTDK8IgEcW96rnnt-t82ZHrWQ1wYgD0J4fjQp5vf-HZGLxvC6hghEPLoCTO3gF-3o5pc5CZcXjzaLoPQwh0bUI4P4_FKNYB236JVJlFBEIgjBaTuNvcm2Mf8u31UUWkBe5oQ==")!
+        
+        //    gAAAAABlczTRHJwJHsiDH3-QwuXHXQoTDK8IgEcW96rnnt-t82ZHrWQ1wYgD0J4fjQp5vf-HZGLxvC6hghEPLoCTO3gF-3o5pc5CZcXjzaLoPQwh0bUI4P4_FKNYB236JVJlFBEIgjBaTuNvcm2Mf8u31UUWkBe5oQ==
+        
+        //    gAAAAABlczTRHJwJHsiDH3-QwuXHXQoTDK8IgEcW96rnnt-t82ZHrWQ1wYgD0J4fjQp5vf-HZGLxvC6hghEPLoCTO3gF-3o5pc5CZcXjzaLoPQwh0bUI4P4_FKNYB236JVJlFBEIgjBaTuNvcm2Mf8u31UUWkBe5oQ==
+        
+        let version     = Data([fernetToken[0]])
+        let timestamp   = fernetToken[1 ..< 9]
+        let iv          = fernetToken[9 ..< 25]
+        let ciphertext  = fernetToken[25 ..< fernetToken.count - 32]
+        let hmac        = fernetToken[fernetToken.count - 32 ..< fernetToken.count]
+        
+        let plainText = decrypt(ciphertext: ciphertext, key: cryptoKey, iv: iv)
+        //    print(plainText, String(data: plainText, encoding: .utf8) ?? "Non utf8")
+        //    print(verifyHMAC(hmac, authenticating: version + timestamp + iv + ciphertext, using: signingKey))
+        return String(data: plainText, encoding: .utf8) ?? "Non utf8"
+    }
+    else {
+        
+        return "No License File found"
+    }
 }
 
 func checkLicense (dateRef: String) -> String {

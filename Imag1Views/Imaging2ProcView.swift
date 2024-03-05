@@ -16,6 +16,7 @@ struct Imaging2ProcView: View {
     @ObservedObject var diskDataManager = DiskDataManager()
     @ObservedObject var timer = ElapsedTimeTimer()
     @ObservedObject var dmgtimer = ElapsedTimeTimer()
+    @ObservedObject var hviewModel = HashingViewModel()
     @State private var caseName: String = ""
     @State private var evidenceName: String = ""
     @State private var agentName: String = ""
@@ -60,6 +61,7 @@ struct Imaging2ProcView: View {
     @State var maxValue: CGFloat = 0.7
     @State var currentValue: CGFloat = 0.6
     @State var percentage: CGFloat = 0.6
+    @State var endMessage: String = "All Completed!"
     let procStep = ["Colecting and processing information...", "Creating DMG...", "Hashing DMG...", "Processing Fineshed"]
     let timerGauge = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     @State var timerGauge2: Timer?
@@ -132,9 +134,9 @@ struct Imaging2ProcView: View {
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
 //                        .italic() 
                         .foregroundColor(.blue) // Set the text color
-                        .frame(width: 800, height: 150, alignment: .leading)
+                        .frame(width: 840, height: 150, alignment: .leading)
                         .padding(5)
-                        .background(Color("LL_blue").opacity(0.5)) // Set the background color
+                        .background(Color("LL_blue")) // .opacity(0.5) Set the background color
                         .cornerRadius(14)
                     
                 }
@@ -246,7 +248,7 @@ struct Imaging2ProcView: View {
                                 // Content of the third VStack
                                 CustomProgressView(scale: 3, color: .blue, backgroundColor: .clear, currrentValue: fileSizeChecker3.fileSizeInGB)
                             } else {
-                                Text("All Completed!")
+                                Text(endMessage)
                                     .font(.system(size: 24, weight: .medium, design: .default))
                                     .foregroundColor(.white)
                             }
@@ -288,33 +290,29 @@ struct Imaging2ProcView: View {
         showProc = true
         anyprocIsRunning = true
         titleImgSize = "Temp Size Collection"
-        titleGauge = "% Image vs Total Disk"
-        if !FileSelectionManager.shared.exceedTimeLimit {
-            maxValue = CGFloat(FileSelectionManager.shared.totalSize / 1000)
-            currentValue = 0.0
-        } else {
-            print("exceedTimeLimit -> true, max to be estimated")
-            maxValue = 470.0 // whole disk size?
-        }
-        print("Gauge max value: \(maxValue)")
-//        let logfilePathEx = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).LLeX"
+        titleGauge = "% Image vs Disk Size"
+//        DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).LLeX"
         print("log path for file eX: \(logfilePathEx)")
         // create sparse container for Logical file
         sviewModel.output=createSparseContainer()
         print2Log(filePath: logfilePathEx, text2p: "Temp and collec process-------------------------------\n")
-        print(sviewModel.output)
+//        print(sviewModel.output)
         print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
         if  sviewModel.output.contains("failed") {
-            sviewModel.output="Creating container for sparse fails"
+            sviewModel.output="Creating container for sparse fails. The processing cannot continue. Press esc to return to main menu"
+            endMessage = "Process Fail!"
+            timer.stopTimer()
             return
         }
         // Mount sparse container
         print("1st process (create sparse Container), done....")
         sviewModel.output=mountsparseContanier()
         print(sviewModel.output)
-        print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+//        print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
         if  sviewModel.output.contains("failed") {
             sviewModel.output="Container was not mounted. The processing cannot continue. Press esc to return to main menu"
+            endMessage = "Process Fail!"
+            timer.stopTimer()
             return
         }
         
@@ -372,7 +370,6 @@ struct Imaging2ProcView: View {
         logicImgSize[0] = sparseSize
         FileSizeChecker3.shared.fileSizeInGB = fileSizeChecker3.fileSizeInGB
 //        currentValue = fileSizeChecker3.fileSizeInGB
-        print("Gauge current value before copyfFlog: \(currentValue)")
         copyFFLog()
         print("after copyFFLog...")
     }
@@ -620,24 +617,24 @@ struct Imaging2ProcView: View {
         let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
         print2Log(filePath: logfilePath, text2p: "Hash DMG image process -------------\n")
         let hashTimeIni = LLTimeManager.getCurrentTimeString()
-        print2Log(filePath: logfilePath, text2p: "Start time:     \(hashTimeIni)")
- 
+        print2Log(filePath: logfilePath, text2p: "Start time:        \(hashTimeIni)")
+   
         
         switch DiskDataManager.shared.selectedHashOption {
         case "SHA256":
             print("switch case 256")
             let hash256 =
-            hashLargeFileSHA256 (filePath: pathFile)
+            hashLargeFileSHA256 (filePath: pathFile, viewModel: hviewModel)
             let hashTimeEnd = LLTimeManager.getCurrentTimeString()
             print2Log(filePath: logfilePath, text2p: "End time:       \(hashTimeEnd)")
-            print2Log(filePath: logfilePath, text2p: "SHA256 value: \(String(describing: hash256)) \n")
+            print2Log(filePath: logfilePath, text2p: "SHA256 value:   \(String(describing: hash256)) \n")
             
         case "SHA1":
             let hashsha1 =
             hashLargeFileSHA1(filePath: pathFile)
             let hashTimeEnd = LLTimeManager.getCurrentTimeString()
             print2Log(filePath: logfilePath, text2p: "End time:       \(hashTimeEnd)")
-            print2Log(filePath: logfilePath, text2p: "SHA1 value: \(String(describing: hashsha1)) \n")
+            print2Log(filePath: logfilePath, text2p: "SHA1 value:    \(String(describing: hashsha1)) \n")
             
         case "MD5":
             let hashMD5 =
@@ -659,31 +656,31 @@ struct Imaging2ProcView: View {
         print2Log(filePath: logfilePath, text2p: "No hash calculation selected")
     }
     
-    private func setupTimer() {
-        print("setup timer for gauge")
-        timerGauge2 = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-                self.updateSizeForGauge()
-            }
-        }
+//    private func setupTimer() {
+//        print("setup timer for gauge")
+//        timerGauge2 = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+//                self.updateSizeForGauge()
+//            }
+//        }
     
-    func updateSizeForGauge() {
-        fileUpdCounter += 1
-        print("in updateSize4G count: \(fileUpdCounter)")
-        print("in updateSize4G entering fSChecker3: \(fileSizeChecker3.fileSizeInGB)")
-        print("in updateSize4G -> maxValue: \(self.maxValue) ")
-        print("in updateSize4G -> currentValue: \(self.currentValue) ")
-        if currentValue < maxValue {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            print("inside updateSize4G in dispatch fSChecker3: \(fileSizeChecker3.fileSizeInGB)")
-                currentValue = fileSizeChecker3.fileSizeInGB
-                print("currentValue inside update being updated \(self.currentValue)")
-            }
-        } else {
-                            self.timerGauge2?.invalidate()
-                            self.timerGauge2 = nil
-            }
-
-    }
+//    func updateSizeForGauge() {
+//        fileUpdCounter += 1
+//        print("in updateSize4G count: \(fileUpdCounter)")
+//        print("in updateSize4G entering fSChecker3: \(fileSizeChecker3.fileSizeInGB)")
+//        print("in updateSize4G -> maxValue: \(self.maxValue) ")
+//        print("in updateSize4G -> currentValue: \(self.currentValue) ")
+//        if currentValue < maxValue {
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+//            print("inside updateSize4G in dispatch fSChecker3: \(fileSizeChecker3.fileSizeInGB)")
+//                currentValue = fileSizeChecker3.fileSizeInGB
+//                print("currentValue inside update being updated \(self.currentValue)")
+//            }
+//        } else {
+//                            self.timerGauge2?.invalidate()
+//                            self.timerGauge2 = nil
+//            }
+//
+//    }
      
 }
 

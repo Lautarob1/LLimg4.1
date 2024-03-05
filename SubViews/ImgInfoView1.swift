@@ -77,7 +77,7 @@ struct ImgInfoView1: View {
                             onDismiss: {
                                     nameFieldIsFocused = true
                                     })
-                        .offset(y: -150.0)
+                        .offset(y: -140.0)
                     }
                 }
                 .onChange(of: imageName) { newValue in

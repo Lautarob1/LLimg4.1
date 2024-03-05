@@ -16,6 +16,7 @@ struct Imaging3ProcView: View {
     @ObservedObject var diskDataManager = DiskDataManager()
     @ObservedObject var timer = ElapsedTimeTimer()
     @ObservedObject var dmgtimer = ElapsedTimeTimer()
+    @ObservedObject var hviewModel = HashingViewModel()
     @State private var caseName: String = ""
     @State private var evidenceName: String = ""
     @State private var agentName: String = ""
@@ -424,18 +425,7 @@ struct Imaging3ProcView: View {
 //        }
 //    }
  
-//    func copyFFLog() {
-//        print("entering F&Flds log, path for log file")
-//        print(DiskDataManager.shared.selectedStorageOption)
-//        print(CaseInfoData.shared.imgfilePath)
-////        let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
-//        print("logfilePath: \(logfilePath)")
-//        print2Log(filePath: logfilePath, text2p: "Extract process --------------------\n")
-//        print2Log(filePath: logfilePath, text2p: "Start time:     \(sparseTimeIni)")
-//        print2Log(filePath: logfilePath, text2p: "End time:       \(sparseTimeEnd)")
-//        print2Log(filePath: logfilePath, text2p: "Image size:     \(sparseSize)\n")
-//        print("leaving F&Flds log")
-//    }
+
     
     func dmgLog() {
         print("entering Tgt dmg log, path for log file:")
@@ -455,8 +445,7 @@ struct Imaging3ProcView: View {
         print("inside createdmgImage...")
         let fullimagePath = fileSizeChecker3.filePath ?? defaultImagePath
         print("fileSizechecker3.filePath: \(String(describing: fileSizeChecker3.filePath))")
-//        let isMounted = isSparseImageMounted(imagePath: fullimagePath)
-//        print(isMounted ? "Image is mounted" : "Image is not mounted")
+
         let hdiInfo = loaddhiutilInfo()
         guard let devDiskMt = extractDiskIdentifier2(from: hdiInfo, imagePath: fullimagePath) else {
             print("error in dsk id for")
@@ -535,7 +524,7 @@ struct Imaging3ProcView: View {
         case "SHA256":
             print("switch case 256")
             let hash256 =
-            hashLargeFileSHA256 (filePath: pathFile)
+            hashLargeFileSHA256 (filePath: pathFile, viewModel: hviewModel)
             let hashTimeEnd = LLTimeManager.getCurrentTimeString()
             print2Log(filePath: logfilePath, text2p: "End time:       \(hashTimeEnd)")
             print2Log(filePath: logfilePath, text2p: "SHA256 hash value: \(String(describing: hash256)) \n")

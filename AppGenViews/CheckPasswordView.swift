@@ -92,7 +92,9 @@ struct CheckPasswordView: View {
             }
             if !authModel.isLicenseValid {
                 showAlert = true
-                alertMessage = "No Valid license file detected. Access denied. The app will now quit. You should run it again once you have a valid file license on the required path (please check the app Manual)"
+//                print(AuthenticationViewModel.shared.licenseFileFound)
+                authModel.licenseMessage = AuthenticationViewModel.shared.licenseFileFound ? "License Expired" : "No License File found"
+                alertMessage = "\(authModel.licenseMessage). Access denied. The app will now quit. You should run it again once you have a valid file license on the required path (please check the app Manual)"
             }
             
         }
@@ -128,7 +130,7 @@ struct CheckPasswordView: View {
                     print("showAlert final: \(showAlert)")
                     // Additional logic to handle max attempts reached
                 } else {
-                    alertMessage = "Incorrect password. Please try again. You have \(String(3 - passwordAttempts)) attemp(s) left"
+                    alertMessage = "Incorrect password. Please try again. You have \(String(3 - passwordAttempts)) attempt(s) left"
                     showAlert = true
                     print("showAlert <=3: \(showAlert)")
                 }

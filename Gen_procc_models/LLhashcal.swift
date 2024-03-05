@@ -8,6 +8,13 @@
 import Foundation
 import CommonCrypto
 
+
+class HashingViewModel: ObservableObject {
+    @Published var hashProgressPct: Double = 0.0
+    @Published var hashProgressByt: Double = 0.0
+    // Other properties and methods...
+}
+
 func calculateMD5Hash(for filePath: String) -> String? {
     guard let fileData = try? Data(contentsOf: URL(fileURLWithPath: filePath)) else {
         print("Could not read file data")
@@ -112,31 +119,39 @@ func hashLargeFileSHA1(filePath: String) -> String? {
 
 
 
-func hashLargeFileSHA256(filePath: String) -> String {
+func hashLargeFileSHA256(filePath: String, viewModel: HashingViewModel) -> String {
     print("entering in hash 256 lg files func...")
     let bufferSize = 1024 * 1024 // 1 MB
+    let fileAttributes = try? FileManager.default.attributesOfItem(atPath: filePath)
+    let fileSize = fileAttributes?[.size] as? UInt64 ?? 0
+    var totalBytesRead: UInt64 = 0
     guard let file = FileHandle(forReadingAtPath: filePath) else { return "no file to process => nulo"}
     defer { file.closeFile() }
-
     var context = CC_SHA256_CTX()
     CC_SHA256_Init(&context)
-
     while autoreleasepool(invoking: {
         let data = file.readData(ofLength: bufferSize)
         if data.count > 0 {
             data.withUnsafeBytes { buffer in
                 _ = CC_SHA256_Update(&context, buffer.baseAddress, CC_LONG(data.count))
             }
+            totalBytesRead += UInt64(data.count)
+            print(Double(totalBytesRead))
+            DispatchQueue.main.async {
+                viewModel.hashProgressPct = Double(totalBytesRead) / Double(fileSize)
+                viewModel.hashProgressByt = Double(totalBytesRead)
+                print(viewModel.hashProgressByt)
+                print(viewModel.hashProgressPct)
+                
+            }
             return true // Continue
         } else {
             return false // End of file
         }
     }) {}
-
     var digest = Data(count: Int(CC_SHA256_DIGEST_LENGTH))
     digest.withUnsafeMutableBytes { buffer in
         _ = CC_SHA256_Final(buffer.bindMemory(to: UInt8.self).baseAddress, &context)
     }
-
     return digest.map { String(format: "%02hhx", $0) }.joined()
 }

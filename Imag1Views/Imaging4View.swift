@@ -45,7 +45,7 @@ struct Imaging4View: View {
             .padding(7)
             .background()
             VStack {
-                ImgInfoTgtView()
+                ImgInfoHashView()
             HStack {
                     Button(action: {
                         onReview()

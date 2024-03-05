@@ -11,9 +11,8 @@ struct TgtSelect4HashView: View {
     @State private var filePath: String = ""
     @State private var selectedItems = Set<UUID>()
     @ObservedObject private var fileSelectionManager = FileSelectionManager()
-    @State private var stillWorking = false
+//    @State private var stillWorking = false
     let path2img: String = "Targeted hash file/Image"
-//    let butlabel: String = (stillWorking ? "Working on it" : "Select Files/Folders")
     
     var body: some View {
         VStack {
@@ -33,19 +32,18 @@ struct TgtSelect4HashView: View {
                     if openPanel.runModal() == .OK {
    
                         openPanel.urls.forEach { url in
-                            fileSelectionManager.addFileFolder(path: url.path)
-                            FileSelectionManager.shared.addFileFolder(path: url.path)
+                            fileSelectionManager.addFile(path: url.path)
+                            FileSelectionManager.shared.addFile(path: url.path)
  
                         }
                     }
                     
                 })
                 {
-                    Text(stillWorking ? "Working on it" : "Select File to Hash")
+                    Text("Choose File to Hash")
 
                       
                 }
-                .disabled(stillWorking)
                 .frame(width:140, height: 25)
     
 
@@ -57,22 +55,22 @@ struct TgtSelect4HashView: View {
 
 
             List(selection: $selectedItems) {
-                ForEach(FileSelectionManager.shared.selectedFiFo, id: \.id) { file in
+                ForEach(FileSelectionManager.shared.selectedFiles, id: \.id) { file in
                     HStack {
                         Text(file.path)
                             .font(.subheadline)
-//                        Spacer()
-//                        Text("\(file.size) bytes")
-//                            .font(.caption)
+                        Spacer()
+                        Text("\(file.size) bytes")
+                            .font(.caption)
                     }
                 }
-//                HStack {
-//                    Text("Total Size")
-//                        .font(.caption)
-//                    Spacer()
-//                    Text("\(FileSelectionManager.shared.totalSize) bytes")
-//                        .font(.caption)
-//                }
+                HStack {
+                    Text("Total Size")
+                        .font(.caption)
+                    Spacer()
+                    Text("\(FileSelectionManager.shared.totalSize) bytes")
+                        .font(.caption)
+                }
     }
 //    .listStyle(SidebarListStyle())
 

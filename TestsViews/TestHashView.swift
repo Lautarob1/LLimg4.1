@@ -10,6 +10,7 @@ import SwiftUI
 struct TestHashView: View {
     @State private var calcHash: String = "calc hash"
     @State private var pathFile: String = ""
+    @ObservedObject var hviewModel = HashingViewModel()
     
    
     var body: some View {
@@ -55,7 +56,7 @@ struct TestHashView: View {
                 Button("Calculate SHA256") {
                     print("SHA256 button")
                     pathFile = "/Volumes/llidata/test01a.info"
-                    let sha256Hash = hashLargeFileSHA256(filePath: pathFile)
+                    let sha256Hash = hashLargeFileSHA256(filePath: pathFile, viewModel: hviewModel)
                         print("SHA256 Hash: \(sha256Hash)")
                         calcHash = "SHA256 Hash: \(sha256Hash)"
                     }

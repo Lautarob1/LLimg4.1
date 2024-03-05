@@ -360,12 +360,46 @@ class FileSizeChecker3: ObservableObject {
     }
 }
 
+
+class TimerHash: ObservableObject {
+    @Published var timeElapsedFormatted = "00:00:00"
+    private var secondsElapsed = 0
+    var timer: Timer?
+
+    func start() {
+        timer?.invalidate() // Invalidate any existing timer
+        secondsElapsed = 0 // Reset the timer
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            DispatchQueue.main.async {
+                self?.secondsElapsed += 1
+                self?.timeElapsedFormatted = self?.formatElapsedTime() ?? "00:00:00"
+            }
+        }
+    }
+
+    func stop() {
+        timer?.invalidate()
+    }
+
+    private func formatElapsedTime() -> String {
+        let hours = secondsElapsed / 3600
+        let minutes = (secondsElapsed % 3600) / 60
+        let seconds = secondsElapsed % 60
+        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+}
+
+
+
     class ElapsedTimeTimer: ObservableObject {
         @Published var elapsedTimeString: String = "00:00:00"
         private var timer: Timer?
         private var startTime: Date?
         
-        
+//        timer?.invalidate() // Invalidate any existing timer
+//                timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+//                    DispatchQueue.main.async {
+//                        self?.secondsElapsed += 1
         func startTimer() {
             startTime = Date()
             timer?.invalidate()  // Stop any existing timer
