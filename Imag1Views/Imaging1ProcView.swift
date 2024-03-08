@@ -53,7 +53,12 @@ struct Imaging1ProcView: View {
     @StateObject private var fileSizeChecker = FileSizeChecker()
     @StateObject private var fileSizeChecker2 = FileSizeChecker()
     @ObservedObject private var fileSizeChecker3 = FileSizeChecker3()
-    let procStep = ["Processing Sparse...", "Creating DMG...", "Hashing DMG...", "Processing Fineshed"]
+    let procStep = ["Processing Sparse...", "Creating DMG...", "Hashing DMG...", "Processing Finished", "Error Ocurred"]
+    @State var alertMsg: String = ""
+    @State var alertTitle: String = ""
+    @State var showCustomAlert: Bool = false
+//    var onOK: () -> Void
+    @State var messageBelowTimer: String = ""
     let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color.gray]),
                       startPoint: .top,
                       endPoint: .bottom)
@@ -94,15 +99,25 @@ struct Imaging1ProcView: View {
                             let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
                             print("LogfilePath: \(logfilePath)")
                             logfilePathEx = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).LLeX"
-                            
-                            print("passw capt: \(AuthenticationViewModel.shared.rootPassword)")
+
                             acqlogHeader(filePath: logfilePath)
                             acqlogHeader(filePath: logfilePathEx)
                             acqlogDeviceInfo(filePath: logfilePath)
                             acqlogDeviceInfo(filePath: logfilePathEx)
                             acqlogDiskInfo(filePath: logfilePath)
                             sparseImagefullProcess()
-                            print("after fullprocess--- END")
+                            if alertMsg == "" {
+                                print("after fullprocess--- END")
+                                imageName = "info.circle.fill"
+                                alertTitle = "😀"
+                                alertMsg = "Process finished, press Done Button or esc to return to main menu"
+                                messageBelowTimer = "All Completed!"
+                                stepIndex = 3
+                            }
+                            showCustomAlert = true
+                            anyprocIsRunning = false
+                            showDoneButton = true
+                            
                         }) {
                             Text("Click to start process")
                                 .font(.custom("Helvetica Neue", size: 16))
@@ -113,7 +128,7 @@ struct Imaging1ProcView: View {
                                 .padding(1)
                         }
                     }
-                    
+                   
                     .onAppear {
                         animateArrow = true
                     }
@@ -236,7 +251,7 @@ struct Imaging1ProcView: View {
                                 // Content of the third VStack
                                 CustomProgressView(scale: 2, color: .blue, backgroundColor: .clear, currrentValue: fileSizeChecker3.fileSizeInGB)
                             } else {
-                                Text("All Completed!")
+                                Text(messageBelowTimer)
                                     .font(.system(size: 24, weight: .medium, design: .default))
                                     .foregroundColor(.white)
                             }
@@ -248,8 +263,27 @@ struct Imaging1ProcView: View {
                     }
                     
                 }
+                .overlay (
+                    Group {if showCustomAlert {
+                        CustomAlertView(
+                            showAlert: $showCustomAlert,
+                            imageName: imageName,
+                            title: alertTitle,
+                            message: alertMsg,
+                            fontSize1: 16,
+                            fontSize2: 12,
+                            textColor: Color(.white),
+                            backgroundColor: Color("LL_blue")
+//                            onOK: {
+//                                print("hola")
+//                            }
+                        )
+                        .offset(y: -100.0)
+                    }
+                    }
+                )
             }
-
+ 
 
                 Button(action: {
                     onComplete()
@@ -266,6 +300,7 @@ struct Imaging1ProcView: View {
                 }
                 Spacer()
             }
+            .buttonStyle(PlainButtonStyle())
             .frame(width: 880, height: 520)
             .padding(5)
         }
@@ -282,14 +317,26 @@ struct Imaging1ProcView: View {
         sviewModel.output=createSparseContainer()
         print(sviewModel.output)
         if  sviewModel.output.contains("failed") {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             sviewModel.output="Creating container for sparse fails. The processing cannot continue. Press esc to return to main menu"
+            return
+        }
+        if  sviewModel.output.contains("Sorry, try again") {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+            sviewModel.output="Creating container for sparse fails. The processing cannot continue. Press esc to return to main menu"
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "😬"
+            alertMsg = "The sparse container could not be created due to a password failure"
+            stepIndex = 4
+
             return
         }
         // Mount sparse container
         print("1st process (create sparse Container), done....")
         sviewModel.output=mountsparseContanier()
-        print(sviewModel.output)
+//        print(sviewModel.output)
         if  sviewModel.output.contains("failed") {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             sviewModel.output="Container was not mounted and that is required to continue... Press esc to return to main menu"
             return
         }
@@ -299,7 +346,7 @@ struct Imaging1ProcView: View {
         // Sparse Creation
         createsparseImage ()
         
-        print2Log(filePath: logfilePathEx, text2p: "Sparse Image process------------------------------------\n")
+        print2Log(filePath: logfilePathEx, text2p: "Sparse Image process------------------------------------------------\n")
         print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
         print("3rd process (create sparse Image) done....")
         
@@ -310,7 +357,7 @@ struct Imaging1ProcView: View {
             titleGauge = "% DMG vs Total Disk"
             createdmgImage()
             
-            print2Log(filePath: logfilePathEx, text2p: "Sparse Image process------------------------------------\n")
+            print2Log(filePath: logfilePathEx, text2p: "DMG Image process------------------------------------------------\n")
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             print("4th process (create dmg) done....")
         }
@@ -319,8 +366,6 @@ struct Imaging1ProcView: View {
         }
         hashcalculations()
         print("5th process (hash calcs) done....")
-        anyprocIsRunning = false
-        showDoneButton = true
     }
     
     //  aux functions used
@@ -510,7 +555,7 @@ struct Imaging1ProcView: View {
             print("image still mounted after 2 attemps. Process canceled")
             return
         }
-        stepIndex += 1
+        stepIndex = 1
         let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
         let passw = AuthenticationViewModel.shared.rootPassword
         print("in dmg, logfilePath: \(logfilePath)")
@@ -550,7 +595,7 @@ struct Imaging1ProcView: View {
     
     func hashcalculations() {
         print("inside hashcalculations...")
-        stepIndex += 1
+        stepIndex = 2
         print("in hash calculations \(procStep[stepIndex])")
         let imgName = CaseInfoData.shared.imageName
         var pathFile = ""

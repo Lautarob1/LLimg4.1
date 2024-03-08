@@ -10,12 +10,21 @@ import SwiftUI
 struct ImgInfoView1: View {
     @ObservedObject private var diskDataManager = DiskDataManager.shared
     @ObservedObject private var caseInfoData = CaseInfoData.shared
-    @State private var imageName: String = ""
+//    @ObservedObject var validModel: ValidationViewModel
+    @State private var imageName: String = "AcqImage01"
+    @State private var path2img: String = "Select destination path"
+//    @State private var path2img: String = "/Volumes/llidata"
     @State private var selectedDskOption: String = ""
+    @State private var selectedPath2img: String = ""
+    @State private var alertMsgName: String = ""
+    @State private var alertMsgPath: String = ""
+    @State private var titleMsgName: String = ""
+    @State private var titleMsgPath: String = ""
     @State private var isliveimgChecked: Bool = true
     @State private var isViewPresented = false
     @State private var isChecked: Bool = true
     @State private var isInputValid: Bool = true
+    @State private var isPathValid: Bool = true
     @FocusState private var nameFieldIsFocused: Bool
     @State private var showCustomAlert: Bool = false
 
@@ -57,7 +66,7 @@ struct ImgInfoView1: View {
                         }
                     }
                     HStack {
-                        FilePickerView(path2img: "path where image will be stored", butlabel: "Select..." ) { selectedPath in
+                        FilePickerView(path2img: path2img, butlabel: "Select..." ) { selectedPath in
                             DiskDataManager.shared.selectedStorageOption = selectedPath}
                                             }
             
@@ -68,8 +77,8 @@ struct ImgInfoView1: View {
                         CustomAlertView2(
                             showAlert2: $showCustomAlert,
                             imageName: "exclamationmark.triangle",
-                            title: "🤔 Invalid name!",
-                            message: " (Name is blank or contains invalid chars)",
+                            title: "🤔 Invalid \(titleMsgName)  \(titleMsgPath)",
+                            message: " \(alertMsgName)\n \(alertMsgPath)",
                             fontSize1: 20,
                             fontSize2: 14,
                             textColor: Color(.white),
@@ -77,7 +86,7 @@ struct ImgInfoView1: View {
                             onDismiss: {
                                     nameFieldIsFocused = true
                                     })
-                        .offset(y: -140.0)
+                        .offset(y: -100.0)
                     }
                 }
                 .onChange(of: imageName) { newValue in
@@ -85,22 +94,13 @@ struct ImgInfoView1: View {
                         if isInputValid {
                             CaseInfoData.shared.imageName = newValue
                         } else {
+                            titleMsgName = "Name"
+                            alertMsgName = "Cannot be empty or contain special chars"
                             showCustomAlert = true
-                            CaseInfoData.shared.imageName = "Image01"
+                            CaseInfoData.shared.imageName = ""
                         }
                     }
-//                .onChange(of: nameFieldIsFocused) { isFocused in
-//                    if !isFocused {
-//                        isInputValid = validateInput(name: imageName)
-//                        showCustomAlert = !isInputValid
-//                        if isInputValid {
-//                            CaseInfoData.shared.imageName = imageName
-//                        }
-//                        else {
-//                            CaseInfoData.shared.imageName = "Image01"
-//                        }
-//                    }
-//                }               
+ 
                 HStack {
                     Text("Convert to DMG:")
                         .font(.headline)

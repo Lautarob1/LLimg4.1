@@ -8,6 +8,11 @@
 import SwiftUI
 
 struct HeaderView: View {
+    @State private var searchText = ""
+    @State private var isHoverAbout: Bool = false
+    @State private var isHoverManual: Bool = false
+    
+
     var body: some View {
         ZStack {
             Image("LLimager_Window2")
@@ -16,20 +21,89 @@ struct HeaderView: View {
                 .scaledToFit()
 
             // Alignment of the text
-            HStack (spacing: 50) {
-//                Spacer() // Pushes the text to the right
-                VStack {
-                    Spacer() // Pushes the text to the bottom
-                    Text("Version 4.0")
-                        .font(.headline)
-                        .foregroundColor(.black) // Change the color if needed
-//                        .padding([.bottom, .trailing], 20) // Adjust padding
-                        .frame(width: 300, alignment: .leading) // Set the frame width wider than the text
-                        .position(x: 430 + 150, y: 30)
+            HStack {
+            Spacer()
+                Text("Version 4.0")
+                    .font(.headline)
+                    .foregroundColor(.black)
+                    .frame(width: 300, alignment: .leading)
+//            Spacer()
+                HStack {
+                    ZStack {
+                        Button(action: showAbout) {
+                        Image(systemName: "person.fill.questionmark")
+                            .imageScale(.large)
+                            .foregroundColor(Color(.black))
+                            .font(.title)
+                            .background(Color("LL_orange"))
+                            }
+                        .buttonStyle(PlainButtonStyle())
+                    .background(Color("LL_orange"))
+                            .onHover(perform: { hovering in
+                                isHoverAbout = hovering
+                            })
+                        if isHoverAbout {
+                            Text("About us")
+                                .foregroundColor(.white)
+                        }
+                    }
+                    Spacer().frame(width: 30)
+                    ZStack {
+                        Button(action: showPDF) {
+                        Image(systemName: "book.pages.fill")
+                            .imageScale(.large)
+                            .foregroundColor(Color(.black))
+                            .font(.title)
+                            .background(Color("LL_orange"))
+
+                            }
+                        .buttonStyle(PlainButtonStyle())
+                        .background(Color("LL_orange"))
+                        .onHover(perform: { hovering in
+                            isHoverManual = hovering
+                        })
+                    if isHoverManual {
+                        Text("Manual")
+                            .foregroundColor(.white)
+                    }
+                        
+                    }
+                    Spacer().frame(width: 30)
                 }
+
+                
             }
         }
         .frame(width: 900, height: 60)
+    }
+    
+    func showPDF() {
+        let pdfPath = "/Volumes/llimager/llimager-manual.pdf"
+        let pdfUrl = URL(fileURLWithPath: pdfPath)
+            openPDFInNewWindow(url: pdfUrl)
+  
+    }
+    
+    func showAbout() {
+        let pdfPath = "/Volumes/llimager/AboutUS_draft_2BRevised.pdf"
+        let pdfUrl = URL(fileURLWithPath: pdfPath)
+            openPDFInNewWindow(url: pdfUrl)
+  
+    }
+    
+    func openPDFInNewWindow(url: URL) {
+        let pdfViewer = pdfViewerView(pdfURL: url)
+        let hostingView = NSHostingView(rootView: pdfViewer)
+        
+        let window = NSWindow(
+            contentRect: NSRect(x: 25, y: 25, width: 600, height: 600),
+            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            backing: .buffered, defer: false)
+        window.isReleasedWhenClosed = false
+        window.center()
+        window.setFrameAutosaveName("PDF Viewer")
+        window.contentView =  NSHostingView(rootView: pdfViewer)
+        window.makeKeyAndOrderFront(nil)
     }
 }
 

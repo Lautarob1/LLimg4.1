@@ -373,17 +373,7 @@ struct MenuView: View {
                     return AnyView(Text("No view to display for case 2"))
                 }
                 
-//                return AnyView(Text("Placeholder for case 2"))
-//            case 3:
-////                Imaging1View(onReview: {
-////                    self.showViews[1] = false // This will dismiss Imaging1View
-////                    self.showViewsRev[1] = true // This will show Imaging1View
-////                })
-//            case 4:
-////                Imaging1View(onReview: {
-////                    self.showViews[1] = false // This will dismiss Imaging1View
-////                    self.showViewsRev[1] = true // This will show Imaging1View
-////                })
+
                 
                 // Add more cases as needed for each index/view
             default:

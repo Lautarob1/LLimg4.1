@@ -60,6 +60,26 @@ struct testFuncView2: View {
     }
 }
 
+
+struct testFuncView3: View {
+    @State var output: String = "Test function for Path"
+    var body: some View {
+        VStack {
+            Text(output)
+            Button("Check Path") {
+                print("in validate path func")
+                output=String(validatePath(path: "/Volumes/llidata"))
+            }
+            RoundedRectangle(cornerRadius: /*@START_MENU_TOKEN@*/25.0/*@END_MENU_TOKEN@*/)
+                .fill(
+
+                    Color(#colorLiteral(red: 1, green: 0.5212053061, blue: 0.5, alpha: 1))
+                )
+                .frame(width: 150, height: 50)
+        }
+        .frame(width: 400, height: 300)
+    }
+}
 #Preview {
-    testFuncView2()
+    testFuncView3()
 }

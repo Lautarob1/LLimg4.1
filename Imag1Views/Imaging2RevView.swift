@@ -13,6 +13,9 @@ struct Imaging2RevView: View {
     @State private var isViewPresented = false
     @State private var isChecked: Bool = false
     @State private var showAlertSize: Bool = false
+    @State private var createImage: Bool = false
+    @State private var alertText1: String = ""
+    @State private var alertText2: String = ""
 //    @State private var destinationDisk: String
     var onProcess: () -> Void
     var onModify: () -> Void
@@ -89,38 +92,35 @@ struct Imaging2RevView: View {
                             .padding(3)
                     }
                 }
+                .buttonStyle(PlainButtonStyle())
                 .padding(.vertical, 15)
             }
-
+            .onAppear() {
+                let sourceDisk = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/")
+                let destinationDisk = DiskDataManager.shared.selectedStorageOption
+                let destDMGDisk = DiskDataManager.shared.selected2ndStorageOption
+                let imgName = validateInput(name: CaseInfoData.shared.imageName)
+                print("scr disk: \(sourceDisk )")
+                print("dst disk: \(destinationDisk)")
+                print("dst2 disk: \(destDMGDisk)")
+                print("name of image: \(CaseInfoData.shared.imageName)")
+                print("valid name?: \(imgName)")
+                let sizeNoOK = !isStorageSizeOK2 (sourceDisk: sourceDisk , destinationDisk: destinationDisk, destDMGDisk: destDMGDisk)
+                alertText1 = (sizeNoOK ? "😯 Not enough space in the destination disk for"  : "")
+                alertText2 = (imgName ? "" : "\n😳 Image Name invalid or empty")
+                if   sizeNoOK || !imgName {
+                    createImage = true
+                    showAlertSize = true
+                }
+            }
                 }
             }
  
         }
-        // show alert here
-//            if showAlertSize {
-//                CustomAlertView(
-//                    showAlert: $showAlertSize,
-//                    imageName: "exclamationmark.triangle",
-//                    title: "LLIMAGER Alert",
-//                    message: "Not enough space in the destination disk for the \(DiskDataManager.shared.selectedDskOption) image",
-//                    fontSize1: 14,
-//                    fontSize2: 12,
-//                    textColor: Color("LL_blue"),
-//                    backgroundColor: .white
-//                )
-//                .frame(width: 300, height: 250)
-//                .cornerRadius(15)
-//                .shadow(radius: 10)
-//                .opacity(showAlertSize ? 1 : 0) // Control visibility
-//                .animation(.easeInOut, value: showAlertSize)
-//             
-//            }
             
     } // here closes ZStack
         
-//    }
-//
-//}
+
 
 #Preview {
     Imaging2RevView(onProcess: {}, onModify: {}, onCancel: {}

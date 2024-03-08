@@ -10,13 +10,13 @@ import AppKit
 
 struct FilePickerView: View {
     @State private var filePath: String = ""
-    let path2img: String
+    @State var path2img: String
     let butlabel: String
     var onPathSelected: (String) -> Void
     
     var body: some View {
         HStack {
-            TextField(path2img, text: $filePath)
+            Text(path2img) //, text: $filePath)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .frame(width: 310, alignment: .leading)
                 .padding()
@@ -29,7 +29,8 @@ struct FilePickerView: View {
 
                 if openPanel.runModal() == .OK {
                     self.filePath = openPanel.url?.path ?? ""
-                    onPathSelected(self.filePath) 
+                    onPathSelected(self.filePath)
+                    path2img = self.filePath
                 }
             }
         }

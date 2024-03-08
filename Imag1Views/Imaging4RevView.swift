@@ -94,6 +94,7 @@ struct Imaging4RevView: View {
                             .padding(3)
                     }
                 }
+                .buttonStyle(PlainButtonStyle())
                 .padding(.vertical, 15)
             }
 

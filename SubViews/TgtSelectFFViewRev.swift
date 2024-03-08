@@ -17,7 +17,7 @@ struct TgtSelectFFViewRev: View {
 ScrollView {
             VStack {
                 HStack {
-                 Text("Files or Folders to be Acquired")
+                 Text("S O U R C E:")
                 .font(.headline)
                 .padding(.vertical, 5)
      

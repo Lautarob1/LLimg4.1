@@ -77,6 +77,7 @@ struct Imaging1View: View {
                             .padding(5)
                     }
                 }
+                .buttonStyle(PlainButtonStyle())
                 .padding()
             }
             .frame(width: 450, height: 600)

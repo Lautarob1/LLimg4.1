@@ -13,9 +13,12 @@ struct Imaging1RevView: View {
     @State private var isViewPresented = false
     @State private var isChecked: Bool = false
     @State private var showAlertSize: Bool = false
-    @State private var createImage: Bool = false
+    @State private var disableBCreateImg: Bool = false
+    @State private var validStorage: Bool = false
+    @State private var dupName: Bool = false
     @State private var alertText1: String = ""
     @State private var alertText2: String = ""
+    @State private var alertText3: String = ""
 //    @State private var destinationDisk: String
     var onProcess: () -> Void
     var onModify: () -> Void
@@ -71,12 +74,12 @@ struct Imaging1RevView: View {
                         Text("Create Image")
                             .font(.custom("Helvetica Neue", size: 14))
                             .frame(width: 100, height: 20)
-                            .foregroundColor(createImage ? Color.gray : Color.white)
+                            .foregroundColor(disableBCreateImg ? Color.gray : Color.white)
                             .background(Color.blue)
                             .cornerRadius(10)
                             .padding(3)
                     }
-                    .disabled(createImage)
+                    .disabled(disableBCreateImg)
                     Button(action: {
                         onModify()
                     }) {
@@ -87,27 +90,46 @@ struct Imaging1RevView: View {
                             .background(Color.blue)
                             .cornerRadius(10)
                             .padding(3)
+                            .border(Color.clear)
                     }
                 }
+                .buttonStyle(PlainButtonStyle())
                 .padding(.vertical, 15)
             }
             .onAppear() {
                 let sourceDisk = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/")
                 let destinationDisk = DiskDataManager.shared.selectedStorageOption
+                if validatePath(path: destinationDisk) {
                 let destDMGDisk = DiskDataManager.shared.selected2ndStorageOption
                 let imgName = validateInput(name: CaseInfoData.shared.imageName)
+                let destfullPathSp = destinationDisk + "/" + CaseInfoData.shared.imageName + ".sparseimage"
+                    dupName = isImageNameAtPath(path: destfullPathSp)
+                    
+                let destfullPathDMG = destinationDisk + "/" + CaseInfoData.shared.imageName + ".sparseimage"
+                    dupName = isImageNameAtPath(path: destfullPathDMG)
+                    
                 print("scr disk: \(sourceDisk )")
                 print("dst disk: \(destinationDisk)")
                 print("dst2 disk: \(destDMGDisk)")
                 print("name of image: \(CaseInfoData.shared.imageName)")
                 print("valid name?: \(imgName)")
+                print("dupName?: \(dupName)")
+                    
                 let sizeNoOK = !isStorageSizeOK2 (sourceDisk: sourceDisk , destinationDisk: destinationDisk, destDMGDisk: destDMGDisk)
-                alertText1 = (sizeNoOK ? "😯 Not enough space in the destination disk for"  : "")
+                alertText1 = (sizeNoOK ? "😯 Not enough space in the destination disk for the selected source path"  : "")
                 alertText2 = (imgName ? "" : "\n😳 Image Name invalid or empty")
-                if   sizeNoOK || !imgName {
-                    createImage = true
+                alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete sparse or DMG files with name: \(imgName)" :  "" )
+                imageName = "exclamationmark.triangle"
+                    if   sizeNoOK || !imgName || dupName {
+                        disableBCreateImg = true
+                        showAlertSize = true
+                    }
+                }
+                else {
+                    alertText1 = "Selected path for destination is empty ot invalid"
+                    imageName = "folder.badge.questionmark"
+                    disableBCreateImg = true
                     showAlertSize = true
-//                    print(showAlertSize)
                 }
             }
  
@@ -116,13 +138,13 @@ struct Imaging1RevView: View {
             if showAlertSize {
                 CustomAlertView(
                     showAlert: $showAlertSize,
-                    imageName: "exclamationmark.triangle",
+                    imageName: imageName,
                     title: "LLIMAGER Alert",
-                    message: "\(alertText1) the selected disk \(alertText2)",
+                    message: "\(alertText1)  \(alertText2) \(alertText3) ",
                     fontSize1: 14,
                     fontSize2: 12,
-                    textColor: Color("LL_blue"),
-                    backgroundColor: .white
+                    textColor: Color(.white),
+                    backgroundColor: Color("LL_blue")
                 )
                 .frame(width: 300, height: 250)
                 .cornerRadius(15)

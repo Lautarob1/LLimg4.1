@@ -26,7 +26,7 @@ struct TgtInfoViewRev: View {
             // Display information from the first disk
             
             // Display information from the second disk
-            Text("image will be stored at:")
+            Text("D E S T I N A T I O N:")
                 .font(.headline)
                 .padding()
             if isDiskValid {

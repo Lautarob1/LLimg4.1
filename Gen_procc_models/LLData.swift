@@ -69,6 +69,78 @@ class FileWriter {
 }
 
 
+import Foundation
+
+class FileWriterWithDelection {
+    private var fileHandle: FileHandle?
+    private let filePath: URL
+
+    init?(filePath: String) {
+        let fileURL = URL(fileURLWithPath: filePath)
+        self.filePath = fileURL
+
+        let fileManager = FileManager.default
+
+        // Check if the file exists
+        if fileManager.fileExists(atPath: filePath) {
+            do {
+                // Delete the existing file
+                try fileManager.removeItem(at: fileURL)
+                
+                // Create a new file
+                fileManager.createFile(atPath: filePath, contents: nil)
+                
+                // Open a file handle for writing
+                guard let fileHandle = FileHandle(forWritingAtPath: filePath) else {
+                    print("Failed to open file handle for a new file")
+                    return nil
+                }
+                self.fileHandle = fileHandle
+            } catch {
+                print("Failed to delete or open file handle: \(error)")
+                return nil
+            }
+        } else {
+            // If the file does not exist, create it and open a file handle
+            fileManager.createFile(atPath: filePath, contents: nil)
+            guard let fileHandle = FileHandle(forWritingAtPath: filePath) else {
+                print("Failed to open file handle for a new file")
+                return nil
+            }
+            self.fileHandle = fileHandle
+        }
+    }
+
+    // Make sure to add functions to write data and close the file handle appropriately
+    func write(data: Data) {
+        fileHandle?.write(data)
+    }
+    
+    func close() {
+        fileHandle?.closeFile()
+    }
+}
+
+
+class FileDelete {
+    static func deleteIfExists(filePath: String) {
+        let fileURL = URL(fileURLWithPath: filePath)
+        let fileManager = FileManager.default
+
+        if fileManager.fileExists(atPath: filePath) {
+            do {
+                try fileManager.removeItem(at: fileURL)
+                print("File successfully deleted.")
+            } catch {
+                print("Failed to delete file: \(error)")
+            }
+        } else {
+            print("File does not exist.")
+        }
+    }
+}
+
+
 class FileWriterSF {                // For writting from several views in a sync manner
     private let fileHandle: FileHandle?
     private let filePath: URL
@@ -262,3 +334,12 @@ class FileSelectionManager: ObservableObject {
 }
 
 
+class ValidationViewModel: ObservableObject {
+    @Published var isnameValid: Bool = false
+    @Published var ispathValid: Bool = false
+    
+    // Computed property to determine if both fields are valid
+    var areBothFieldsValid: Bool {
+        isnameValid && ispathValid
+    }
+}

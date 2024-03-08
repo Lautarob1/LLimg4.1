@@ -33,13 +33,13 @@ struct DiskinfoViewRev: View {
     var body: some View {
         VStack (spacing: 3){
             // Display information from the first disk
-            Text("Disk to be imaged:")
+            Text("S O U R C E:")
                 .font(.headline)
                 .padding()
             displayDiskInfo(dskfileInfoDict1)
             Spacer()
             // Display information from the second disk
-            Text("image will be stored at:")
+            Text("D E S T I N A T I O N:")
                 .font(.headline)
                 .padding()
             displayDiskInfo(dskfileInfoDict2)
@@ -56,26 +56,28 @@ struct DiskinfoViewRev: View {
             let destDMGDisk = DiskDataManager.shared.selected2ndStorageOption
             dskfileInfoDict1 = diskutilInfo(for: getDiskIDCapacityAvSpace(diskPath: sourceDisk).diskID ?? dskMainData2())
             let destinDisk = DiskDataManager.shared.selectedStorageOption
-//            guard dskfileInfoDict2 = diskutilInfo(for: (getDiskIDCapacityAvSpace(diskPath: destinationDisk).diskID!  else {
+//            guard dskfileInfoDict2 = diskutilInfo(for: (getDiskIDCapacityAvSpace(diskPath: destinationDisk).diskID  else {
 //                print("File path not set")
 //                return
 //            }
-                           
-            dskfileInfoDict2 = diskutilInfo(for: (getDiskIDCapacityAvSpace(diskPath: destinationDisk).diskID ?? "/Volumes/llidata"))
-            print("detailed for destin dsk in DiskInfoViewRev: \(dskfileInfoDict2)")
+// below substitute "/Volumes/llidata" by ""
+            dskfileInfoDict2 = diskutilInfo(for: (getDiskIDCapacityAvSpace(diskPath: destinationDisk).diskID ?? ""))
+//            print("detailed for destin dsk in DiskInfoViewRev: \(dskfileInfoDict2)")
         }
     }
     
     private func displayDiskInfo(_ dict: [String: String]) -> some View {
-        VStack {
-            ForEach(Array(dict), id: \.key) { key, value in
-                HStack {
-                    Text("\(key):")
-                        .font(.caption)
-                        .frame(width: 120, height: 15, alignment: .leading)
-                    Text("\(value)")
-                        .font(.caption2)
-                        .frame(width: 300, height: 15, alignment: .leading)
+        ScrollView {
+            VStack {
+                ForEach(Array(dict), id: \.key) { key, value in
+                    HStack {
+                        Text("\(key):")
+                            .font(.caption)
+                            .frame(width: 115, height: 26, alignment: .leading)
+                        Text("\(value)")
+                            .font(.caption2)
+                            .frame(width: 270, height: 26, alignment: .leading)
+                    }
                 }
             }
         }

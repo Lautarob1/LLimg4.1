@@ -58,7 +58,7 @@ func licenseFile()  -> String {
     do {
         fileContents = try String(contentsOf: URL(fileURLWithPath: filePath), encoding: .utf8)
         AuthenticationViewModel.shared.licenseFileFound = true
-        print("After read file \(AuthenticationViewModel.shared.licenseFileFound)")
+//        print("After read file \(AuthenticationViewModel.shared.licenseFileFound)")
         // Now fileContents contains the text of your file
     } catch {
         print("in catch -no file found- \(AuthenticationViewModel.shared.licenseFileFound)")

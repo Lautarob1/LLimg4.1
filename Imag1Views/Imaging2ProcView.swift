@@ -62,7 +62,7 @@ struct Imaging2ProcView: View {
     @State var currentValue: CGFloat = 0.6
     @State var percentage: CGFloat = 0.6
     @State var endMessage: String = "All Completed!"
-    let procStep = ["Colecting and processing information...", "Creating DMG...", "Hashing DMG...", "Processing Fineshed"]
+    let procStep = ["Colecting and processing information...", "Creating DMG...", "Hashing DMG...", "Processing Finished"]
     let timerGauge = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     @State var timerGauge2: Timer?
 

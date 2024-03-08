@@ -25,6 +25,12 @@ struct CustomAlertView2: View {
 //            Spacer()
             VStack (spacing: 0){
                 HStack {
+//                    Image("LLimg_appLogo_32px.png") //
+//                        .resizable() // Make the image resizable
+//                        .aspectRatio(contentMode: .fit) // Maintain the aspect ratio
+//                        .frame(width: 32, height: 32) // Set the frame to 32x32
+//                        .padding(3)
+
                     Image(systemName: imageName)
                         .font(.largeTitle)
                         .foregroundColor(textColor)
@@ -38,7 +44,7 @@ struct CustomAlertView2: View {
                 Text(message)
                     .font(.system(size: fontSize2))
                     .foregroundColor(textColor)
-                    .padding(.horizontal, 12)
+                    .padding(.horizontal, 15)
                 
                 Button("OK") {
                     showAlert2 = false
@@ -47,9 +53,9 @@ struct CustomAlertView2: View {
                 .background(Color.blue)
                 .foregroundColor(.white)
                 .frame(width: 80)
-                .padding(3)
+                .padding(10)
             }
-            .frame(width: 300, height: 120)
+            .frame(width: 300)
             .background(backgroundColor)
             .cornerRadius(20)
             .shadow(radius: 10)
@@ -69,7 +75,7 @@ struct CustomAlertView2: View {
                     fontSize1: 20,
                     fontSize2: 14,
                     textColor: Color(.white),
-                    backgroundColor: Color("LL_orange"),
+                    backgroundColor: Color("LL_blue"),
                     onDismiss: {
                         print("OnDismiss")
                     })

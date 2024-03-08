@@ -16,16 +16,10 @@ struct CustomAlertView: View {
     var fontSize2: CGFloat
     var textColor: Color
     var backgroundColor: Color
-    
+//    var onOK: () -> Void
 
     var body: some View {
         VStack (spacing: 0) {
-//            Image("LLimager_Window2")
-//                .resizable()
-//                .frame(width: 320, height: 30)
-//                .scaledToFit()
-//                .padding(5)
-//            Spacer()
             HStack {
                 Image(systemName: imageName)
                     .font(.largeTitle)
@@ -36,7 +30,6 @@ struct CustomAlertView: View {
                 .foregroundColor(textColor)
                 .padding(10)
             }
-
             Text(message)
                 .font(.system(size: fontSize2))
                 .foregroundColor(textColor)
@@ -44,12 +37,13 @@ struct CustomAlertView: View {
 
             Button("OK") {
                 showAlert = false
+//                onOK()
             }
             .background(Color.blue)
             .foregroundColor(.white)
             .padding()
         }
-        .frame(width: 320, height: 170)
+        .frame(width: 300)  // , height: 140)
         .background(backgroundColor)
         .cornerRadius(20)
         .shadow(radius: 10)
@@ -62,11 +56,12 @@ struct CustomAlertView: View {
         showAlert: .constant(true),
                     imageName: "exclamationmark.triangle",
                     title: "Warning",
-                    message: "Something went wrong! 😡",
+                    message: "The sparse container could not be created due to a password failure! 😡",
                     fontSize1: 16,
                     fontSize2: 14,
-                    textColor: Color("LL_blue"),
-                    backgroundColor: Color(.white))
-
+        textColor: Color(.white),
+                    backgroundColor: Color("LL_blue")
+//                    onOK: {print("OK pressed")}
+    )
 }
 

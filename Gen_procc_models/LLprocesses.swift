@@ -712,6 +712,7 @@ func comboDefaultValue(using diskDataManager: DiskDataManager) -> String {
 }
 
 func acqlogHeader(filePath: String) {
+    FileDelete.deleteIfExists(filePath: filePath)
     let fileWriter = FileWriter(filePath: filePath)
     if let writer = fileWriter {
         writer.write("██╗     ██╗         ██╗███╗   ███╗ █████╗  ██████╗ ███████╗██████╗     ██╗   ██╗██╗  ██╗\n")
@@ -794,17 +795,18 @@ func writecaseNotes(_ caseNotes: String, lineLength: Int = 50) -> [String] {
         return casenotesFormated
     }
 
-func exclogHeader(filePath: String) {
+func exclogHeader(filePath: String) {    
+    FileDelete.deleteIfExists(filePath: filePath)
     let fileWriter = FileWriter(filePath: filePath)
     if let writer = fileWriter {
         writer.write("\n")
-        writer.write(String(repeating: "=", count: 100))
+        writer.write(String(repeating: "=", count: 88))
         writer.write("\n")
         writer.write("    LLimager V 4.0\n")
         writer.write("      Mac Computers Forensics Imager\n")
         writer.write("\n")
         writer.write("        E X E C   L O G    D E T A I L S \n")
-        writer.write(String(repeating: "-", count: 80))
+        writer.write(String(repeating: "-", count: 88))
         writer.write("\n")
         writer.write("    Case Summary\n")
         writer.write("\n")
@@ -822,7 +824,7 @@ func exclogHeader(filePath: String) {
         }
         writer.write("\n")
         writer.write("        Start Time:     \(LLTimeManager.getCurrentTimeString())\n")
-        writer.write(String(repeating: "-", count: 100))
+        writer.write(String(repeating: "-", count: 88))
     }
         else {
         // Handle error: Failed to initialize FileWriter
@@ -836,7 +838,7 @@ func acqlogDeviceInfo(filePath: String) {
     let fileWriter = FileWriter(filePath: filePath)
     if let writer = fileWriter {
         writer.write("\n")
-        writer.write(String(repeating: "-", count: 80))
+        writer.write(String(repeating: "-", count: 88))
         writer.write("\n")
         writer.write("    Hardware information\n")
         writer.write("\n")
@@ -866,7 +868,7 @@ func acqlogDiskInfo(filePath: String) {
     let fileWriter = FileWriter(filePath: filePath)
     if let writer = fileWriter {
         writer.write("\n")
-        writer.write(String(repeating: "-", count: 100))
+        writer.write(String(repeating: "-", count: 88))
         writer.write("\n")
         writer.write("    Source Disk Information\n")
         
@@ -875,7 +877,7 @@ func acqlogDiskInfo(filePath: String) {
         
         writer.write("\n")
         writer.write(dskinfoTarget(volName: extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? dskMainData2()))
-        writer.write(String(repeating: "+", count: 100))
+        writer.write(String(repeating: "+", count: 88))
     }
         else {
         // Handle error: Failed to initialize FileWriter
@@ -888,7 +890,7 @@ func acqlogTargetedFF (filePath: String) {
     let fileWriter = FileWriter(filePath: filePath)
     if let writer = fileWriter {
         writer.write("\n")
-        writer.write(String(repeating: "-", count: 100))
+        writer.write(String(repeating: "-", count: 88))
         writer.write("\n")
         writer.write("    Targeted Files and Folders Information\n")
         
@@ -900,7 +902,7 @@ func acqlogTargetedFF (filePath: String) {
             writer.write(formatOutput4Tgt(string: file.path, number: file.size))
             
         }
-        writer.write(String(repeating: "=", count: 100))
+        writer.write(String(repeating: "=", count: 88))
     }
         else {
         // Handle error: Failed to initialize FileWriter
@@ -936,7 +938,7 @@ func acqSparselog(filePath: String) {
     let fileWriter = FileWriter(filePath: filePath)
     if let writer = fileWriter {
         writer.write("\n")
-        writer.write(String(repeating: "-", count: 80))
+        writer.write(String(repeating: "-", count: 88))
         writer.write("\n")
         writer.write("    Image Information\n")
         writer.write("        Sparse Image Name:           \(CaseInfoData.shared.imageName)\n")
@@ -1214,4 +1216,26 @@ func validateInput(name: String) -> Bool {
         // Handle valid input
         return true
     }
+}
+
+func validatePath(path: String) -> Bool {
+    let fileManager = FileManager.default
+        
+        // Check if the path exists and is a directory
+        var isDirectory: ObjCBool = false
+        let exists = fileManager.fileExists(atPath: path, isDirectory: &isDirectory)
+        
+        if exists && isDirectory.boolValue {
+            // The path exists and is a directory, now check if it's writable
+            let isWritable = fileManager.isWritableFile(atPath: path)
+            return isWritable
+        }
+        
+        return false
+}
+
+
+func isImageNameAtPath(path: String) -> Bool {
+    let fileManager = FileManager.default
+        return fileManager.fileExists(atPath: path)
 }
