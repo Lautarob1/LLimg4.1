@@ -53,7 +53,7 @@ struct Imaging1ProcView: View {
     @StateObject private var fileSizeChecker = FileSizeChecker()
     @StateObject private var fileSizeChecker2 = FileSizeChecker()
     @ObservedObject private var fileSizeChecker3 = FileSizeChecker3()
-    let procStep = ["Processing Sparse...", "Creating DMG...", "Hashing DMG...", "Processing Finished", "Error Ocurred"]
+    let procStep = ["Creating Sparse...", "Creating DMG...", "Hashing DMG...", "Processing Finished", "Error Ocurred"]
     @State var alertMsg: String = ""
     @State var alertTitle: String = ""
     @State var showCustomAlert: Bool = false
@@ -62,7 +62,8 @@ struct Imaging1ProcView: View {
     let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color.gray]),
                       startPoint: .top,
                       endPoint: .bottom)
-    var onComplete: () -> Void
+//    var onComplete: () -> Void
+    @Binding var selectedOption: MenuOption?
     
     var body: some View {
         
@@ -138,7 +139,7 @@ struct Imaging1ProcView: View {
                     TextEditor(text: $sviewModel.output)
 //                    Text(sviewModel.output)
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
-//                        .italic() 
+//                        .italic()
                         .foregroundColor(.blue) // Set the text color
                         .frame(width: 840, height: 140, alignment: .leading)
                         .padding(5)
@@ -286,7 +287,7 @@ struct Imaging1ProcView: View {
  
 
                 Button(action: {
-                    onComplete()
+                    self.selectedOption = nil
                 }) {
                     if showDoneButton {
                         Text("Done")
@@ -345,8 +346,8 @@ struct Imaging1ProcView: View {
         
         // Sparse Creation
         createsparseImage ()
-        
-        print2Log(filePath: logfilePathEx, text2p: "Sparse Image process------------------------------------------------\n")
+
+        print2Log(filePath: logfilePathEx, text2p: "Sparse Image process\(String(repeating: "-", count: 40))\n")
         print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
         print("3rd process (create sparse Image) done....")
         
@@ -357,7 +358,7 @@ struct Imaging1ProcView: View {
             titleGauge = "% DMG vs Total Disk"
             createdmgImage()
             
-            print2Log(filePath: logfilePathEx, text2p: "DMG Image process------------------------------------------------\n")
+            print2Log(filePath: logfilePathEx, text2p: "DMG Image process\(String(repeating: "-", count: 43))\n")
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             print("4th process (create dmg) done....")
         }
@@ -459,10 +460,15 @@ struct Imaging1ProcView: View {
         print(CaseInfoData.shared.imgfilePath)
         let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
         print("logfilePath: \(logfilePath)")
-        print2Log(filePath: logfilePath, text2p: "Sparse image process ---------------\n")
+        let imgName = CaseInfoData.shared.imageName
+        let sparsePath = DiskDataManager.shared.selectedStorageOption
+        acqlogTitleProcesses(filePath: logfilePath)
+        print2Log(filePath: logfilePath, text2p: "Sparse image process\(String(repeating: "-", count: 40))\n")
         print2Log(filePath: logfilePath, text2p: "Start time:     \(sparseTimeIni)")
         print2Log(filePath: logfilePath, text2p: "End time:       \(sparseTimeEnd)")
         print2Log(filePath: logfilePath, text2p: "Image size:     \(sparseSize)\n")
+        print2Log(filePath: logfilePath, text2p: "Sparse image created:      \(sparsePath)/\(imgName).sparseimage\n")
+        
         print("leaving sparse log")
     }
     
@@ -470,11 +476,14 @@ struct Imaging1ProcView: View {
         print("entering dmg log, path for log file:")
         print(DiskDataManager.shared.selectedStorageOption)
         let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+        let imgName = CaseInfoData.shared.imageName
+        let dmgPath = DiskDataManager.shared.selectedStorageOption
         print("logfilePath: \(logfilePath)")
-        print2Log(filePath: logfilePath, text2p: "DMG image process ------------------\n")
+        print2Log(filePath: logfilePath, text2p: "DMG image process\(String(repeating: "-", count: 40))\n")
         print2Log(filePath: logfilePath, text2p: "Start time:     \(dmgTimeIni)")
         print2Log(filePath: logfilePath, text2p: "End time:       \(dmgTimeEnd)")
         print2Log(filePath: logfilePath, text2p: "Image size:     \(dmgSize)\n")
+        print2Log(filePath: logfilePath, text2p: "DMG image created:      \(dmgPath)/\(imgName).dmg\n")
         print("leaving dmg log")
     }
     
@@ -607,7 +616,7 @@ struct Imaging1ProcView: View {
 
         print("path to dmg in hash calc: \(pathFile)")
         let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
-        print2Log(filePath: logfilePath, text2p: "Hash DMG image process -------------\n")
+        print2Log(filePath: logfilePath, text2p: "Hash DMG process\(String(repeating: "-", count: 40))\n")
         let hashTimeIni = LLTimeManager.getCurrentTimeString()
         print2Log(filePath: logfilePath, text2p: "Start time:     \(hashTimeIni)")
         switch DiskDataManager.shared.selectedHashOption {
@@ -648,9 +657,15 @@ struct Imaging1ProcView: View {
      
 }
 
-
-#Preview {
-        Imaging1ProcView(onComplete: {
-            // Dummy closure for preview
-        })
+struct Imaging1ProcView_Previews: PreviewProvider {
+    @State static var selectedOption: MenuOption? = MenuOption(id: 1)
+    
+    static var previews: some View {
+        Imaging1ProcView(selectedOption: $selectedOption)
+    }
 }
+
+//#Preview {
+//    @State var selectedOption: MenuOption? = MenuOption(id: 1)
+//        Imaging1ProcView(selectedOption: $selectedOption)
+//}

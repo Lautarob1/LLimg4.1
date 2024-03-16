@@ -455,22 +455,6 @@ func dskinfofromPath (path: String) -> [(titleh: String, valueh: String)]  {
 
 
 
-//func dskMainData () -> String {
-//    let process = Process()
-//    let pipe = Pipe()
-//    process.launchPath = "/bin/bash"
-//    process.arguments = ["-c", "df -h ~ | grep '/dev/' | awk '{print $1}' | cut -d'/' -f3"]
-//
-//    process.standardOutput = pipe
-//    process.launch()
-//
-//    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-//    let output = String(data: data, encoding: .utf8) ?? ""
-//
-//    return output.trimmingCharacters(in: .newlines)
-//
-//}
-//
 func dskMainData2 () -> String {
     let process = Process()
     let pipe = Pipe()
@@ -617,75 +601,6 @@ func parseDiskutilOutput(_ output: String) -> [String: String] {
     return infoDict
 }
 
-//func executeSudoCommand(command: String, passw: String) -> String {
-//    let fullCommand = "echo \(passw) | sudo -S \(command)"
-//    let process = Process()
-//    let pipe = Pipe()
-//    process.environment = ProcessInfo.processInfo.environment
-//    process.executableURL = URL(fileURLWithPath: "/bin/zsh")
-//    process.arguments = ["-c", fullCommand]
-//    process.standardOutput = pipe
-//    process.standardError = pipe
-//
-//    do {
-//        try process.run()
-//        process.waitUntilExit()
-//    } catch {
-//        return "Error: \(error.localizedDescription)"
-//    }
-//
-//    let data = pipe.fileHandleForReading.readDataToEndOfFile()
-//    return String(data: data, encoding: .utf8) ?? "Error decoding output"
-//}
-//
-//func executeSudoCommand2(command: String, passw: String) -> String {
-//    _ = "echo \(passw) | sudo -S \(command)"
-//    let process = Process()
-//    let pipe = Pipe()
-//    _ = DispatchQueue(label: "outputQueue")
-//    var output = ""
-//    pipe.fileHandleForReading.readabilityHandler = { fileHandle in
-//        let data = fileHandle.availableData
-//        if let str = String(data: data, encoding: .utf8) {
-//            DispatchQueue.main.async { // Ensuring UI update is on main thread
-//                output += str
-//                print(str)
-//                // Create an instance of Date to represent the current moment
-//                let now = Date()
-//
-//                // Initialize a DateFormatter
-//                let formatter = DateFormatter()
-//
-//                // Set the desired format for the time
-//                // For example: "HH:mm:ss" for hours, minutes, and seconds
-//                formatter.dateFormat = "HH:mm:ss"
-//
-//                // Convert the date to a string using the formatter
-//                let currentTimeString = formatter.string(from: now)
-//
-//                // Print the current time
-//                print(currentTimeString)
-//                        }
-//                    }
-//                }
-//    do {
-//        try process.run()
-//    } catch {
-//        print("Error: \(error.localizedDescription)")
-//        // Handle the error case appropriately
-//    }
-//
-//    // Run an event loop to prevent the main thread from exiting
-//    let runLoop = RunLoop.current
-//    while process.isRunning {
-//        runLoop.run(mode: .default, before: Date(timeIntervalSinceNow: 0.1))
-//    }
-//
-//    pipe.fileHandleForReading.readabilityHandler = nil
-//
-//    // Return output after the process has finished executing
-//    return output
-//}
 
 
 func findUserDisk(of focusIdent: String, in combo: [String]) -> Int? {
@@ -744,9 +659,10 @@ func acqlogHeader(filePath: String) {
         writer.write("        Agent Name:     \(CaseInfoData.shared.agentName)\n")
         writer.write("        Case ID:        \(CaseInfoData.shared.caseID)\n")
         let casenoteF = writecaseNotes(CaseInfoData.shared.caseNotes)
+//        print("*** case notes count \(String(casenoteF.count))")
         if casenoteF.count > 0 {
             writer.write("\n")
-            writer.write("        Case Notes:     \(casenoteF[0])")
+            writer.write("        Case Notes:     \(casenoteF[0])\n")
             for casenote in casenoteF.dropFirst() {
                 writer.write("                        \(casenote)\n")
             }
@@ -791,6 +707,30 @@ func writecaseNotes(_ caseNotes: String, lineLength: Int = 50) -> [String] {
             
         }
         }
+            else {
+                let paragraph = caseNotes
+                let words = paragraph.split(separator: " ")
+                var currentLine = ""
+                for word in words {
+                    if currentLine.count + word.count + 1 > lineLength {
+                        // Append the current line to the result and start a new line
+                        casenotesFormated.append(currentLine)
+                        currentLine = String(word)
+                    } else {
+                        // Add word to the current line
+                        if !currentLine.isEmpty {
+                            currentLine += " "
+                        }
+                        currentLine += word
+                    }
+                }
+                
+                // Add the last line of the paragraph if it's not empty
+                if !currentLine.isEmpty {
+                    casenotesFormated.append(currentLine)
+                }
+                
+    }
         
         return casenotesFormated
     }
@@ -863,6 +803,18 @@ func acqlogDeviceInfo(filePath: String) {
     
 }
 
+func acqlogTitleProcesses (filePath: String) {
+    let fileWriter = FileWriter(filePath: filePath)
+    if let writer = fileWriter {
+    writer.write("       ┌─┐┬─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐\n")
+    writer.write("       ├─┘├┬┘│ ││  ├┤ └─┐└─┐├┤ └─┐\n")
+    writer.write("       ┴  ┴└─└─┘└─┘└─┘└─┘└─┘└─┘└─┘\n")
+    }
+        else {
+        // Handle error: Failed to initialize FileWriter
+        print("Failed to initialize FileWriter")
+        return }
+}
 
 func acqlogDiskInfo(filePath: String) {
     let fileWriter = FileWriter(filePath: filePath)
@@ -877,7 +829,8 @@ func acqlogDiskInfo(filePath: String) {
         
         writer.write("\n")
         writer.write(dskinfoTarget(volName: extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? dskMainData2()))
-        writer.write(String(repeating: "+", count: 88))
+        writer.write(String(repeating: "=", count: 88))
+        writer.write("\n")
     }
         else {
         // Handle error: Failed to initialize FileWriter
@@ -898,8 +851,40 @@ func acqlogTargetedFF (filePath: String) {
         
         
         writer.write("\n")
+        for file in FileSelectionManager.shared.selectedFiFo {
+            writer.write(String(file.path)+"\n")
+            
+        }
+        writer.write(String(repeating: "=", count: 88))
+    }
+        else {
+        // Handle error: Failed to initialize FileWriter
+        print("Failed to initialize FileWriter")
+        return }
+    
+}
+
+func acqlogConv2Sparse (filePath: String) {
+    let fileWriter = FileWriter(filePath: filePath)
+    if let writer = fileWriter {
+        writer.write("\n")
+        writer.write(String(repeating: "-", count: 88))
+        writer.write("\n")
+        writer.write("    Sparse Information\n")
+ 
+        writer.write("\n")
         for file in FileSelectionManager.shared.selectedFiles {
-            writer.write(formatOutput4Tgt(string: file.path, number: file.size))
+            writer.write("\(String(file.path)) -> size: \(file.size) \n")
+            writer.write("    Sparse Attributes\n")
+            do {
+                let attributes = try FileManager.default.attributesOfItem(atPath: file.path)
+//                print("Basic File Attributes:")
+                for (key, value) in attributes {
+                    writer.write ("     \(key.rawValue): \(value)\n")
+                }
+            } catch {
+                print("Error retrieving file attributes: \(error)")
+            }
             
         }
         writer.write(String(repeating: "=", count: 88))
@@ -989,6 +974,40 @@ func extractData(from text: String) -> [String: Int64] {
     return results
 }
 
+import Foundation
+import CoreServices
+
+func extractFileMetadata(at path: String) {
+    let fileURL = URL(fileURLWithPath: path)
+
+    // Getting basic file attributes using FileManager
+    do {
+        let attributes = try FileManager.default.attributesOfItem(atPath: path)
+        print("Basic File Attributes:")
+        for (key, value) in attributes {
+            print("\(key.rawValue): \(value)")
+        }
+    } catch {
+        print("Error retrieving file attributes: \(error)")
+    }
+
+    // Using MDItem for more extensive metadata
+    if let mdItem = MDItemCreate(kCFAllocatorDefault, (fileURL as CFURL as! CFString)) {
+        print("\nExtended Metadata:")
+        if let attributeNames = MDItemCopyAttributeNames(mdItem) as? [String] {
+            for attributeName in attributeNames {
+                if let attributeValue = MDItemCopyAttribute(mdItem, attributeName as CFString) {
+                    print("\(attributeName): \(attributeValue)")
+                }
+            }
+        }
+    } else {
+        print("Could not retrieve extended metadata.")
+    }
+}
+
+// Example usage
+//extractFileMetadata(at: "/Volumes/data/filename.name")
 
 
 func diskCapacity (dataRead: [String: Int64]) -> [String: Int64] {
@@ -1234,6 +1253,14 @@ func validatePath(path: String) -> Bool {
         return false
 }
 
+func isDestinationInRoot(path: String) -> Bool {
+    if path.contains("/Volumes")  {
+          return false
+        }
+    else {
+        return true
+    }
+}
 
 func isImageNameAtPath(path: String) -> Bool {
     let fileManager = FileManager.default

@@ -136,14 +136,13 @@ func hashLargeFileSHA256(filePath: String, viewModel: HashingViewModel) -> Strin
                 _ = CC_SHA256_Update(&context, buffer.baseAddress, CC_LONG(data.count))
             }
             totalBytesRead += UInt64(data.count)
-            print(Double(totalBytesRead))
-            DispatchQueue.main.async {
+//            print(Double(totalBytesRead))
+//            DispatchQueue.main.async {
                 viewModel.hashProgressPct = Double(totalBytesRead) / Double(fileSize)
                 viewModel.hashProgressByt = Double(totalBytesRead)
-                print(viewModel.hashProgressByt)
-                print(viewModel.hashProgressPct)
-                
-            }
+//                print(viewModel.hashProgressByt)
+//                print(viewModel.hashProgressPct)
+//            }
             return true // Continue
         } else {
             return false // End of file

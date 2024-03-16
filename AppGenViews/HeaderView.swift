@@ -10,7 +10,7 @@ import SwiftUI
 struct HeaderView: View {
     @State private var searchText = ""
     @State private var isHoverAbout: Bool = false
-    @State private var isHoverManual: Bool = false
+    @State private var isHoverHelp: Bool = false
     
 
     var body: some View {
@@ -43,8 +43,12 @@ struct HeaderView: View {
                                 isHoverAbout = hovering
                             })
                         if isHoverAbout {
-                            Text("About us")
+                            Text("About")
                                 .foregroundColor(.white)
+                                .padding(5)
+                                .background(Color.black.opacity(0.5))
+                                .transition(.opacity)
+                                .animation(.easeInOut, value: isHoverAbout)
                         }
                     }
                     Spacer().frame(width: 30)
@@ -60,11 +64,15 @@ struct HeaderView: View {
                         .buttonStyle(PlainButtonStyle())
                         .background(Color("LL_orange"))
                         .onHover(perform: { hovering in
-                            isHoverManual = hovering
+                            isHoverHelp = hovering
                         })
-                    if isHoverManual {
-                        Text("Manual")
+                    if isHoverHelp {
+                        Text("Help")
                             .foregroundColor(.white)
+                            .padding(5)
+                            .background(Color.black.opacity(0.5))
+                            .transition(.opacity)
+                            .animation(.easeInOut, value: isHoverHelp)
                     }
                         
                     }

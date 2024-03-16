@@ -13,110 +13,116 @@ struct Imaging4RevView: View {
     @State private var isViewPresented = false
     @State private var isChecked: Bool = false
     @State private var showAlertSize: Bool = false
-//    @State private var destinationDisk: String
-    var onProcess: () -> Void
-    var onModify: () -> Void
-    var onCancel: () -> Void
+    @Binding var selectedOption: MenuOption?
+    @Binding var showReviewView: Bool
+    @State private var showProcessView = false
     
     var body: some View {
         
         ZStack {
-        HStack {
-            
-            
-            VStack {
-                HStack(alignment: .top) {
-                    Image("img_but4")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 90, height: 90)
-                        .cornerRadius(15)
-                        .padding(.leading)
-                    Spacer()  // Pushes the image to the left
-                }
+            HStack {
                 
                 
-                HStack {
-                    
-                    VStack {
-                        CaseInfoViewRev()
-                        
-                        ImgInfoViewRev()
-//                        HardinfoViewRev()
+                VStack {
+                    HStack(alignment: .top) {
+                        Image("img_but4")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 90, height: 90)
+                            .cornerRadius(15)
+                            .padding(.leading)
+                        Spacer()  // Pushes the image to the left
                     }
-                    .padding(.trailing, 25)
-                    VStack (spacing: 50){
-                        TgtSelect4HashViewRev()
-                        VStack (alignment: .leading){
-                        Text("Log file will be in:")
-                        Text(DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info")
+                    
+                    
+                    HStack {
                         
+                        VStack {
+                            CaseInfoViewRev()
+                            
+//                            ImgInfoViewRev()
                         }
-                
-                    }
- 
-                }
-                
-                HStack {
-                    Button(action: {
-                        onCancel()
-                    }) {
-                        Text("Cancel")
-                            .font(.custom("Helvetica Neue", size: 14))
-                            .frame(width: 100, height: 20)
-                            .foregroundColor(.white)
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                            .padding(3)
+                        .padding(.trailing, 25)
+                        VStack (spacing: 30){
+                            TgtSelect4HashViewRev()
+                            VStack (alignment: .leading){
+                                Text("Log file will be in: \n")
+                                Text(DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info")
+                                
+                            }
+                            
+                        }
+                        
                     }
                     
-                    Button(action: {
-                        onProcess()
-                    }) {
-                        Text("Process Hash")
-                            .font(.custom("Helvetica Neue", size: 14))
-                            .frame(width: 100, height: 20)
-                            .foregroundColor(.white)
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                            .padding(3)
+                    HStack {
+                        Button(action: {
+                            self.selectedOption = nil
+                        }) {
+                            Text("Cancel")
+                                .font(.custom("Helvetica Neue", size: 14))
+                                .frame(width: 100, height: 20)
+                                .foregroundColor(.white)
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                                .padding(3)
+                        }
+                        
+                        Button(action: {
+                            self.showProcessView = true
+                        }) {
+                            Text("Process Hash")
+                                .font(.custom("Helvetica Neue", size: 14))
+                                .frame(width: 100, height: 20)
+                                .foregroundColor(.white)
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                                .padding(3)
+                        }
+                        
+                        Button(action: {
+                            self.showReviewView = false
+                        }) {
+                            Text("Change values")
+                                .font(.custom("Helvetica Neue", size: 14))
+                                .frame(width: 100, height: 20)
+                                .foregroundColor(.white)
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                                .padding(3)
+                        }
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(.vertical, 15)
+                    .sheet(isPresented: $showProcessView) {
+                        Imaging4ProcView(selectedOption: $selectedOption)
                     }
                     
-                    Button(action: {
-                        onModify()
-                    }) {
-                        Text("Change values")
-                            .font(.custom("Helvetica Neue", size: 14))
-                            .frame(width: 100, height: 20)
-                            .foregroundColor(.white)
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                            .padding(3)
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-                .padding(.vertical, 15)
-            }
-
                 }
             }
-//        onAppear() {
-//            print("on appear with value \(DiskDataManager.shared.selectedStorageOption)")
-//            pathforhashlog()          
-//        }
- 
-        }
-
-    func pathforhashlog() {
-        print("in func path4log")
-        if DiskDataManager.shared.selectedStorageOption == "" {
-            DiskDataManager.shared.selectedStorageOption = "/Volumes/llimager/lldata"
+            
         }
     }
+
+//    func pathforhashlog() {
+//        print("in func path4log")
+//        if DiskDataManager.shared.selectedStorageOption == "" {
+//            DiskDataManager.shared.selectedStorageOption = "/Volumes/llimager/lldata"
+//        }
+//    }
             
     }
 
-#Preview {
-    Imaging4RevView(onProcess: {}, onModify: {}, onCancel: {}
-    )
-}
+struct Imaging4RevView_Previews: PreviewProvider {
+        @State static var selectedOption: MenuOption? = MenuOption(id: 4)
+        @State static var showReviewView: Bool = true
+        
+        static var previews: some View {
+            Imaging4RevView(selectedOption: $selectedOption, showReviewView: $showReviewView)
+        }
+    }
+
+//#Preview {
+//    Imaging4RevView(selectedOption: selectedOption, showReviewView: $showReviewView)
+//    )
+//}

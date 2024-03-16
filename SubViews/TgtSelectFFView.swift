@@ -50,26 +50,19 @@ struct TgtSelectFFView: View {
 
             .background()
 
-
-            List(selection: $selectedItems) {
-                ForEach(FileSelectionManager.shared.selectedFiFo, id: \.id) { file in
-                    HStack {
-                        Text(file.path)
-                            .font(.subheadline)
-//                        Spacer()
-//                        Text("\(file.size) bytes")
-//                            .font(.caption)
+//            ScrollView {
+                List(selection: $selectedItems) {
+                    ForEach(FileSelectionManager.shared.selectedFiFo, id: \.id) { file in
+                        HStack {
+                            Text(file.path)
+                                .font(.subheadline)
+ 
+                        }
                     }
+
                 }
-//                HStack {
-//                    Text("Total Size")
-//                        .font(.caption)
-//                    Spacer()
-//                    Text("\(FileSelectionManager.shared.totalSize) bytes")
-//                        .font(.caption)
-//                }
-    }
-//    .listStyle(SidebarListStyle())
+//            }
+
 
             HStack {
                 Button("Delete Selected") {
@@ -83,37 +76,9 @@ struct TgtSelectFFView: View {
         .frame(width: 420, height: 220)
     }
     
-    private func selectFilesAndFolders() {
-        print("in select files/flds with stillWorking= \(stillWorking)")
-        let openPanel = NSOpenPanel()
-        openPanel.allowsMultipleSelection = true
-        openPanel.canChooseDirectories = true
-        openPanel.canChooseFiles = true
-
-        if openPanel.runModal() == .OK {
-            stillWorking = true // Set processing to true
-            let selectedURLs = openPanel.urls
-            DispatchQueue.main.async {
-            self.stillWorking = true // Ensure this is set on the main thread
-                        }
-            DispatchQueue.global(qos: .userInitiated).async {
-                for url in selectedURLs {
-                    DispatchQueue.main.async {
-                        print("in select files/flds with stillWorking= \(stillWorking)")
-                        fileSelectionManager.addFile(path: url.path)
-                        FileSelectionManager.shared.addFile(path: url.path)
-                    }
-                }
-                DispatchQueue.main.async {
-                    self.stillWorking = false // Set processing to false when done
-                }
-            }
-        }
-    }
-    
     
     func deleteSelectedItems() {
-        FileSelectionManager.shared.selectedFiles.removeAll { fileItem in
+        FileSelectionManager.shared.selectedFiFo.removeAll { fileItem in
             selectedItems.contains(fileItem.id)
         }
         selectedItems.removeAll()

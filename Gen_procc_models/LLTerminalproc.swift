@@ -19,6 +19,7 @@ class ConsoleViewModel: ObservableObject {
     
     
     func executeSudoCommand(command: String, passw: String) -> String {
+        print("entering ConsoleViewModel-executeSudoCommand")
         let fullCommand = "echo \(passw) | sudo -S \(command)"
         let process = Process()
         let pipe = Pipe()
@@ -36,6 +37,7 @@ class ConsoleViewModel: ObservableObject {
         }
         
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        print("about to leave ConsoleViewModel-executeSudoCommand")
         return String(data: data, encoding: .utf8) ?? "Error decoding output"
     }
     
@@ -313,6 +315,8 @@ class FileSizeChecker3: ObservableObject {
     @Published var fileSizeInGB: Double = 0.0
     var totalSizeInGB: Double = 0.0
     @Published var percenAdvance: Double = 0.0
+    @Published var pctAdvanceTgt: Double = 0.0
+    @Published var pctAdvanceSpar: Double = 0.0
     private var timer: Timer?
     var filePath: String?
     
@@ -345,13 +349,13 @@ class FileSizeChecker3: ObservableObject {
             if let fileSize = attributes[.size] as? Int64 {
                 // Convert file size to GB
                 let fileSizeInGB = Double(fileSize) / 1_000_000_000
-                let percenAdvance = fileSizeInGB / FileSizeChecker3.shared.totalSizeInGB
-                print("inside filechk3 totalSizeinGB: \(totalSizeInGB)")
-                print("inside filechk3 FileSizeChecker3.shared.totalSizeInGB: \(FileSizeChecker3.shared.totalSizeInGB)")
-                print("inside filechk3 percenAdvance: \(percenAdvance)")
+//                let percenAdvance = fileSizeInGB / FileSizeChecker3.shared.totalSizeInGB
+//                print("inside filechk3 totalSizeinGB: \(totalSizeInGB)")
+//                print("inside filechk3 FileSizeChecker3.shared.totalSizeInGB: \(FileSizeChecker3.shared.totalSizeInGB)")
+//                print("inside filechk3 percenAdvance: \(percenAdvance)")
                 DispatchQueue.main.async {
                     self.fileSizeInGB = fileSizeInGB
-                    self.percenAdvance = percenAdvance
+//                    self.percenAdvance = percenAdvance
                 }
             }
         } catch {

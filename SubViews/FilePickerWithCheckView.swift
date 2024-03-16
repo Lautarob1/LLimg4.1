@@ -12,7 +12,7 @@ struct FilePickerWithCheckView: View {
     @ObservedObject private var caseInfoData = CaseInfoData.shared
         @State private var filePath: String = ""
         @State private var isButtonDisabled: Bool = true
-        let path2img: String
+        @State var path2img: String
         let butlabel: String
         let enablefb: String
         var onPathSelected: (String) -> Void
@@ -20,7 +20,7 @@ struct FilePickerWithCheckView: View {
         var body: some View {
             VStack {
                 HStack {
-                    TextField(path2img, text: $filePath)
+                    Text(path2img) //, text: $filePath)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding()
                 Button(butlabel) {
@@ -32,6 +32,7 @@ struct FilePickerWithCheckView: View {
                         if openPanel.runModal() == .OK {
                             self.filePath = openPanel.url?.path ?? ""
                             onPathSelected(self.filePath)
+                            path2img = self.filePath
                         }
                     }
                     .disabled(isButtonDisabled)

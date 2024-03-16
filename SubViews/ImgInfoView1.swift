@@ -132,7 +132,7 @@ struct ImgInfoView1: View {
                     .background()
                 } // if
             }
-                .frame(width: 420, height: 500)
+                .frame(width: 420) //, height: 600)
                 .padding()
             }
 

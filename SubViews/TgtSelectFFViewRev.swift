@@ -17,35 +17,28 @@ struct TgtSelectFFViewRev: View {
 ScrollView {
             VStack {
                 HStack {
-                 Text("S O U R C E:")
+                 Text("S O U R C E")
                 .font(.headline)
                 .padding(.vertical, 5)
      
                 }
                 .background()
-                
-                List {
-                    ForEach(FileSelectionManager.shared.selectedFiFo) { file in
-                        HStack {
-                            Text(file.path)
-                                .font(.caption)
-//                            Spacer()
-//                            Text("\(file.size) bytes")
-//                                .font(.caption)
+//                ScrollView {
+                    List {
+                        ForEach(FileSelectionManager.shared.selectedFiFo) { file in
+                            HStack {
+                                Text(file.path)
+                                    .font(.caption)
+ 
+                            }
                         }
+                        Spacer()
+
                     }
-                    Spacer()
-//                    HStack {
-//                          Text("Total Size")
-//                            .font(.caption)
-//                          Spacer()
-//                          Text("\(FileSelectionManager.shared.totalSize) bytes")
-//                            .font(.caption)
-//                      }
-                }
+//                }
 
             }
-            .frame(width: 430, height: 300)
+            .frame(width: 420, height: 250)
         }
     }
     

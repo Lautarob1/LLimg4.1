@@ -60,7 +60,7 @@ struct ImgInfoView: View {
                     }
                 }
                 HStack {
-                    FilePickerView(path2img: "path where image and temp files will be stored", butlabel: "Select..." ) { selectedPath in
+                    FilePickerView(path2img: "DESTINATION path", butlabel: "Select..." ) { selectedPath in
                         DiskDataManager.shared.selectedStorageOption = selectedPath}
                                         }
   

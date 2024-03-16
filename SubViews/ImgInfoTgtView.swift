@@ -38,7 +38,7 @@ struct ImgInfoTgtView: View {
                             TgtSelectFFView()
                         }
                         HStack {
-                            FilePickerView(path2img: "path where image and temp files will be stored", butlabel: "Select..." ) { selectedPath in
+                            FilePickerView(path2img: "DESTINATION path", butlabel: "Select..." ) { selectedPath in
                                 DiskDataManager.shared.selectedStorageOption = selectedPath}
                         }  // Other UI elements
                     }
@@ -81,7 +81,7 @@ struct ImgInfoTgtView: View {
                 
                 
             }
-            .frame(width: 420, height: 500)
+            .frame(width: 420) //, height: 300)
             .padding()
         }
         

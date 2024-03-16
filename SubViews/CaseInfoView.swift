@@ -14,12 +14,7 @@ struct CaseInfoView: View {
     @State private var agentName: String = CaseInfoData.shared.agentName
     @State private var caseID: String = CaseInfoData.shared.caseID
     @State private var caseNotes: String = CaseInfoData.shared.caseNotes
-    //    @EnvironmentObject var caseinfoData: CaseInfoData
-    //    @Binding var caseName: String
-    //    @Binding var evidenceName: String
-    //    @Binding var agentName: String
-    //    @Binding var caseID: String
-    //    @Binding var caseNotes: String
+
     private let maxWordCount = 200
     
     var body: some View {
@@ -81,7 +76,7 @@ struct CaseInfoView: View {
                             }
                     }
                 HStack {
-                    Text("notes:")
+                    Text("Notes:")
                         .font(.headline)
                         .padding(.leading, 3)
                         .frame(width: 70, alignment: .leading)

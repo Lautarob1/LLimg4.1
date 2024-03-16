@@ -33,13 +33,13 @@ struct DiskinfoViewRev: View {
     var body: some View {
         VStack (spacing: 3){
             // Display information from the first disk
-            Text("S O U R C E:")
+            Text("S O U R C E")
                 .font(.headline)
                 .padding()
             displayDiskInfo(dskfileInfoDict1)
             Spacer()
             // Display information from the second disk
-            Text("D E S T I N A T I O N:")
+            Text("D E S T I N A T I O N")
                 .font(.headline)
                 .padding()
             displayDiskInfo(dskfileInfoDict2)
@@ -47,7 +47,7 @@ struct DiskinfoViewRev: View {
             // Additional UI for calculations or other interactions
             // ...
         }
-        .frame(width:430)
+        .frame(width:430, height: 600)
         .background()
         .onAppear {
 //            print("detailed disk info for: \(DiskDataManager.shared.selectedDskOption)")
@@ -68,14 +68,14 @@ struct DiskinfoViewRev: View {
     
     private func displayDiskInfo(_ dict: [String: String]) -> some View {
         ScrollView {
-            VStack {
+            VStack (spacing: 2) {
                 ForEach(Array(dict), id: \.key) { key, value in
                     HStack {
                         Text("\(key):")
                             .font(.caption)
                             .frame(width: 115, height: 26, alignment: .leading)
                         Text("\(value)")
-                            .font(.caption2)
+                            .font(.caption)
                             .frame(width: 270, height: 26, alignment: .leading)
                     }
                 }

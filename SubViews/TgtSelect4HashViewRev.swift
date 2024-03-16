@@ -45,7 +45,7 @@ ScrollView {
                 }
 
             }
-            .frame(width: 430, height: 300)
+            .frame(width: 430, height: 250)
         }
     }
     

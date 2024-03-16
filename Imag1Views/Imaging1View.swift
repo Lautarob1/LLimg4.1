@@ -12,13 +12,11 @@ struct Imaging1View: View {
     @State private var isliveimgChecked: Bool = true
     @State private var isViewPresented = false
     @State private var isChecked: Bool = false
-    //    @State private var isInputValid: Bool = true
-    //    @State private var showCustomAlert: Bool = false
-    var onReview: () -> Void
-    var onCancel: () -> Void
-    
-//    @available(macOS 14.0, *)
-//    @available(macOS 14.0, *)
+    @Binding var selectedOption: MenuOption?
+    @State private var showReviewView = false
+//    var onReview: () -> Void
+//    var onCancel: () -> Void
+
     var body: some View {
         
         HStack {
@@ -54,8 +52,8 @@ struct Imaging1View: View {
                 HStack {
                     Button(action: {
                        print("Img name: \(CaseInfoData.shared.imageName)")
-                            onReview()
-                        
+                        showReviewView = true
+
                     }) {
                         Text("Review")
                             .font(.custom("Helvetica Neue", size: 14))
@@ -65,8 +63,12 @@ struct Imaging1View: View {
                             .cornerRadius(10)
                             .padding(5)
                     }
+                    
+                    .sheet(isPresented: $showReviewView) {
+                        Imaging1RevView(selectedOption: $selectedOption, showReviewView: $showReviewView)
+                    }
                     Button(action: {
-                        onCancel()
+                        self.selectedOption = nil
                     }) {
                         Text("Cancel")
                             .font(.custom("Helvetica Neue", size: 14))
@@ -76,9 +78,9 @@ struct Imaging1View: View {
                             .cornerRadius(10)
                             .padding(5)
                     }
+                    .padding()
                 }
                 .buttonStyle(PlainButtonStyle())
-                .padding()
             }
             .frame(width: 450, height: 600)
             .padding()
@@ -90,6 +92,16 @@ struct Imaging1View: View {
     
 }
 
-#Preview {
-    Imaging1View(onReview: {}, onCancel: {})
+struct Imaging1View_Previews: PreviewProvider {
+    @State static var selectedOption: MenuOption? = MenuOption(id: 1)
+    
+    static var previews: some View {
+        Imaging1View(selectedOption: $selectedOption)
+    }
 }
+
+
+//#Preview {
+//    @State var selectedOption: MenuOption? = MenuOption(id: 1)
+//    Imaging1View (selectedOption: $selectedOption)
+//}

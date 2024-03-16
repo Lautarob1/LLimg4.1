@@ -62,11 +62,16 @@ struct Imaging2ProcView: View {
     @State var currentValue: CGFloat = 0.6
     @State var percentage: CGFloat = 0.6
     @State var endMessage: String = "All Completed!"
-    let procStep = ["Colecting and processing information...", "Creating DMG...", "Hashing DMG...", "Processing Finished"]
+    let procStep = ["Collecting targeted files/folders...", "Creating DMG...", "Hashing DMG...", "Processing Finished", "Error !!"]
+    @State var alertMsg: String = ""
+    @State var alertTitle: String = ""
+    @State var showCustomAlert: Bool = false
+    @State var messageBelowTimer: String = ""
     let timerGauge = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
     @State var timerGauge2: Timer?
 
-    var onComplete: () -> Void
+//    var onComplete: () -> Void
+    @Binding var selectedOption: MenuOption?
     
     var body: some View {
         
@@ -110,6 +115,18 @@ struct Imaging2ProcView: View {
                             acqlogDeviceInfo(filePath: logfilePath)
                             acqlogTargetedFF(filePath: logfilePath)
                             targetedImagefullProcess()
+                            if alertMsg == "" {
+                                print("after fullprocess--- END")
+                                imageName = "info.circle.fill"
+                                alertTitle = "😀"
+                                alertMsg = "Process finished, press Done Button or esc to return to main menu"
+                                messageBelowTimer = "All Completed!"
+                                stepIndex = 3
+                            }
+                            showCustomAlert = true
+                            anyprocIsRunning = false
+                            showDoneButton = true
+                            
                             print("after fullprocess--- END")
                         }) {
                             Text("Click to start process")
@@ -248,7 +265,7 @@ struct Imaging2ProcView: View {
                                 // Content of the third VStack
                                 CustomProgressView(scale: 3, color: .blue, backgroundColor: .clear, currrentValue: fileSizeChecker3.fileSizeInGB)
                             } else {
-                                Text(endMessage)
+                                Text(messageBelowTimer)
                                     .font(.system(size: 24, weight: .medium, design: .default))
                                     .foregroundColor(.white)
                             }
@@ -260,11 +277,30 @@ struct Imaging2ProcView: View {
                     }
                     
                 }
+                .overlay (
+                    Group {if showCustomAlert {
+                        CustomAlertView(
+                            showAlert: $showCustomAlert,
+                            imageName: imageName,
+                            title: alertTitle,
+                            message: alertMsg,
+                            fontSize1: 16,
+                            fontSize2: 12,
+                            textColor: Color(.white),
+                            backgroundColor: Color("LL_blue")
+//                            onOK: {
+//                                print("hola")
+//                            }
+                        )
+                        .offset(y: -100.0)
+                    }
+                    }
+                )
             }
 
                 if showDoneButton {
                     Button(action: {
-                        onComplete()
+                        self.selectedOption = nil
                     }) {
                         Text("Done")
                             .font(.custom("Helvetica Neue", size: 14))
@@ -297,22 +333,44 @@ struct Imaging2ProcView: View {
         sviewModel.output=createSparseContainer()
         print2Log(filePath: logfilePathEx, text2p: "Temp and collec process-------------------------------\n")
 //        print(sviewModel.output)
+        print("after create sparse Container")
         print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
         if  sviewModel.output.contains("failed") {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             sviewModel.output="Creating container for sparse fails. The processing cannot continue. Press esc to return to main menu"
-            endMessage = "Process Fail!"
-            timer.stopTimer()
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "😬"
+            alertMsg = "The sparse container could not be created due to a failure"
+            stepIndex = 4
+
             return
         }
+
+        if  sviewModel.output.contains("Sorry, try again") {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+            sviewModel.output="Creating container for sparse fails. The processing cannot continue. Press esc to return to main menu"
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "😬"
+            alertMsg = "The sparse container could not be created due to a password failure"
+            stepIndex = 4
+
+            return
+        }
+
         // Mount sparse container
         print("1st process (create sparse Container), done....")
         sviewModel.output=mountsparseContanier()
         print(sviewModel.output)
 //        print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+
         if  sviewModel.output.contains("failed") {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             sviewModel.output="Container was not mounted. The processing cannot continue. Press esc to return to main menu"
-            endMessage = "Process Fail!"
-            timer.stopTimer()
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "😬"
+            alertMsg = "The sparse container could not be mounted. Process fail"
+            stepIndex = 4
+
             return
         }
         
@@ -484,6 +542,7 @@ struct Imaging2ProcView: View {
     
     func createSparseContainer () -> String {
         let imgName = CaseInfoData.shared.imageName
+        let sparsePath = DiskDataManager.shared.selectedStorageOption
         print("in createSparseCont: imgName=\(imgName)")
         let passw = AuthenticationViewModel.shared.rootPassword
         let dskWithImagedFF = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? getRootFileSystemDiskID()!)
@@ -491,15 +550,20 @@ struct Imaging2ProcView: View {
         let imgSize = getDiskIDCapacityAvSpace(diskPath: dskWithImagedFF).capacity!
         maxValue = convertSizeStringToDouble(imgSize)
         FileSizeChecker3.shared.totalSizeInGB = maxValue
-        sviewModel.output=sviewModel.executeSudoCommand(command: "sudo hdiutil create -size \(imgSize) -type SPARSE -fs APFS -volname \(imgName) /Volumes/llidata/\(imgName)", passw: passw)
-        
+        print("imgSize calculated from getDisk (line 1060) \(imgSize)")
+        print("in createSparseCont: passw= \(passw)")
+        print("in createSparseCont: sparsePath= \(sparsePath)")
+        print("sudo hdiutil create -size \(imgSize) -type SPARSE -fs APFS -volname \(imgName) \(sparsePath)/\(imgName)")
+        sviewModel.output=sviewModel.executeSudoCommand(command: "sudo hdiutil create -size \(imgSize) -type SPARSE -fs APFS -volname \(imgName) \(sparsePath)/\(imgName)", passw: passw)
+        print("exiting createSparseContainer")
         return sviewModel.output
     }
     func mountsparseContanier() -> String {
+        let sparsePath = DiskDataManager.shared.selectedStorageOption
         let imgName = CaseInfoData.shared.imageName+".sparseimage"
         let passw = AuthenticationViewModel.shared.rootPassword
         
-        sviewModel.output=sviewModel.executeSudoCommand(command: "sudo hdiutil attach /Volumes/llidata/\(imgName)", passw: passw)
+        sviewModel.output=sviewModel.executeSudoCommand(command: "sudo hdiutil attach \(sparsePath)/\(imgName)", passw: passw)
         return sviewModel.output
     }
     
@@ -518,25 +582,40 @@ struct Imaging2ProcView: View {
  
     
     // Function to copy a file or directory, including hidden files and preserving extended attributes
-    func copyItem(atPath srcPath: String, toPath dstPath: String) {
-        let process = Process()
-        process.launchPath = "/bin/cp"
-        process.arguments = ["-a", srcPath, dstPath]
-        print("cmd in func copyItem: cp -a \(srcPath) \(dstPath)")
-        process.launch()
-        process.waitUntilExit()
 
-        let status = process.terminationStatus
-        if status == 0 {
-            filesCopied += 1
-        } else {
-            filesNotCopied += 1
-            let logfilePath2 = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName)_error.info"
-            print2Log(filePath: logfilePath2, text2p: "Failed to copy \(srcPath). Exit code: \(status)")
-            print("Failed to copy \(srcPath). Exit code: \(status)")
+    func copyItem(atPath srcPath: String, toPath dstPath: String) {
+ //        let process = Process()
+ //        process.launchPath = "/bin/cp"
+ //        process.arguments = ["-a", srcPath, dstPath]
+ //        print("cmd in func copyItem: cp -a \(srcPath) \(dstPath)")
+ //        process.launch()
+ //        process.waitUntilExit()
+         let passw = AuthenticationViewModel.shared.rootPassword
+         let command = "cp -a \(srcPath) \(dstPath)"
+         let fullCommand = "echo \(passw) | sudo -S \(command)"
+         print(command)
+         let process = Process()
+         let pipe = Pipe()
+         process.environment = ProcessInfo.processInfo.environment
+         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+         process.arguments = ["-c", fullCommand]
+        do {
+            try process.run()
+            process.waitUntilExit()
+        } catch {
+            print("Error: \(error.localizedDescription)")
         }
-    }
-    
+        
+         let status = process.terminationStatus
+         if status == 0 {
+             filesCopied += 1
+         } else {
+             filesNotCopied += 1
+             let logfilePath2 = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName)_error.info"
+             print2Log(filePath: logfilePath2, text2p: "Failed to copy \(srcPath). Exit code: \(status)")
+             print("Failed to copy \(srcPath). Exit code: \(status)")
+         }
+     }
     
     func createdmgImage() {
         let imgName = CaseInfoData.shared.imageName
@@ -617,7 +696,7 @@ struct Imaging2ProcView: View {
         let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
         print2Log(filePath: logfilePath, text2p: "Hash DMG image process -------------\n")
         let hashTimeIni = LLTimeManager.getCurrentTimeString()
-        print2Log(filePath: logfilePath, text2p: "Start time:        \(hashTimeIni)")
+        print2Log(filePath: logfilePath, text2p: "Start time:     \(hashTimeIni)")
    
         
         switch DiskDataManager.shared.selectedHashOption {
@@ -684,10 +763,18 @@ struct Imaging2ProcView: View {
      
 }
 
-
-#Preview {
-
-        Imaging2ProcView(onComplete: {
-            // Dummy closure for preview
-    })
+struct Imaging2ProcView_Previews: PreviewProvider {
+    @State static var selectedOption: MenuOption? = MenuOption(id: 1)
+    
+    static var previews: some View {
+        Imaging2ProcView(selectedOption: $selectedOption)
+    }
 }
+
+
+//#Preview {
+//
+//        Imaging2ProcView(onComplete: {
+//            // Dummy closure for preview
+//    })
+//}

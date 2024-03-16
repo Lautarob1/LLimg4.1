@@ -26,7 +26,7 @@ struct TgtInfoViewRev: View {
             // Display information from the first disk
             
             // Display information from the second disk
-            Text("D E S T I N A T I O N:")
+            Text("D E S T I N A T I O N")
                 .font(.headline)
                 .padding()
             if isDiskValid {
@@ -50,21 +50,22 @@ struct TgtInfoViewRev: View {
     }
     
     private func displayDiskInfo(_ dict: [String: String]) -> some View {
-        VStack {
-            ForEach(Array(dict), id: \.key) { key, value in
-                HStack {
-                    Text("\(key):")
-                        .font(.caption)
-                        .frame(width: 125, height: 15, alignment: .leading)
-                    Text("\(value)") // +  "😡")
-                        .font(.caption2)
-                        .frame(width: 280, alignment: .leading)
+        ScrollView {
+            VStack (spacing: 2) {
+                ForEach(Array(dict), id: \.key) { key, value in
+                    HStack {
+                        Text("\(key):")
+                            .font(.caption)
+                            .frame(width: 115, height: 26, alignment: .leading)
+                        Text("\(value)")
+                            .font(.caption)
+                            .frame(width: 270, height: 26, alignment: .leading)
+                    }
                 }
             }
         }
         
     }
-   
 }
 
 

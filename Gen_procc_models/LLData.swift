@@ -69,7 +69,6 @@ class FileWriter {
 }
 
 
-import Foundation
 
 class FileWriterWithDelection {
     private var fileHandle: FileHandle?
@@ -263,6 +262,10 @@ class FileSelectionManager: ObservableObject {
     
     func removeFile(at indexSet: IndexSet) {
         selectedFiles.remove(atOffsets: indexSet)
+    }
+    
+    func removeFileFolder(at indexSet: IndexSet) {
+        selectedFiFo.remove(atOffsets: indexSet)
     }
     
     func calculateSizeAsync(for path: String, completion: @escaping (Int64) -> Void) {

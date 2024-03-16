@@ -42,7 +42,7 @@ struct ImgInfoHashView: View {
                    TgtSelect4HashView()
                 }
                 HStack {
-                    FilePickerView(path2img: "path for hash values report", butlabel: "Select..." ) { selectedPath in
+                    FilePickerView(path2img: "Destination for report", butlabel: "Select..." ) { selectedPath in
                         DiskDataManager.shared.selectedStorageOption = selectedPath}
                                         }
   
@@ -60,7 +60,7 @@ struct ImgInfoHashView: View {
                     .background()
                 // if
             }
-                .frame(width: 420, height: 500)
+                .frame(width: 420)
                 .padding()
             }
 

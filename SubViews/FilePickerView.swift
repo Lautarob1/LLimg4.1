@@ -26,6 +26,7 @@ struct FilePickerView: View {
                 openPanel.allowsMultipleSelection = false
                 openPanel.canChooseDirectories = true
                 openPanel.canChooseFiles = false
+                openPanel.canCreateDirectories = true
 
                 if openPanel.runModal() == .OK {
                     self.filePath = openPanel.url?.path ?? ""
@@ -34,7 +35,7 @@ struct FilePickerView: View {
                 }
             }
         }
-        .frame(width: 420)
+//        .frame(width: 420)
         .background()
     }
 }

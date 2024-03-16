@@ -12,8 +12,10 @@ struct Imaging2View: View {
     @State private var isliveimgChecked: Bool = true
     @State private var isViewPresented = false
     @State private var isChecked: Bool = false
-    var onReview: () -> Void
-    var onCancel: () -> Void
+//    var onReview: () -> Void
+//    var onCancel: () -> Void
+    @Binding var selectedOption: MenuOption?
+    @State private var showReviewView = false
     
     var body: some View {
 
@@ -46,9 +48,10 @@ struct Imaging2View: View {
             .background()
             VStack {
                 ImgInfoTgtView()
+           
             HStack {
                     Button(action: {
-                        onReview()
+                        showReviewView = true
                     }) {
                         Text("Review")
                             .font(.custom("Helvetica Neue", size: 14))
@@ -58,8 +61,11 @@ struct Imaging2View: View {
                             .cornerRadius(7)
                             .padding(3)
                     }
+                    .sheet(isPresented: $showReviewView) {
+                    Imaging2RevView(selectedOption: $selectedOption, showReviewView: $showReviewView)
+                }
                 Button(action: {
-                    onCancel()
+                    self.selectedOption = nil
                 }) {
                     Text("Cancel")
                         .font(.custom("Helvetica Neue", size: 14))
@@ -80,6 +86,15 @@ struct Imaging2View: View {
 
 }
 
-#Preview {
-    Imaging2View(onReview: {}, onCancel: {}) //.environmentObject(CaseInfoData())
+struct Imaging2View_Previews: PreviewProvider {
+    @State static var selectedOption: MenuOption? = MenuOption(id: 1)
+    
+    static var previews: some View {
+        Imaging2View(selectedOption: $selectedOption)
+    }
 }
+
+
+//#Preview {
+//    Imaging2View(onReview: {}, onCancel: {}) //.environmentObject(CaseInfoData())
+//}

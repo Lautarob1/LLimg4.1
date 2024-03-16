@@ -12,27 +12,28 @@ struct Imaging4View: View {
     @State private var isliveimgChecked: Bool = true
     @State private var isViewPresented = false
     @State private var isChecked: Bool = false
-    var onReview: () -> Void
-    var onCancel: () -> Void
+    @Binding var selectedOption: MenuOption?
+    @State private var showReviewView = false
+
     
     var body: some View {
-
+        
         HStack {
             
             VStack {
                 HStack(alignment: .top) {
-                        Image("img_but4")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 90, height: 90)
-                            .cornerRadius(15)
-                            .padding(.leading)
-                        Spacer()  // Pushes the image to the left
-                    }
-            
+                    Image("img_but4")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 90, height: 90)
+                        .cornerRadius(15)
+                        .padding(.leading)
+                    Spacer()  // Pushes the image to the left
+                }
+                
                 CaseInfoView()
                     .padding(.leading, 10)
-
+                
             }
             .frame(width: 360, height: 500)
             VStack{
@@ -46,9 +47,9 @@ struct Imaging4View: View {
             .background()
             VStack {
                 ImgInfoHashView()
-            HStack {
+                HStack {
                     Button(action: {
-                        onReview()
+                        showReviewView = true
                     }) {
                         Text("Review")
                             .font(.custom("Helvetica Neue", size: 14))
@@ -58,28 +59,43 @@ struct Imaging4View: View {
                             .cornerRadius(7)
                             .padding(3)
                     }
-                Button(action: {
-                    onCancel()
-                }) {
-                    Text("Cancel")
-                        .font(.custom("Helvetica Neue", size: 14))
-                        .frame(width: 100, height: 20)
-                        .foregroundColor(.white)
-                        .background(Color.blue)
-                        .cornerRadius(7)
-                        .padding(3)
+                    .sheet(isPresented: $showReviewView) {
+                        Imaging4RevView(selectedOption: $selectedOption, showReviewView: $showReviewView)
+                        Button(action: {
+                            self.selectedOption = nil
+                        }) {
+                            Text("Cancel")
+                                .font(.custom("Helvetica Neue", size: 14))
+                                .frame(width: 100, height: 20)
+                                .foregroundColor(.white)
+                                .background(Color.blue)
+                                .cornerRadius(7)
+                                .padding(3)
+                        }
+                    }
+                    .padding()
                 }
-                }
-                .padding()
+                .buttonStyle(PlainButtonStyle())
+                
             }
-                .frame(width: 450, height: 600)
-                .padding()
-
+            .frame(width: 450, height: 600)
+            .padding()
         }
-        }
-
+        
+    }
 }
 
-#Preview {
-    Imaging4View(onReview: {}, onCancel: {}) //.environmentObject(CaseInfoData())
+struct Imaging4View_Previews: PreviewProvider {
+    @State static var selectedOption: MenuOption? = MenuOption(id: 4)
+    @State static var showReviewView: Bool = true
+    
+    static var previews: some View {
+        Imaging4RevView(selectedOption: $selectedOption, showReviewView: $showReviewView)
+    }
 }
+    
+    
+//    
+//#Preview {
+//    Imaging4View(onReview: {}, onCancel: {}) //.environmentObject(CaseInfoData())
+//}
