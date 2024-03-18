@@ -14,8 +14,6 @@ struct Imaging1View: View {
     @State private var isChecked: Bool = false
     @Binding var selectedOption: MenuOption?
     @State private var showReviewView = false
-//    var onReview: () -> Void
-//    var onCancel: () -> Void
 
     var body: some View {
         

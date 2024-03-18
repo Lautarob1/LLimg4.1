@@ -9,7 +9,6 @@ import SwiftUI
 
 
 
-//@available(macOS 14.0, *)
 struct Imaging3ProcView: View {
     @ObservedObject var authModel = AuthenticationViewModel()
     @ObservedObject var sviewModel = ConsoleViewModel()
@@ -68,8 +67,6 @@ struct Imaging3ProcView: View {
     @State var messageBelowTimer: String = ""
     @State var sparseGB: Double = 0.0
  
-
-//    var onComplete: () -> Void
     @Binding var selectedOption: MenuOption?
     
     var body: some View {

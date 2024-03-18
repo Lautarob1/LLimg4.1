@@ -61,7 +61,9 @@ struct Imaging4View: View {
                     }
                     .sheet(isPresented: $showReviewView) {
                         Imaging4RevView(selectedOption: $selectedOption, showReviewView: $showReviewView)
+                    }
                         Button(action: {
+                            initHash()
                             self.selectedOption = nil
                         }) {
                             Text("Cancel")
@@ -71,7 +73,6 @@ struct Imaging4View: View {
                                 .background(Color.blue)
                                 .cornerRadius(7)
                                 .padding(3)
-                        }
                     }
                     .padding()
                 }
@@ -81,7 +82,9 @@ struct Imaging4View: View {
             .frame(width: 450, height: 600)
             .padding()
         }
-        
+        .onAppear() {
+            initHash()
+        }
     }
 }
 

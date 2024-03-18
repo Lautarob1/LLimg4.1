@@ -11,7 +11,6 @@ struct TgtSelect4HashView: View {
     @State private var filePath: String = ""
     @State private var selectedItems = Set<UUID>()
     @ObservedObject private var fileSelectionManager = FileSelectionManager()
-//    @State private var stillWorking = false
     let path2img: String = "Targeted hash file/Image"
     
     var body: some View {
@@ -48,9 +47,6 @@ struct TgtSelect4HashView: View {
     
 
             }
-//            .onAppear() {
-//                let butlabel: String = (stillWorking ? "Working on it" : "Select Files/Folders")
-//            }
             .background()
 
 

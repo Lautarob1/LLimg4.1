@@ -14,7 +14,7 @@ struct Imaging4ProcView: View {
     @ObservedObject var sviewModel = ConsoleViewModel()
     @ObservedObject var diskDataManager = DiskDataManager()
     @ObservedObject var timer = ElapsedTimeTimer()
-    @ObservedObject var hviewModel = HashingViewModel()
+    @ObservedObject var hashViewModel = HashingViewModel2()
     @ObservedObject var timerHash = TimerHash()
     @State private var caseName: String = ""
     @State private var evidenceName: String = ""
@@ -58,6 +58,11 @@ struct Imaging4ProcView: View {
     @State var currentValue: CGFloat = 0.6
     @State var percentage: CGFloat = 0.6
     let procStep = ["Hashing Files...", "Processing Finished"]
+    @State var alertMsg: String = ""
+    @State var alertTitle: String = ""
+    @State var showCustomAlert: Bool = false
+    @State var messageBelowTimer: String = ""
+    @State var sparseGB: Double = 0.0
     @Binding var selectedOption: MenuOption?
     
     var body: some View {
@@ -91,12 +96,13 @@ struct Imaging4ProcView: View {
                         Button (action: {
                             print("process starts")
                             showControls = false
-                            
                             logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
-  
                             acqlogHeader(filePath: logfilePath)
-                            showProc = true
+                            hashViewModel.showProc = true
+//                            showProc = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             hashingfullProcess()
+                            }
                             print("after fullprocess--- END")
                         }) {
                             Text("Click to start process")
@@ -106,6 +112,7 @@ struct Imaging4ProcView: View {
                                 .foregroundColor(.white)
                                 .background(Color(("LL_orange")))
                                 .cornerRadius(10)
+                                .buttonStyle(PlainButtonStyle())
                                 
                         }
                     }
@@ -133,24 +140,22 @@ struct Imaging4ProcView: View {
                 HStack {
                     
                 }
-                if showProc {
+                if hashViewModel.showProc {
                 VStack (spacing: 0) {
                     HStack {
                         VStack {
-                            Text(procStep[stepIndex])
+                            Text(procStep[hashViewModel.stepIndex])
                         }
                         .font(.title)
-                        .foregroundColor(.white) // Set text color to white
-                        .frame(maxWidth: 840, alignment: .leading) // Align text to the left
-                        .padding(5) // Add padding around the text
-                        .background(Color("LL_blue")) // Set background color to blue
-                        .cornerRadius(5) // Optional: for rounded corners
+                        .foregroundColor(.white)
+                        .frame(maxWidth: 840, alignment: .leading)
+                        .padding(5)
+                        .background(Color("LL_blue"))
+                        .cornerRadius(5)
                     }
                     .padding()
                     HStack(spacing: 0) {
-                        // Set spacing to 0 if you don't want any space between the VStacks
                         VStack {
-                            // Content of the second VStack
                             Text(titleImgSize)
                                 .font(.system(size: 18, weight: .medium, design: .default))
                                 .foregroundColor(.white)
@@ -167,11 +172,11 @@ struct Imaging4ProcView: View {
                         }
                         .frame(width: 250, height: 30)
                         .padding(.horizontal)
-                        .background(Color("LL_orange")) // Background color for visualization
+                        .background(Color("LL_orange"))
                         
                         VStack {
                             // Content of the third VStack
-                            Text("Time Elapsed: \(timerHash.timeElapsedFormatted)")
+                            Text("Time Elapsed: \(hashViewModel.elapsedTime)")
                                 .font(.system(size: 14, weight: .medium, design: .default)) // Customize the font here
                                 .frame(width: 220, height: 25)
                                 .padding(0) // Add padding around the text
@@ -190,7 +195,7 @@ struct Imaging4ProcView: View {
                     HStack(spacing: 0) { // Set spacing to 0 if you don't want any space between the VStacks
                         VStack {
                             // Content of the first VStack
-                            Text("\(hviewModel.hashProgressByt, specifier: "%.0f") Bytes")
+                            Text("\(hashViewModel.hashProgressByt, specifier: "%.0f") Bytes")
                                 .font(.system(size: 24, weight: .medium, design: .default)) // Customize the font here
                                 .frame(minWidth: 130, minHeight: 40)
                                 .padding(2) // Add padding around the text
@@ -214,13 +219,13 @@ struct Imaging4ProcView: View {
                                     .frame(width: 150, height: 80)
 
                                 Circle()
-                                    .trim(from: 0.0, to: hviewModel.hashProgressPct)
+                                    .trim(from: 0.0, to: hashViewModel.hashProgressPct)
                                     .stroke(style: StrokeStyle(lineWidth: 20.0, lineCap: .round, lineJoin: .round))
                                     .foregroundColor(.white)
                                     .frame(width: 150, height: 80)
                                     .rotationEffect(Angle(degrees: 270.0))
 
-                                Text(String(format: "%00.0f%%", 100 * hviewModel.hashProgressPct))
+                                Text(String(format: "%00.0f%%", 100 * hashViewModel.hashProgressPct))
                                     .font(.headline)
                                     .foregroundColor(.white)
                             }
@@ -231,9 +236,9 @@ struct Imaging4ProcView: View {
                         .background(gradient)
                         
                         VStack {
-                            if anyprocIsRunning {
+                            if hashViewModel.anyprocIsRunning {
                                 // Content of the third VStack
-                                CustomProgressView(scale: 2, color: .blue, backgroundColor: .clear, currrentValue: hviewModel.hashProgressByt)
+                                CustomProgressView(scale: 2, color: .blue, backgroundColor: .clear, currrentValue: hashViewModel.hashProgressByt)
                             } else {
                                 Text("All Completed!")
                                     .font(.system(size: 24, weight: .medium, design: .default))
@@ -247,9 +252,25 @@ struct Imaging4ProcView: View {
                     }
                     
                 }
+                .overlay (
+                    Group {if showCustomAlert {
+                        CustomAlertView(
+                            showAlert: $showCustomAlert,
+                            imageName: imageName,
+                            title: alertTitle,
+                            message: alertMsg,
+                            fontSize1: 16,
+                            fontSize2: 12,
+                            textColor: Color(.white),
+                            backgroundColor: Color("LL_blue")
+                        )
+                        .offset(y: -100.0)
+                    }
+                    }
+                )
             }
 
-                if showDoneButton {
+                if hashViewModel.showDoneButton {
                     Button(action: {
                         self.selectedOption = nil
                     }) {
@@ -261,6 +282,7 @@ struct Imaging4ProcView: View {
                             .cornerRadius(10)
                             .padding(3)
                     }
+                    .buttonStyle(PlainButtonStyle())
                     Spacer()
                 }
             }
@@ -275,20 +297,12 @@ struct Imaging4ProcView: View {
     
     func hashingfullProcess () {
         print("entering hashingfullProcess ....")
-        showProc = true
-//        Thread.sleep(forTimeInterval: 1)
-        anyprocIsRunning = true
-        titleImgSize = "Size Collection"
+//        hashViewModel.showProcHash = true
+        hashViewModel.anyprocIsRunning = true
+        titleImgSize = "Size Collected"
         titleGauge = "% Completed"
-        timerHash.start()
-        timer.startTimer()
-//        Thread.sleep(forTimeInterval: 1)
-        print("timerH after 2nd sleep \(timerHash.timeElapsedFormatted)")
-        print("timer after 2nd sleep \(timer.elapsedTimeString)")
+        
         hashcalculations()
-        print("Process hash calcs done....")
-        anyprocIsRunning = false
-        showDoneButton = true
     }
     
     //  aux functions used
@@ -297,9 +311,8 @@ struct Imaging4ProcView: View {
     func hashcalculations() {
         
         print("inside hashcalculations...")
-        print("timerH in hashCalc \(timerHash.timeElapsedFormatted)")
-        
-        print("timer in hash calc \(timer.elapsedTimeString)")
+//        print("timerH in hashCalc \(timerHash.timeElapsedFormatted)")
+//        print("timer in hash calc \(timer.elapsedTimeString)")
         if DiskDataManager.shared.selectedHashOption != "NO-HASH" {stepIndex = 1 }
         let fullFilePaths = FileSelectionManager.shared.selectedFiles
         logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
@@ -311,8 +324,12 @@ struct Imaging4ProcView: View {
             switch whichHash {
             case "SHA256":
                 print("switch case 256")
-                let hash256 = hashLargeFileSHA256 (filePath: file.path, viewModel: hviewModel)
 //                var hash256 = ""
+                let hash256 = hashViewModel.startHashing(filePath: file.path)
+//                hash256 = hashViewModel.hashResult ?? "No hash calculated"
+//                DispatchQueue.main.async {
+//                    self.timerHash.start()
+//                }
 //                DispatchQueue.global(qos: .background).async {
 //                    hash256 =
 //                    hashLargeFileSHA256 (filePath: file.path, viewModel: hviewModel)
@@ -320,16 +337,19 @@ struct Imaging4ProcView: View {
 //                        self.timerHash.stop()
 //                    }
 //                }
-                let hashTimeEnd = LLTimeManager.getCurrentTimeString()
-                print2Log(filePath: logfilePath, text2p: "Hashing file:     \(file.path)")
-//                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
-                print2Log(filePath: logfilePath, text2p: "Start time:       \(hashTimeIni)")
-                print2Log(filePath: logfilePath, text2p: "End time:         \(hashTimeEnd)")
-                print2Log(filePath: logfilePath, text2p: "SHA256 hash:      \(String(describing: hash256)) \n")
-                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
+//                    let hash256 = hashViewModel.hashResult
+                    print("hash: \(hashViewModel.hashResult) ")
+//                    Text("Hash Result: \(hashResult)")
+                    let hashTimeEnd = LLTimeManager.getCurrentTimeString()
+//                    print2Log(filePath: logfilePath, text2p: "Hashing file:     \(file.path)")
+//                    //                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
+//                    print2Log(filePath: logfilePath, text2p: "Start time:       \(hashTimeIni)")
+//                    print2Log(filePath: logfilePath, text2p: "End time:         \(hashTimeEnd)")
+//                    print2Log(filePath: logfilePath, text2p: "SHA256 hash:      \(hash256)")
+//                    print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
+                    
                 
-                
-            case "SHA1":
+                case "SHA1":
                 let hashsha1 =
                 hashLargeFileSHA1(filePath: file.path)
                 let hashTimeEnd = LLTimeManager.getCurrentTimeString()
@@ -356,9 +376,13 @@ struct Imaging4ProcView: View {
             default:
                 print("Invalid selection")
             }
-        }
-        stepIndex = 1
-        timerHash.stop()
+        }  
+//        
+//            anyprocIsRunning = false
+//            showDoneButton = true
+//            stepIndex = 1
+     
+//        timerHash.stop()
             
         }
 

@@ -12,8 +12,6 @@ struct Imaging2View: View {
     @State private var isliveimgChecked: Bool = true
     @State private var isViewPresented = false
     @State private var isChecked: Bool = false
-//    var onReview: () -> Void
-//    var onCancel: () -> Void
     @Binding var selectedOption: MenuOption?
     @State private var showReviewView = false
     
@@ -65,6 +63,7 @@ struct Imaging2View: View {
                     Imaging2RevView(selectedOption: $selectedOption, showReviewView: $showReviewView)
                 }
                 Button(action: {
+                    initTgt()
                     self.selectedOption = nil
                 }) {
                     Text("Cancel")
@@ -81,6 +80,9 @@ struct Imaging2View: View {
                 .frame(width: 450, height: 600)
                 .padding()
 
+        }
+        .onAppear() {
+            initTgt()
         }
         }
 

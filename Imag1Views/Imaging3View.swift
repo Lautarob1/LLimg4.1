@@ -50,9 +50,9 @@ struct Imaging3View: View {
                 
                 HStack {
                     Button(action: {
-                       print("Img name: \(CaseInfoData.shared.imageName)")
+                        print("Img name: \(CaseInfoData.shared.imageName)")
                         showReviewView = true
-
+                        
                     }) {
                         Text("Review")
                             .font(.custom("Helvetica Neue", size: 14))
@@ -67,6 +67,7 @@ struct Imaging3View: View {
                         Imaging3RevView(selectedOption: $selectedOption, showReviewView: $showReviewView)
                     }
                     Button(action: {
+                        initSparse()
                         self.selectedOption = nil
                     }) {
                         Text("Cancel")
@@ -85,9 +86,11 @@ struct Imaging3View: View {
             .padding()
             
         }
+        .onAppear() {
+            initSparse()
+        }
+        
     }
-    
-    
     
 }
 

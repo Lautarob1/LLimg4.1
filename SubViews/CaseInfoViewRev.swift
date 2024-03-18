@@ -55,7 +55,7 @@ public struct CaseInfoViewRev: View {
 
                 }
                 HStack {
-                        Text("notes:")
+                        Text("Notes:")
                             .font(.headline)
                             .padding(.leading, 3)
                             .frame(width: 120, alignment: .leading)

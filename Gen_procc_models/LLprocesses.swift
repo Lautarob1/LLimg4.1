@@ -7,7 +7,39 @@
 
 import Foundation
 
+func initTgt() {
+// initialize values for tgt
+    FileSelectionManager.shared.selectedFiFo = []
+    DiskDataManager.shared.selectedDskOption = ""
+    DiskDataManager.shared.selectedStorageOption = ""
+    DiskDataManager.shared.selected2ndStorageOption = ""
+    DiskDataManager.shared.selectedHashOption = "SHA256"
+    DiskDataManager.shared.isComboDisabled = true
+    CaseInfoData.shared.imageName = "TargetedImg01"
+}
 
+func initSparse() {
+// initialize values for both convert sparse and hash
+    FileSelectionManager.shared.selectedFiles = []
+    DiskDataManager.shared.selectedDskOption = ""
+    DiskDataManager.shared.selectedStorageOption = ""
+    DiskDataManager.shared.selected2ndStorageOption = ""
+    DiskDataManager.shared.selectedHashOption = "SHA256"
+    CaseInfoData.shared.imageName = ""
+    
+}
+
+
+func initHash() {
+// initialize values for both convert sparse and hash
+    FileSelectionManager.shared.selectedFiles = []
+    DiskDataManager.shared.selectedDskOption = ""
+    DiskDataManager.shared.selectedStorageOption = ""
+    DiskDataManager.shared.selected2ndStorageOption = ""
+    DiskDataManager.shared.selectedHashOption = "SHA256"
+    CaseInfoData.shared.imageName = ""
+    
+}
 
 func loadDiskInfo() -> [String] {
     // this process reads all storage devices connected to the computer and returned a lines array as per terminal output
