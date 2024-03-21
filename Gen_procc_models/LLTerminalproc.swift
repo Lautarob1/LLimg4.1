@@ -314,15 +314,20 @@ class FileSizeChecker3: ObservableObject {
     static let shared = FileSizeChecker3()
     @Published var fileSizeInGB: Double = 0.0
     var totalSizeInGB: Double = 0.0
-    @Published var percenAdvance: Double = 0.0
-    @Published var pctAdvanceTgt: Double = 0.0
-    @Published var pctAdvanceSpar: Double = 0.0
+    @Published var pctAdvance: Double = 0.0
     private var timer: Timer?
     var filePath: String?
     
     func startMonitoring() {
         guard let filePath = filePath else {
             print("File path not set")
+            // total disk size here to be used in pct advance calcs
+            let sourceDisk = "/dev/" + (extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/")
+            if let totalCapacity = getAnyDiskInfo(dskpath: sourceDisk)?.totalCapacity {
+                let totalSizeInGB = totalCapacity / 1_000_000_000
+                print("Total capacity: \(totalCapacity)")
+                print("Total source in GB: \(totalSizeInGB)")
+            }
             return
         }
         
@@ -349,13 +354,13 @@ class FileSizeChecker3: ObservableObject {
             if let fileSize = attributes[.size] as? Int64 {
                 // Convert file size to GB
                 let fileSizeInGB = Double(fileSize) / 1_000_000_000
-//                let percenAdvance = fileSizeInGB / FileSizeChecker3.shared.totalSizeInGB
-//                print("inside filechk3 totalSizeinGB: \(totalSizeInGB)")
-//                print("inside filechk3 FileSizeChecker3.shared.totalSizeInGB: \(FileSizeChecker3.shared.totalSizeInGB)")
-//                print("inside filechk3 percenAdvance: \(percenAdvance)")
+                let pctAdvanceImgDev = fileSizeInGB / FileSizeChecker3.shared.totalSizeInGB
+                print("inside filechk3 totalSizeinGB: \(totalSizeInGB)")
+                print("inside filechk3 FileSizeChecker3.shared.totalSizeInGB: \(FileSizeChecker3.shared.totalSizeInGB)")
+                print("inside filechk3 percenAdvance: \(pctAdvanceImgDev)")
                 DispatchQueue.main.async {
                     self.fileSizeInGB = fileSizeInGB
-//                    self.percenAdvance = percenAdvance
+                    self.pctAdvance = pctAdvanceImgDev
                 }
             }
         } catch {

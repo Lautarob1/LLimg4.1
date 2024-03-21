@@ -11,6 +11,7 @@ import SwiftUI
 class AuthenticationViewModel: ObservableObject {    
     static let shared = AuthenticationViewModel()
     @Published var isLicenseValid: Bool = false
+    @Published var isSerialValid: Bool = false
     @Published var licenseFileFound: Bool = false
     @Published var licenseType: String = ""
     @Published var licenseSerial: String = ""
@@ -23,14 +24,21 @@ class AuthenticationViewModel: ObservableObject {
     func ValidateLicense() -> String {
 //         licenseStatus = "Expired"
 //        temp test (not working when using the app in other computer.
-        let filePath = "/Volumes/LLimager-int/LLimager/llimager.lic"
+        let filePath = "/Volumes/LLimager-Int/LLimager/llimager.lic"
         licenseFileFound = licencefileExistsAndCanBeRead(atPath: filePath)
+
         if licenseFileFound {
             let licenseDetails = readLicense().components(separatedBy: "\n")
+            print("Lic details read: \(licenseDetails)")
             self.licenseType = licenseDetails[0]
             self.licenseSerial = licenseDetails[1]
             self.licenseExpDate = licenseDetails[2]
-            self.licenseStatus = checkLicense(dateRef: licenseDetails[2])        }
+            if self.licenseType == "License" {
+                self.isSerialValid = checkSerialNumber()
+            }
+            self.licenseStatus = checkLicense(dateRef: licenseDetails[2])
+            if !self.isSerialValid {self.licenseStatus = self.licenseStatus + "-InvalidSerial"}
+        }
         else {
             self.licenseStatus = "File not found"
         }
@@ -53,7 +61,29 @@ class AuthenticationViewModel: ObservableObject {
             isPasswordCorrect = (password == "passw")
         }
     }
-
+    
+    
+    func executeCommand(command: String) -> String {
+        print("entering ConsoleViewModel-executeCommand")
+        let process = Process()
+        let pipe = Pipe()
+        process.environment = ProcessInfo.processInfo.environment
+        process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        process.arguments = ["-c", command]
+        process.standardOutput = pipe
+        process.standardError = pipe
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+        } catch {
+            return "Error: \(error.localizedDescription)"
+        }
+        
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        print("about to leave ConsoleViewModel-executeSudoCommand")
+        return String(data: data, encoding: .utf8) ?? "Error decoding output"
+    }
 
     func licencefileExistsAndCanBeRead(atPath path: String) -> Bool {
         let fileManager = FileManager.default
@@ -75,6 +105,20 @@ class AuthenticationViewModel: ObservableObject {
         }
     }
 
+    func checkSerialNumber () -> Bool {
+        let cmdOutput = executeCommand(command: "system_profiler SPUSBDataType")
+        let serialValid: Bool = false
+        if cmdOutput.contains(self.licenseSerial) {
+            var serialValid = true
+        }
+        print("is serial Valid after ouput: \(isSerialValid)")
+        // eliminate this lines within the second if{} only temp for test
+        if cmdOutput.contains("S6XGNS0W618693L") {
+            var serialValid = true
+        }
+        print("is serial Valid after serial added: \(isSerialValid)")
+        return serialValid
+    }
 
 }
 

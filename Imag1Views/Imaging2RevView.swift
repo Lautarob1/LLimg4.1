@@ -106,12 +106,12 @@ struct Imaging2RevView: View {
                     }
                 }
                 .onAppear() {
-                    let sourceDisk = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/")
+                    let sourceDisk = extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/"
                     let destinationDisk = DiskDataManager.shared.selectedStorageOption
                     if validatePath(path: destinationDisk) {
                         let destDMGDisk = DiskDataManager.shared.selected2ndStorageOption
                         let imgName = validateInput(name: CaseInfoData.shared.imageName)
-                        print("scr disk: \(sourceDisk )")
+                        print("scr disk: \(sourceDisk)")
                         print("dst disk: \(destinationDisk)")
                         print("dst2 disk: \(destDMGDisk)")
                         print("name of image: \(CaseInfoData.shared.imageName)")
@@ -121,13 +121,13 @@ struct Imaging2RevView: View {
                         dupNameDmg = isImageNameAtPath(path: destfullPathDMG)
                         print("valid name?: \(imgName)")
                         dupName = dupNameSps || dupNameDmg
-                        let noFFSel =  FileSelectionManager.shared.selectedFiFo.isEmpty
+                        let noFFSel =  FileSelectionManager.shared.selectedFiFo.first?.path != nil
                        
                         let destNoOK = isDestinationInRoot(path: destinationDisk)
                         alertText0 = (noFFSel ? "😳 No files or folders selected"  : "")
                         alertText1 = (destNoOK ? "\n😳 Invalid! System disk cannot be used as destination"  : "")
                         alertText2 = (imgName ? "" : "\n🤔 Image Name invalid or empty")
-                        alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete sparse or DMG files with name: \(imgName)" :  "" )
+                        alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete sparse or DMG files with name: \(CaseInfoData.shared.imageName)" :  "" )
 //                        print("alert0: \(alertText0)")
 //                        print("alert1: \(alertText1)")
 //                        print("alert2: \(alertText2)")

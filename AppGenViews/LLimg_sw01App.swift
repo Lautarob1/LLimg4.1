@@ -31,7 +31,8 @@ struct LLimg_sw01App: App {
                         .onAppear {
                             let status = authModel.ValidateLicense()
                             //                            print("result of ValidateLicense: \(status)")
-                            if status == "Expired" || status == "File not found" {
+                            if status == "Expired" || status == "File not found" || status.contains("InvalidSerial") {
+                                print("status of license: \(status)")
                                 authModel.isLicenseValid = false
                             } else {
                                 // Activate (to true) for triggering the app verif logic and quit if the license is expiered

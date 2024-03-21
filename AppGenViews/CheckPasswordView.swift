@@ -93,7 +93,7 @@ struct CheckPasswordView: View {
             if !authModel.isLicenseValid {
                 showAlert = true
 //                print(AuthenticationViewModel.shared.licenseFileFound)
-                authModel.licenseMessage = AuthenticationViewModel.shared.licenseFileFound ? "License Expired" : "No License File found"
+                authModel.licenseMessage = AuthenticationViewModel.shared.licenseFileFound ? "License Expired or Invalid" : "No License File found"
                 alertMessage = "\(authModel.licenseMessage). Access denied. The app will now quit. You should run it again once you have a valid file license in the required path (please check the app Manual)"
             }
             

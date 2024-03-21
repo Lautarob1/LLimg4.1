@@ -62,6 +62,9 @@ struct Imaging1ProcView: View {
     let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color.gray]),
                       startPoint: .top,
                       endPoint: .bottom)
+    let gradt2 = LinearGradient(gradient: Gradient(colors: [Color("LL_blue"), Color.black.opacity(0.6)]),
+                      startPoint: .top,
+                      endPoint: .bottom)
 //    var onComplete: () -> Void
     @Binding var selectedOption: MenuOption?
     
@@ -136,18 +139,18 @@ struct Imaging1ProcView: View {
                     
                 }
                 ScrollView {
-                    TextEditor(text: $sviewModel.output)
-//                    Text(sviewModel.output)
+//                    TextEditor(text: $sviewModel.output)
+                    Text(sviewModel.output)
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
 //                        .italic()
-                        .foregroundColor(.blue) // Set the text color
-                        .frame(width: 840, height: 140, alignment: .leading)
+                        .foregroundColor(.white) // Set the text color
+                        .frame(width: 840, height: 200, alignment: .leading)
                         .padding(5)
-                        .background(Color("LL_blue")) // .opacity(0.5)) // Set the background color
+                        .background(gradt2) //Color("LL_blue")) // .opacity(0.5)) // Set the background color
                         .cornerRadius(10)
                     
                 }
-                .frame(width: 860, height: 170)
+                .frame(width: 860, height: 200)
                 .padding(5)
                 
                 if showProc {
@@ -231,13 +234,13 @@ struct Imaging1ProcView: View {
                                     .frame(width: 150, height: 80)
 
                                 Circle()
-                                    .trim(from: 0.0, to: fileSizeChecker3.percenAdvance)
+                                    .trim(from: 0.0, to: fileSizeChecker3.pctAdvance)
                                     .stroke(style: StrokeStyle(lineWidth: 20.0, lineCap: .round, lineJoin: .round))
                                     .foregroundColor(.white)
                                     .frame(width: 150, height: 80)
                                     .rotationEffect(Angle(degrees: 270.0))
 
-                                Text(String(format: "%00.0f%%", 100 * fileSizeChecker3.percenAdvance))
+                                Text(String(format: "%00.0f%%", 100 * fileSizeChecker3.pctAdvance))
                                     .font(.headline)
                                     .foregroundColor(.white)
                             }
@@ -313,7 +316,7 @@ struct Imaging1ProcView: View {
         showProc = true
         anyprocIsRunning = true
         titleImgSize = "Temp Size Collection"
-        titleGauge = "% Data vs Total Disk"
+        titleGauge = "%  of Total Disk"
         // create sparse container
         sviewModel.output=createSparseContainer()
         print(sviewModel.output)

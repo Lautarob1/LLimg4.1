@@ -124,7 +124,7 @@ struct Imaging4RevView: View {
                         alertText0 = (!noFFSel ? "😳 No files selected"  : "")
                         alertText1 = (destNoOK ? "\n😳 Invalid! System disk cannot be used as destination"  : "")
                         alertText2 = (imgName ? "" : "\n🤔 Report Name invalid or empty")
-                        alertText3 = (dupName ? "\n🤔 Report file exists, rename or delete file with path: \(imgName)" :  "" )
+                        alertText3 = (dupName ? "\n🤔 Report file exists, rename or delete file with path: \(CaseInfoData.shared.imageName)" :  "" )
                         print("File selected?: \(noFFSel)")
                         print("destNoOk: \(destNoOK)")
                         print("imgName: \(imgName)")

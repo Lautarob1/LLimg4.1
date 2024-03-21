@@ -51,6 +51,9 @@ struct Imaging3ProcView: View {
     let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color.gray]),
                       startPoint: .top,
                       endPoint: .bottom)
+    let gradt2 = LinearGradient(gradient: Gradient(colors: [Color("LL_blue"), Color.black.opacity(0.6)]),
+                      startPoint: .top,
+                      endPoint: .bottom)
     @State var titleImgSize: String = "Image Size"
     @State var titleGauge: String = "Disk Size"
     @State var elapTime: [String] = ["Elapsed Time0", "Elapsed Time1", "Elapsed Time2"]
@@ -130,18 +133,18 @@ struct Imaging3ProcView: View {
                     
                 }
                 ScrollView {
-                    TextEditor(text: $sviewModel.output)
-                    //                    Text(sviewModel.output)
+//                    TextEditor(text: $sviewModel.output)
+                       Text(sviewModel.output)
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
 //                        .italic() 
-                        .foregroundColor(.blue) // Set the text color
-                        .frame(width: 840, height: 160, alignment: .leading)
+                        .foregroundColor(.white) // Set the text color
+                        .frame(width: 840, height: 200, alignment: .leading)
                         .padding(5)
-                        .background(Color("LL_blue"))  //.opacity(0.5))
+                        .background(gradt2)   //Color("LL_blue"))  //.opacity(0.5))
                         .cornerRadius(14)
                     
                 }
-                .frame(width: 860, height: 170)
+                .frame(width: 860, height: 200)
                 .padding(5)
                 
                 HStack {

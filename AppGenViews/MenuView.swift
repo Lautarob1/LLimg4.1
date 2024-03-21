@@ -31,6 +31,7 @@ struct MenuView: View {
     let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color(.gray)]),
                                   startPoint: .top,
                                   endPoint: .bottom)
+    @State private var showAlert0: Bool = true
     @State private var selectedOption: MenuOption? = nil
 
 
@@ -89,10 +90,10 @@ struct MenuView: View {
                     .frame(width: 900, height: 700)
                     Spacer()
                 }
-                //                headerView
-                // buttonsGridView
             }
-            
+            if showAlert0 {
+                CustomAlertView0(onOK: {showAlert0 = false})
+            }
         }
         .frame(width: 900, height: 620)
         .background(gradient)

@@ -48,6 +48,9 @@ struct Imaging4ProcView: View {
     let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color.gray]),
                       startPoint: .top,
                       endPoint: .bottom)
+    let gradt2 = LinearGradient(gradient: Gradient(colors: [Color("LL_blue"), Color.black.opacity(0.6)]),
+                      startPoint: .top,
+                      endPoint: .bottom)
     @State var titleImgSize: String = "Image Size"
     @State var titleGauge: String = "Disk Size"
     @State var elapTime: [String] = ["Elapsed Time0", "Elapsed Time1", "Elapsed Time2"]
@@ -123,18 +126,18 @@ struct Imaging4ProcView: View {
                     
                 }
                 ScrollView {
-                    TextEditor(text: $sviewModel.output)
-                    //                    Text(sviewModel.output)
+//                    TextEditor(text: $sviewModel.output)
+                    Text(sviewModel.output)
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
 //                        .italic() // Make the text italic
-                        .foregroundColor(.blue) // Set the text color
-                        .frame(width: 840, height: 160, alignment: .leading)
+                        .foregroundColor(.white) // Set the text color
+                        .frame(width: 840, height: 200, alignment: .leading)
                         .padding(5)
-                        .background(Color("LL_blue")) // .opacity(0.5) Set the background color
+                        .background(gradt2) // "LL_blue")) // .opacity(0.5) Set the background color
                         .cornerRadius(10)
                     
                 }
-                .frame(width: 860, height: 170)
+                .frame(width: 860, height: 200)
                 .padding(5)
                 
                 HStack {
@@ -297,7 +300,6 @@ struct Imaging4ProcView: View {
     
     func hashingfullProcess () {
         print("entering hashingfullProcess ....")
-//        hashViewModel.showProcHash = true
         hashViewModel.anyprocIsRunning = true
         titleImgSize = "Size Collected"
         titleGauge = "% Completed"
@@ -313,7 +315,7 @@ struct Imaging4ProcView: View {
         print("inside hashcalculations...")
 //        print("timerH in hashCalc \(timerHash.timeElapsedFormatted)")
 //        print("timer in hash calc \(timer.elapsedTimeString)")
-        if DiskDataManager.shared.selectedHashOption != "NO-HASH" {stepIndex = 1 }
+        if DiskDataManager.shared.selectedHashOption != "NO-HASH" { hashViewModel.stepIndex = 1 }
         let fullFilePaths = FileSelectionManager.shared.selectedFiles
         logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
             
@@ -325,7 +327,7 @@ struct Imaging4ProcView: View {
             case "SHA256":
                 print("switch case 256")
 //                var hash256 = ""
-                let hash256 = hashViewModel.startHashing(filePath: file.path)
+                let hash256: () = hashViewModel.startHashing(filePath: file.path, hashType: whichHash)
 //                hash256 = hashViewModel.hashResult ?? "No hash calculated"
 //                DispatchQueue.main.async {
 //                    self.timerHash.start()
@@ -338,9 +340,9 @@ struct Imaging4ProcView: View {
 //                    }
 //                }
 //                    let hash256 = hashViewModel.hashResult
-                    print("hash: \(hashViewModel.hashResult) ")
+//                    print("hash: \(hashViewModel.hashResult) ")
 //                    Text("Hash Result: \(hashResult)")
-                    let hashTimeEnd = LLTimeManager.getCurrentTimeString()
+//                    let hashTimeEnd = LLTimeManager.getCurrentTimeString()
 //                    print2Log(filePath: logfilePath, text2p: "Hashing file:     \(file.path)")
 //                    //                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
 //                    print2Log(filePath: logfilePath, text2p: "Start time:       \(hashTimeIni)")
@@ -350,26 +352,28 @@ struct Imaging4ProcView: View {
                     
                 
                 case "SHA1":
-                let hashsha1 =
-                hashLargeFileSHA1(filePath: file.path)
-                let hashTimeEnd = LLTimeManager.getCurrentTimeString()
-                print2Log(filePath: logfilePath, text2p: "Hashing file:     \(file.path)")
+//                let hashsha1 =
+//                hashLargeFileSHA1(filePath: file.path)
+                let hashsha1: () = hashViewModel.startHashing(filePath: file.path, hashType: whichHash)
+//                let hashTimeEnd = LLTimeManager.getCurrentTimeString()
+//                print2Log(filePath: logfilePath, text2p: "Hashing file:     \(file.path)")
+////                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
+//                print2Log(filePath: logfilePath, text2p: "Start time:       \(hashTimeIni)")
+//                print2Log(filePath: logfilePath, text2p: "End time:         \(hashTimeEnd)")
+//                print2Log(filePath: logfilePath, text2p: "SHA256 hash:      \(String(describing: hashsha1)) \n")
 //                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
-                print2Log(filePath: logfilePath, text2p: "Start time:       \(hashTimeIni)")
-                print2Log(filePath: logfilePath, text2p: "End time:         \(hashTimeEnd)")
-                print2Log(filePath: logfilePath, text2p: "SHA256 hash:      \(String(describing: hashsha1)) \n")
-                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
                 
             case "MD5":
-                let hashMD5 =
-                hashLargeFileMD5(filePath: file.path)
-                let hashTimeEnd = LLTimeManager.getCurrentTimeString()
-                print2Log(filePath: logfilePath, text2p: "Hashing file:     \(file.path)")
+                let hashMD5: () = hashViewModel.startHashing(filePath: file.path, hashType: whichHash)
+//                let hashMD5 =
+//                hashLargeFileMD5(filePath: file.path)
+//                let hashTimeEnd = LLTimeManager.getCurrentTimeString()
+//                print2Log(filePath: logfilePath, text2p: "Hashing file:     \(file.path)")
+////                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
+//                print2Log(filePath: logfilePath, text2p: "Start time:       \(hashTimeIni)")
+//                print2Log(filePath: logfilePath, text2p: "End time:         \(hashTimeEnd)")
+//                print2Log(filePath: logfilePath, text2p: "MD5 hash value: \(String(describing: hashMD5)) \n")
 //                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
-                print2Log(filePath: logfilePath, text2p: "Start time:       \(hashTimeIni)")
-                print2Log(filePath: logfilePath, text2p: "End time:         \(hashTimeEnd)")
-                print2Log(filePath: logfilePath, text2p: "MD5 hash value: \(String(describing: hashMD5)) \n")
-                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
                 
             case "NO-HASH":
                 processNoHash()

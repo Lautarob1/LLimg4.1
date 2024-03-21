@@ -104,7 +104,7 @@ struct Imaging1RevView: View {
                         
                     }
                     .onAppear() {
-                        let sourceDisk = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/")
+                        let sourceDisk = "/dev/" + (extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/")
                         let destinationDisk = DiskDataManager.shared.selectedStorageOption
                         if validatePath(path: destinationDisk) {
                             let destDMGDisk = DiskDataManager.shared.selected2ndStorageOption
@@ -125,7 +125,7 @@ struct Imaging1RevView: View {
                             let sizeNoOK = !isStorageSizeOK2 (sourceDisk: sourceDisk , destinationDisk: destinationDisk, destDMGDisk: destDMGDisk)
                             alertText1 = (sizeNoOK ? "😯 Not enough space in the destination disk for the selected source path"  : "")
                             alertText2 = (imgName ? "" : "\n😳 Image Name invalid or empty")
-                            alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete sparse or DMG files with name: \(imgName)" :  "" )
+                            alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete sparse or DMG files with name: \(CaseInfoData.shared.imageName)" :  "" )
                             imageName = "exclamationmark.triangle"
                             if   sizeNoOK || !imgName || dupName {
                                 disableBCreateImg = true

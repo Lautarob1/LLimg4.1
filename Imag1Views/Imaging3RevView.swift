@@ -119,13 +119,13 @@ struct Imaging3RevView: View {
                         let destfullPathDMG = destinationDisk + "/" + CaseInfoData.shared.imageName + ".dmg"
                         dupName = isImageNameAtPath(path: destfullPathDMG)
                         print("valid name?: \(imgName)")
-                        let noFFSel =  FileSelectionManager.shared.selectedFiles.isEmpty
+                        let noFFSel =  FileSelectionManager.shared.selectedFiles.first?.path != nil
                         
                         let destNoOK = isDestinationInRoot(path: destinationDisk)
-                        alertText0 = (noFFSel ? "😳 No sparse image selected"  : "")
+                        alertText0 = (!noFFSel ? "😳 No sparse image selected"  : "")
                         alertText1 = (destNoOK ? "\n😳 Invalid! System disk cannot be used as destination"  : "")
                         alertText2 = (imgName ? "" : "\n🤔 Image Name invalid or empty")
-                        alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete DMG file with name: \(imgName)" :  "" )
+                        alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete DMG file with name: \(CaseInfoData.shared.imageName)" :  "" )
                         //                        print("alert0: \(alertText0)")
                         //                        print("alert1: \(alertText1)")
                         //                        print("alert2: \(alertText2)")

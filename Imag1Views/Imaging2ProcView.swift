@@ -52,8 +52,11 @@ struct Imaging2ProcView: View {
     let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color.gray]),
                       startPoint: .top,
                       endPoint: .bottom)
+    let gradt2 = LinearGradient(gradient: Gradient(colors: [Color("LL_blue"), Color.black.opacity(0.6)]),
+                      startPoint: .top,
+                      endPoint: .bottom)
     @State var titleImgSize: String = "Image Size"
-    @State var titleGauge: String = "Disk Size"
+    @State var titleGauge: String = "% of Disk Size"
     @State var elapTime: [String] = ["Elapsed Time0", "Elapsed Time1", "Elapsed Time2"]
     @State var imageSize: String = "Image Size in GB"
     @State var strokeWidth: CGFloat = 20
@@ -146,18 +149,18 @@ struct Imaging2ProcView: View {
                     
                 }
                 ScrollView {
-                    TextEditor(text: $sviewModel.output)
-                    //                    Text(sviewModel.output)
+//                    TextEditor(text: $sviewModel.output)
+                    Text(sviewModel.output)
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
 //                        .italic() 
-                        .foregroundColor(.blue) // Set the text color
-                        .frame(width: 840, height: 150, alignment: .leading)
+                        .foregroundColor(.white) // Set the text color
+                        .frame(width: 840, height: 200, alignment: .leading)
                         .padding(5)
-                        .background(Color("LL_blue")) // .opacity(0.5) Set the background color
+                        .background(gradt2) // "LL_blue")) // .opacity(0.5) Set the background color
                         .cornerRadius(14)
                     
                 }
-                .frame(width: 860, height: 170)
+                .frame(width: 860, height: 200)
                 .padding(5)
                 
                 HStack {
@@ -244,13 +247,13 @@ struct Imaging2ProcView: View {
                                     .frame(width: 150, height: 80)
 
                                 Circle()
-                                    .trim(from: 0.0, to: fileSizeChecker3.percenAdvance)
+                                    .trim(from: 0.0, to: fileSizeChecker3.pctAdvance)
                                     .stroke(style: StrokeStyle(lineWidth: 20.0, lineCap: .round, lineJoin: .round))
                                     .foregroundColor(.white)
                                     .frame(width: 150, height: 80)
                                     .rotationEffect(Angle(degrees: 270.0))
 
-                                Text(String(format: "%00.0f%%", 100 * fileSizeChecker3.percenAdvance))
+                                Text(String(format: "%00.0f%%", 100 * fileSizeChecker3.pctAdvance))
                                     .font(.headline)
                                     .foregroundColor(.white)
                             }
@@ -545,7 +548,7 @@ struct Imaging2ProcView: View {
         let sparsePath = DiskDataManager.shared.selectedStorageOption
         print("in createSparseCont: imgName=\(imgName)")
         let passw = AuthenticationViewModel.shared.rootPassword
-        let dskWithImagedFF = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? getRootFileSystemDiskID()!)
+        let dskWithImagedFF = (extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? getRootFileSystemDiskID()!)
         print("disk to be imaged: \(dskWithImagedFF)")
         let imgSize = getDiskIDCapacityAvSpace(diskPath: dskWithImagedFF).capacity!
         maxValue = convertSizeStringToDouble(imgSize)
@@ -735,31 +738,7 @@ struct Imaging2ProcView: View {
         print2Log(filePath: logfilePath, text2p: "No hash calculation selected")
     }
     
-//    private func setupTimer() {
-//        print("setup timer for gauge")
-//        timerGauge2 = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-//                self.updateSizeForGauge()
-//            }
-//        }
-    
-//    func updateSizeForGauge() {
-//        fileUpdCounter += 1
-//        print("in updateSize4G count: \(fileUpdCounter)")
-//        print("in updateSize4G entering fSChecker3: \(fileSizeChecker3.fileSizeInGB)")
-//        print("in updateSize4G -> maxValue: \(self.maxValue) ")
-//        print("in updateSize4G -> currentValue: \(self.currentValue) ")
-//        if currentValue < maxValue {
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//            print("inside updateSize4G in dispatch fSChecker3: \(fileSizeChecker3.fileSizeInGB)")
-//                currentValue = fileSizeChecker3.fileSizeInGB
-//                print("currentValue inside update being updated \(self.currentValue)")
-//            }
-//        } else {
-//                            self.timerGauge2?.invalidate()
-//                            self.timerGauge2 = nil
-//            }
-//
-//    }
+
      
 }
 

@@ -136,7 +136,7 @@ func hashLargeFileSHA256(filePath: String, viewModel: HashingViewModel) -> Strin
                 _ = CC_SHA256_Update(&context, buffer.baseAddress, CC_LONG(data.count))
             }
             totalBytesRead += UInt64(data.count)
-            print(Double(totalBytesRead))
+//            print(Double(totalBytesRead))
             DispatchQueue.main.async {
                 viewModel.hashProgressPct = Double(totalBytesRead) / Double(fileSize)
                 viewModel.hashProgressByt = Double(totalBytesRead)
@@ -173,7 +173,7 @@ class HashingViewModel2: ObservableObject {
     private var hashStartTime: Date?
     private var timer: Timer?
     
-    func startHashing(filePath: String) {
+    func startHashing(filePath: String, hashType: String) {
         hashStartTime = Date()
         hashProgressByt = 0
         hashProgressPct = 0
@@ -186,21 +186,59 @@ class HashingViewModel2: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.updateElapsedTime()
         }
-        
-        hashLargeFile2SHA256(filePath: filePath, viewModel: self) { result in
-              DispatchQueue.main.async {
-                  self.hashResult = result
-                  print("hash result in model: \(self.hashResult)")
-                  printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni)
-                  self.anyprocIsRunning = false
-                  self.showDoneButton = true
-                  self.stepIndex = 1
-                  // Optionally update additionalResult or other properties
-                  // Invalidate timer as hash process is finished
-                  self.timer?.invalidate()
-                  self.timer = nil
+        print("hash string entering hashViewModel: \(hashType)")
+        switch hashType {
+            case "SHA256":
+            hashLargeFile2SHA256(filePath: filePath, viewModel: self) { result in
+                  DispatchQueue.main.async {
+                      self.hashResult = result
+                      print("hash result in model: \(self.hashResult)")
+                      printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni)
+                      self.anyprocIsRunning = false
+                      self.showDoneButton = true
+                      self.stepIndex = 1
+                      // Optionally update additionalResult or other properties
+                      // Invalidate timer as hash process is finished
+                      self.timer?.invalidate()
+                      self.timer = nil
+                  }
               }
-          }
+            case "SHA1":
+            hashLargeFile2SHA1(filePath: filePath, viewModel: self) { result in
+                  DispatchQueue.main.async {
+                      self.hashResult = result
+                      print("hash result in model: \(self.hashResult)")
+                      printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni)
+                      self.anyprocIsRunning = false
+                      self.showDoneButton = true
+                      self.stepIndex = 1
+                      // Optionally update additionalResult or other properties
+                      // Invalidate timer as hash process is finished
+                      self.timer?.invalidate()
+                      self.timer = nil
+                  }
+              }
+            case "MD5":
+            hashLargeFile2MD5(filePath: filePath, viewModel: self) { result in
+                  DispatchQueue.main.async {
+                      self.hashResult = result
+                      print("hash result in model: \(self.hashResult)")
+                      printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni)
+                      self.anyprocIsRunning = false
+                      self.showDoneButton = true
+                      self.stepIndex = 1
+                      // Optionally update additionalResult or other properties
+                      // Invalidate timer as hash process is finished
+                      self.timer?.invalidate()
+                      self.timer = nil
+                  }
+              }
+
+            default:
+                print("No valid hash designator used")
+        }
+        
+
 //        print("hash result in return func: \(self.hashResult)")
 //        return self.hashResult
     }
@@ -228,7 +266,7 @@ func hashLargeFile2SHA256(filePath: String, viewModel: HashingViewModel2, comple
         let bufferSize = 1024 * 1024 // 1 MB
         let fileAttributes = try? FileManager.default.attributesOfItem(atPath: filePath)
         let fileSize = fileAttributes?[.size] as? UInt64 ?? 0
-        print("filePath: \(filePath)")
+        print("filePath within 256: \(filePath)")
         guard let file = FileHandle(forReadingAtPath: filePath) else {
             DispatchQueue.main.async {
                 completion("Failed to open file")
@@ -273,15 +311,130 @@ func hashLargeFile2SHA256(filePath: String, viewModel: HashingViewModel2, comple
     }
 }
 
+func hashLargeFile2SHA1(filePath: String, viewModel: HashingViewModel2, completion: @escaping (String) -> Void) {
+    DispatchQueue.global(qos: .userInitiated).async {
+        let bufferSize = 1024 * 1024 // 1 MB
+        let fileAttributes = try? FileManager.default.attributesOfItem(atPath: filePath)
+        let fileSize = fileAttributes?[.size] as? UInt64 ?? 0
+        print("filePath within SHA1: \(filePath)")
+        guard let file = FileHandle(forReadingAtPath: filePath) else {
+            DispatchQueue.main.async {
+                completion("Failed to open file")
+            }
+            return
+        }
+        
+        var context = CC_SHA1_CTX()
+        CC_SHA1_Init(&context)
+        
+        while autoreleasepool(invoking: {
+            let data = file.readData(ofLength: bufferSize)
+            if data.count > 0 {
+                data.withUnsafeBytes { buffer in
+                    _ = CC_SHA1_Update(&context, buffer.baseAddress, CC_LONG(data.count))
+                }
+                DispatchQueue.main.async {
+                    viewModel.hashProgressByt += Double(data.count)
+                    viewModel.hashProgressPct = viewModel.hashProgressByt / Double(fileSize)
+//                    print("% avance \(viewModel.hashProgressPct)")
+//                    print("% time elapsed \(viewModel.elapsedTime)")
+                    // Optionally update other ViewModel properties related to progress here
+                }
+                return true // Continue
+            } else {
+                return false // End of file
+            }
+        }) {}
+        
+        var digest = Data(count: Int(CC_SHA1_DIGEST_LENGTH))
+        digest.withUnsafeMutableBytes { buffer in
+            _ = CC_SHA1_Final(buffer.bindMemory(to: UInt8.self).baseAddress, &context)
+        }
+        
+        let hashString = digest.map { String(format: "%02hhx", $0) }.joined()
+        
+        DispatchQueue.main.async {
+            completion(hashString)
+        }
+        
+        file.closeFile()
+    }
+}
+
+func hashLargeFile2MD5(filePath: String, viewModel: HashingViewModel2, completion: @escaping (String) -> Void) {
+    DispatchQueue.global(qos: .userInitiated).async {
+        let bufferSize = 1024 * 1024 // 1 MB
+        let fileAttributes = try? FileManager.default.attributesOfItem(atPath: filePath)
+        let fileSize = fileAttributes?[.size] as? UInt64 ?? 0
+        print("filePath: \(filePath)")
+        guard let file = FileHandle(forReadingAtPath: filePath) else {
+            DispatchQueue.main.async {
+                completion("Failed to open file")
+            }
+            return
+        }
+        
+        var context = CC_MD5_CTX()
+        CC_MD5_Init(&context)
+        
+        while autoreleasepool(invoking: {
+            let data = file.readData(ofLength: bufferSize)
+            if data.count > 0 {
+                data.withUnsafeBytes { buffer in
+                    _ = CC_MD5_Update(&context, buffer.baseAddress, CC_LONG(data.count))
+                }
+                DispatchQueue.main.async {
+                    viewModel.hashProgressByt += Double(data.count)
+                    viewModel.hashProgressPct = viewModel.hashProgressByt / Double(fileSize)
+//                    print("% avance \(viewModel.hashProgressPct)")
+//                    print("% time elapsed \(viewModel.elapsedTime)")
+                    // Optionally update other ViewModel properties related to progress here
+                }
+                return true // Continue
+            } else {
+                return false // End of file
+            }
+        }) {}
+        
+        var digest = Data(count: Int(CC_MD5_DIGEST_LENGTH))
+        digest.withUnsafeMutableBytes { buffer in
+            _ = CC_MD5_Final(buffer.bindMemory(to: UInt8.self).baseAddress, &context)
+        }
+        
+        let hashString = digest.map { String(format: "%02hhx", $0) }.joined()
+        
+        DispatchQueue.main.async {
+            completion(hashString)
+        }
+        
+        file.closeFile()
+    }
+}
+
 func printHashLog (hashVal: String, iniTime: String) {
     let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
     let file = FileSelectionManager.shared.selectedFiles.first?.path
     let hashTimeIni = iniTime
+    let hashLength = hashVal.utf8.count
+    print("hashLength: \(hashLength)")
+    var hashType = ""
+    switch hashLength {
+        case 64:
+            hashType = "SHA256 hash:"
+            print("hash type in switch: \(hashType)")
+        case 40:
+            hashType = "SHA1 hash:  "
+        case 32:
+            hashType = "MD5 hash:   "
+        default:
+            print("The string has an unexpected length of \(hashLength) bytes.")
+    }
     let hashTimeEnd = LLTimeManager.getCurrentTimeString()
     print2Log(filePath: logfilePath, text2p: "Hashing file:     \(file ?? "check logfile-path")")
     //                print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
     print2Log(filePath: logfilePath, text2p: "Start time:       \(hashTimeIni)")
     print2Log(filePath: logfilePath, text2p: "End time:         \(hashTimeEnd)")
-    print2Log(filePath: logfilePath, text2p: "SHA256 hash:      \(hashVal)")
-    print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88)))\n")
+//    print("hash type just above it print line: \(hashType)")
+    print2Log(filePath: logfilePath, text2p: "\(hashType)      \(hashVal)")
+    print2Log(filePath: logfilePath, text2p: "\(String(repeating: "-", count: 88))\n")
 }
