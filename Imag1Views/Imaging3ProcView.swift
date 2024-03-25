@@ -16,11 +16,11 @@ struct Imaging3ProcView: View {
     @ObservedObject var timer = ElapsedTimeTimer()
     @ObservedObject var dmgtimer = ElapsedTimeTimer()
     @ObservedObject var hviewModel = HashingViewModel()
-    @State private var caseName: String = ""
-    @State private var evidenceName: String = ""
-    @State private var agentName: String = ""
-    @State private var caseID: String = ""
-    @State private var caseNotes: String = ""
+//    @State private var caseName: String = ""
+//    @State private var evidenceName: String = ""
+//    @State private var agentName: String = ""
+//    @State private var caseID: String = ""
+//    @State private var caseNotes: String = ""
     @State private var imageName: String = ""
     @State private var isliveimgChecked: Bool = false
     @State private var isViewPresented = false
@@ -52,6 +52,9 @@ struct Imaging3ProcView: View {
                       startPoint: .top,
                       endPoint: .bottom)
     let gradt2 = LinearGradient(gradient: Gradient(colors: [Color("LL_blue"), Color.black.opacity(0.6)]),
+                      startPoint: .top,
+                      endPoint: .bottom)
+    let gradt1 = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color.black.opacity(0.6)]),
                       startPoint: .top,
                       endPoint: .bottom)
     @State var titleImgSize: String = "Image Size"
@@ -104,8 +107,8 @@ struct Imaging3ProcView: View {
                             print("process starts")
                             showControls = false
                             
-                            logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
-                            logfilePathEx = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).LLeX"
+                            logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
+                            logfilePathEx = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).LLeX"
                             print("LogfilePath: \(logfilePath)")
                             
                             print("passw capt: \(AuthenticationViewModel.shared.rootPassword)")
@@ -117,13 +120,13 @@ struct Imaging3ProcView: View {
                         }) {
                             Text("Click to start process")
                                 .font(.custom("Helvetica Neue", size: 16))
-                                .frame(width: 160, height: 25)
-                                .padding(3)
+                                .frame(width: 170, height: 30)
+                                .padding(5)
                                 .foregroundColor(.white)
-                                .background(Color(("LL_orange")))
+                                .background(gradt1)
                                 .cornerRadius(10)
-                                
                         }
+                        .buttonStyle(PlainButtonStyle())
                     }
                     
                     
@@ -298,6 +301,7 @@ struct Imaging3ProcView: View {
                             .cornerRadius(10)
                             .padding(3)
                     }
+                    .buttonStyle(PlainButtonStyle())
                     Spacer()
                 }
             }
@@ -323,6 +327,7 @@ struct Imaging3ProcView: View {
         timer.startTimer()
         createdmgImage()
         stepIndex = 1
+        acqlogTitleProcesses(filePath: logfilePath)
         print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
         print("1st process (create dmg) done....")
         hashcalculations()
@@ -340,8 +345,8 @@ struct Imaging3ProcView: View {
     
     func dmgLog() {
         print("entering Sparse to dmg log, path for log file:")
-        print(DiskDataManager.shared.selectedStorageOption)
-        let logfilePath2 = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName)_error.info"
+        print(DiskDataManager.shared.selectedStorageDestin)
+        let logfilePath2 = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName)_error.info"
         print("logfilePath: \(logfilePath)")
         print2Log(filePath: logfilePath, text2p: "DMG image process ------------------\n")
         print2Log(filePath: logfilePath, text2p: "Start time:     \(dmgTimeIni)")
@@ -353,7 +358,7 @@ struct Imaging3ProcView: View {
     func createdmgImage() {
         let imgName = CaseInfoData.shared.imageName
 //        FileSelectionManager.shared.selectedFiles
-        let dmgPath = DiskDataManager.shared.selectedStorageOption
+        let dmgPath = DiskDataManager.shared.selectedStorageDestin
         guard let fullsparsePath = FileSelectionManager.shared.selectedFiles.first?.path else {
             // rise alert here: sparse hot found
             print("sparse not found")
@@ -377,13 +382,13 @@ struct Imaging3ProcView: View {
             print("to be Unmounted: \(devDiskMt)")
             return
         }
-        let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         let passw = AuthenticationViewModel.shared.rootPassword
         print("in dmg, logfilePath: \(logfilePath)")
         print("in dmg, password: \(passw)")
         showdmgvalues = true
         if CaseInfoData.shared.dmgfilePath == "" {
-            CaseInfoData.shared.dmgfilePath = DiskDataManager.shared.selectedStorageOption
+            CaseInfoData.shared.dmgfilePath = DiskDataManager.shared.selectedStorageDestin
         }
 
         dmgTimeIni=LLTimeManager.getCurrentTimeString()
@@ -404,10 +409,10 @@ struct Imaging3ProcView: View {
         if DiskDataManager.shared.selectedHashOption != "NO-HASH" {stepIndex = 2 }
 //        let imgName = CaseInfoData.shared.imageName
         var pathFile = ""
-            pathFile = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).dmg"
+            pathFile = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).dmg"
      
         print("path to dmg in hash calc: \(pathFile)")
-        let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         print2Log(filePath: logfilePath, text2p: "Hash DMG image process -------------\n")
         let hashTimeIni = LLTimeManager.getCurrentTimeString()
         print2Log(filePath: logfilePath, text2p: "Start time:     \(hashTimeIni)")
@@ -444,7 +449,7 @@ struct Imaging3ProcView: View {
     }
     
     func processNoHash() {
-        let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         print2Log(filePath: logfilePath, text2p: "No hash calculation selected")
     }
     

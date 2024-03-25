@@ -29,7 +29,7 @@ class AuthenticationViewModel: ObservableObject {
 
         if licenseFileFound {
             let licenseDetails = readLicense().components(separatedBy: "\n")
-            print("Lic details read: \(licenseDetails)")
+//            print("Lic details read: \(licenseDetails)")
             self.licenseType = licenseDetails[0]
             self.licenseSerial = licenseDetails[1]
             self.licenseExpDate = licenseDetails[2]
@@ -64,7 +64,7 @@ class AuthenticationViewModel: ObservableObject {
     
     
     func executeCommand(command: String) -> String {
-        print("entering ConsoleViewModel-executeCommand")
+//        print("entering ConsoleViewModel-executeCommand")
         let process = Process()
         let pipe = Pipe()
         process.environment = ProcessInfo.processInfo.environment
@@ -81,7 +81,7 @@ class AuthenticationViewModel: ObservableObject {
         }
         
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        print("about to leave ConsoleViewModel-executeSudoCommand")
+//        print("about to leave ConsoleViewModel-executeSudoCommand")
         return String(data: data, encoding: .utf8) ?? "Error decoding output"
     }
 
@@ -111,12 +111,12 @@ class AuthenticationViewModel: ObservableObject {
         if cmdOutput.contains(self.licenseSerial) {
             var serialValid = true
         }
-        print("is serial Valid after ouput: \(isSerialValid)")
+//        print("is serial Valid after ouput: \(isSerialValid)")
         // eliminate this lines within the second if{} only temp for test
         if cmdOutput.contains("S6XGNS0W618693L") {
             var serialValid = true
         }
-        print("is serial Valid after serial added: \(isSerialValid)")
+//        print("is serial Valid after serial added: \(isSerialValid)")
         return serialValid
     }
 

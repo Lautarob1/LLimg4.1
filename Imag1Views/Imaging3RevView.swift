@@ -20,6 +20,7 @@ struct Imaging3RevView: View {
     @State private var alertText1: String = ""
     @State private var alertText2: String = ""
     @State private var alertText3: String = ""
+    @State private var alertText4: String = ""
     @Binding var selectedOption: MenuOption?
     @Binding var showReviewView: Bool
     @State private var showProcessView = false
@@ -105,33 +106,37 @@ struct Imaging3RevView: View {
                     
                 }
                 .onAppear() {
-                    let sourceDisk = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/")
-                    let destinationDisk = DiskDataManager.shared.selectedStorageOption
+                    let destinationDisk = DiskDataManager.shared.selectedStorageDestin
                     if validatePath(path: destinationDisk) {
-                        let destDMGDisk = DiskDataManager.shared.selected2ndStorageOption
+                        let destDMGDisk = DiskDataManager.shared.selected2ndStorageDestin
                         let imgName = validateInput(name: CaseInfoData.shared.imageName)
-                        print("scr disk: \(sourceDisk )")
                         print("dst disk: \(destinationDisk)")
                         print("dst2 disk: \(destDMGDisk)")
                         print("name of image: \(CaseInfoData.shared.imageName)")
-                        //                        let destfullPathSp = destinationDisk + "/" + CaseInfoData.shared.imageName + ".sparse"
-                        //                        dupName = isImageNameAtPath(path: destfullPathSp)
+
                         let destfullPathDMG = destinationDisk + "/" + CaseInfoData.shared.imageName + ".dmg"
                         dupName = isImageNameAtPath(path: destfullPathDMG)
                         print("valid name?: \(imgName)")
                         let noFFSel =  FileSelectionManager.shared.selectedFiles.first?.path != nil
                         
                         let destNoOK = isDestinationInRoot(path: destinationDisk)
+                        let maxSourceSize = FileSelectionManager.shared.totalSize
+                        let destAvailableSpace = getAnyDiskInfo(dskpath: destinationDisk)?.availableSpace ?? 0
+                        let isSpaceOK = destAvailableSpace > maxSourceSize
                         alertText0 = (!noFFSel ? "😳 No sparse image selected"  : "")
                         alertText1 = (destNoOK ? "\n😳 Invalid! System disk cannot be used as destination"  : "")
                         alertText2 = (imgName ? "" : "\n🤔 Image Name invalid or empty")
                         alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete DMG file with name: \(CaseInfoData.shared.imageName)" :  "" )
-                        //                        print("alert0: \(alertText0)")
-                        //                        print("alert1: \(alertText1)")
-                        //                        print("alert2: \(alertText2)")
-                        //                        print("alert3: \(alertText3)")
+                        alertText4 = (isSpaceOK ? "" : "\n🤔 Not enough space on destination disk")
+                        print("noFFSel: \(noFFSel)")
+                        print("destNoOK: \(destNoOK)")
+                        print("dupName: \(dupName)")
+                        print("isSpaceOK: \(isSpaceOK)")
+                        print("availSpace \(destAvailableSpace)")
+                        print("sourceSize \(maxSourceSize)")
+                        
                         imageName = "exclamationmark.triangle"
-                        if   destNoOK || !imgName || dupName || !noFFSel {
+                        if   destNoOK || !imgName || dupName || !noFFSel || !isSpaceOK {
                             disableBCreateImg = true
                             showAlertSps = true
                         }
@@ -150,7 +155,7 @@ struct Imaging3RevView: View {
                     showAlert: $showAlertSps,
                     imageName: imageName,
                     title: "LLIMAGER Alert",
-                    message: "\(alertText0) \(alertText1)  \(alertText2) \(alertText3) ",
+                    message: "\(alertText0) \(alertText1)  \(alertText2) \(alertText3) \(alertText4)",
                     fontSize1: 14,
                     fontSize2: 12,
                     textColor: Color(.white),

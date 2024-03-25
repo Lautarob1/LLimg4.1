@@ -26,7 +26,7 @@ struct MenuView: View {
     @State private var hoverStates: [Int: Bool] = [1: false, 2: false, 3: false, 4: false]
     @State private var isHovering: Bool = false
     private let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 40), count: 2)
-    let buttonTooltips = ["Acquire a Disk Image", "Acquire Selected Files or Folders", "Covert Sparse to DMG", "Calculate Hash Values"]
+    let buttonTooltips = ["Acquire a Disk Image", "Acquire Selected Files or Folders", "Convert Sparse to DMG", "Calculate Hash Values"]
     let buttonImages = ["img_but1", "img_but2", "img_but3", "img_but4"]
     let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color(.gray)]),
                                   startPoint: .top,
@@ -40,10 +40,10 @@ struct MenuView: View {
     var body: some View {
         ZStack {
             
-            VStack (spacing: 50){
+            VStack (spacing: 70){
                 VStack {
                     Spacer()
-                    LazyVGrid(columns: columns, spacing: 150) {
+                    LazyVGrid(columns: columns, spacing: 70) {
                         ForEach(1...4, id: \.self) { optionID in
                             ZStack {
                                 Button(action: {
@@ -52,7 +52,7 @@ struct MenuView: View {
                                     Image("img_but\(optionID)")
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 125, height: 125)
+                                        .frame(width: 170, height: 170)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 .onHover(perform: { hovering in
@@ -115,18 +115,17 @@ struct MenuView: View {
 
     }
         private var buttonsGridView: some View {
-            LazyVGrid(columns: columns, spacing: 100) {
+            LazyVGrid(columns: columns, spacing: 70) {
                 ForEach(1...4, id: \.self) { index in
                     buttonView(for: index)
                 }
             }
             .padding(.bottom, 70)
-//            .background(Color("LL_blue").opacity(0.5))
         }
         
         private func buttonView(for index: Int) -> some View {
             Button(action: {
-                print("Button tapped \(index)")
+//                print("Button tapped \(index)")
                 showViews[index] = true
                 showViewsRev[index] = true
             }) {
@@ -134,7 +133,7 @@ struct MenuView: View {
                     Image(buttonImages[index - 1])
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 125, height: 125)
+                        .frame(width: 170, height: 170)
                         .background(.white)
                         .cornerRadius(15)
 //                        .padding(0)

@@ -104,10 +104,10 @@ struct Imaging1RevView: View {
                         
                     }
                     .onAppear() {
-                        let sourceDisk = "/dev/" + (extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/")
-                        let destinationDisk = DiskDataManager.shared.selectedStorageOption
+                        let sourceDisk = "/dev/" + (extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? "/")
+                        let destinationDisk = DiskDataManager.shared.selectedStorageDestin
                         if validatePath(path: destinationDisk) {
-                            let destDMGDisk = DiskDataManager.shared.selected2ndStorageOption
+                            let destDMGDisk = DiskDataManager.shared.selected2ndStorageDestin
                             let imgName = validateInput(name: CaseInfoData.shared.imageName)
                             let destfullPathSp = destinationDisk + "/" + CaseInfoData.shared.imageName + ".sparseimage"
                             dupName = isImageNameAtPath(path: destfullPathSp)
@@ -122,7 +122,7 @@ struct Imaging1RevView: View {
                             print("valid name?: \(imgName)")
                             print("dupName?: \(dupName)")
                             
-                            let sizeNoOK = !isStorageSizeOK2 (sourceDisk: sourceDisk , destinationDisk: destinationDisk, destDMGDisk: destDMGDisk)
+                            let sizeNoOK = !isStorageSizeOK1 (sourceDisk: sourceDisk , destinationDisk: destinationDisk, destDMGDisk: destDMGDisk)
                             alertText1 = (sizeNoOK ? "😯 Not enough space in the destination disk for the selected source path"  : "")
                             alertText2 = (imgName ? "" : "\n😳 Image Name invalid or empty")
                             alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete sparse or DMG files with name: \(CaseInfoData.shared.imageName)" :  "" )

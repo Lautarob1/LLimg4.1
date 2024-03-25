@@ -11,14 +11,14 @@ class DiskDataManager: ObservableObject {
     static let shared = DiskDataManager()
     @Published var dskData: [(num: String, type: String, name: String, size: String, ident: String, extract: String, mtPt: String)] = []
     @Published var comboInfo: [String] = []
-    @Published var selectedDskOption: String
-    @Published var selectedStorageOption: String = ""
-    @Published var selected2ndStorageOption: String = ""
+    @Published var selectedDskOrigen: String
+    @Published var selectedStorageDestin: String = ""
+    @Published var selected2ndStorageDestin: String = ""
     @Published var selectedHashOption: String = "SHA256"
     @Published var isComboDisabled: Bool = true
     
     init() {        //}
-        self.selectedDskOption = "synthesized disk1s1s1 10.1 GB"// getRootFileSystemDiskID() ?? "/"
+        self.selectedDskOrigen = "synthesized disk1s1s1 10.1 GB"// getRootFileSystemDiskID() ?? "/"
         loadDiskData()
     }
 
@@ -28,7 +28,7 @@ class DiskDataManager: ObservableObject {
         self.dskData = processedData.diskInfo
         self.comboInfo = processedData.comboInfo
     // review force unwrap 
-        self.selectedDskOption = self.comboInfo.first!
+        self.selectedDskOrigen = self.comboInfo.first!
     }
 
 }

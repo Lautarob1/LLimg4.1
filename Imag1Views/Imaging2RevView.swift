@@ -106,10 +106,10 @@ struct Imaging2RevView: View {
                     }
                 }
                 .onAppear() {
-                    let sourceDisk = extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/"
-                    let destinationDisk = DiskDataManager.shared.selectedStorageOption
+                    let sourceDisk = extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? "/"
+                    let destinationDisk = DiskDataManager.shared.selectedStorageDestin
                     if validatePath(path: destinationDisk) {
-                        let destDMGDisk = DiskDataManager.shared.selected2ndStorageOption
+                        let destDMGDisk = DiskDataManager.shared.selected2ndStorageDestin
                         let imgName = validateInput(name: CaseInfoData.shared.imageName)
                         print("scr disk: \(sourceDisk)")
                         print("dst disk: \(destinationDisk)")
@@ -121,7 +121,7 @@ struct Imaging2RevView: View {
                         dupNameDmg = isImageNameAtPath(path: destfullPathDMG)
                         print("valid name?: \(imgName)")
                         dupName = dupNameSps || dupNameDmg
-                        let noFFSel =  FileSelectionManager.shared.selectedFiFo.first?.path != nil
+                        let noFFSel =  FileSelectionManager.shared.selectedFiFo.first?.path == nil
                        
                         let destNoOK = isDestinationInRoot(path: destinationDisk)
                         alertText0 = (noFFSel ? "😳 No files or folders selected"  : "")
@@ -133,7 +133,7 @@ struct Imaging2RevView: View {
 //                        print("alert2: \(alertText2)")
 //                        print("alert3: \(alertText3)")
                         imageName = "exclamationmark.triangle"
-                        if   destNoOK || !imgName || dupName || !noFFSel {
+                        if   destNoOK || !imgName || dupName || noFFSel {
                             disableBCreateImg = true
                             showAlertTgt = true
                         }

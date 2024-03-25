@@ -10,9 +10,9 @@ import Foundation
 func initTgt() {
 // initialize values for tgt
     FileSelectionManager.shared.selectedFiFo = []
-    DiskDataManager.shared.selectedDskOption = ""
-    DiskDataManager.shared.selectedStorageOption = ""
-    DiskDataManager.shared.selected2ndStorageOption = ""
+    DiskDataManager.shared.selectedDskOrigen = ""
+    DiskDataManager.shared.selectedStorageDestin = ""
+    DiskDataManager.shared.selected2ndStorageDestin = ""
     DiskDataManager.shared.selectedHashOption = "SHA256"
     DiskDataManager.shared.isComboDisabled = true
     CaseInfoData.shared.imageName = "TargetedImg01"
@@ -21,9 +21,9 @@ func initTgt() {
 func initSparse() {
 // initialize values for both convert sparse and hash
     FileSelectionManager.shared.selectedFiles = []
-    DiskDataManager.shared.selectedDskOption = ""
-    DiskDataManager.shared.selectedStorageOption = ""
-    DiskDataManager.shared.selected2ndStorageOption = ""
+    DiskDataManager.shared.selectedDskOrigen = ""
+    DiskDataManager.shared.selectedStorageDestin = ""
+    DiskDataManager.shared.selected2ndStorageDestin = ""
     DiskDataManager.shared.selectedHashOption = "SHA256"
     CaseInfoData.shared.imageName = ""
     
@@ -33,9 +33,9 @@ func initSparse() {
 func initHash() {
 // initialize values for both convert sparse and hash
     FileSelectionManager.shared.selectedFiles = []
-    DiskDataManager.shared.selectedDskOption = ""
-    DiskDataManager.shared.selectedStorageOption = ""
-    DiskDataManager.shared.selected2ndStorageOption = ""
+    DiskDataManager.shared.selectedDskOrigen = ""
+    DiskDataManager.shared.selectedStorageDestin = ""
+    DiskDataManager.shared.selected2ndStorageDestin = ""
     DiskDataManager.shared.selectedHashOption = "SHA256"
     CaseInfoData.shared.imageName = ""
     
@@ -70,7 +70,7 @@ func loadDiskInfo() -> [String] {
 
 func extractDiskIdentifier(sparseMounted: String) -> String {
 //    using the command hdiutil info file loaddhiutilInfo, separate by device (section) and within a section, seeks
-//    correspondiing image name and if found extract corresponding disk identifier (like disk3s1, disk4s2 etc). Only IMAGES
+//    corresponding image name and if found extract corresponding disk identifier (like disk3s1, disk4s2 etc). Only IMAGES
     print("executing extDsk with \(sparseMounted)")
     let hdiResults = loaddhiutilInfo()
     print(hdiResults)
@@ -198,7 +198,7 @@ func getMountPoint(diskIdentifier: String) -> String? {
 }
 
 
-func getSystemDiskInfo() -> (diskIdentifier: String, totalCapacity: Int64, usedSpace: Int64, availableSpace: Int64)? {
+func getSystemDiskInfo() -> (diskIdentifier: String, totalCapacity: UInt64, usedSpace: UInt64, availableSpace: UInt64)? {
 //    Get system disk id (and other values)
     let process = Process()
     let pipe = Pipe()
@@ -222,9 +222,9 @@ func getSystemDiskInfo() -> (diskIdentifier: String, totalCapacity: Int64, usedS
                 var diskIdentifier = ""
                 if let range = fullDiskIdentifier.range(of: #"disk\d+"#, options: .regularExpression) {
                      diskIdentifier = String(fullDiskIdentifier[range])}
-                let totalCapacity = Int64(components[1]) ?? 0
-                let usedSpace = Int64(components[2]) ?? 0
-                let availableSpace = Int64(components[3]) ?? 0
+                let totalCapacity = UInt64(components[1]) ?? 0
+                let usedSpace = UInt64(components[2]) ?? 0
+                let availableSpace = UInt64(components[3]) ?? 0
                 return (diskIdentifier, totalCapacity * 512, usedSpace * 512, availableSpace * 512)
             }
         }
@@ -237,7 +237,9 @@ func getSystemDiskInfo() -> (diskIdentifier: String, totalCapacity: Int64, usedS
 }
 
 
-func getAnyDiskInfo(dskpath: String) -> (diskIdentifier: String, totalCapacity: Int64, usedSpace: Int64, availableSpace: Int64)? {
+func getAnyDiskInfo(dskpath: String) -> (diskIdentifier: String, totalCapacity: UInt64, usedSpace: UInt64, availableSpace: UInt64)? {
+   // This func returns the total, available, and used bytes for disk dskpath (like /dev/disk1s1s1, the disk needs to be mounted
+    
     let process = Process()
     let pipe = Pipe()
 
@@ -260,9 +262,9 @@ func getAnyDiskInfo(dskpath: String) -> (diskIdentifier: String, totalCapacity: 
                 var diskIdentifier = ""
                 if let range = fullDiskIdentifier.range(of: #"disk\d+"#, options: .regularExpression) {
                      diskIdentifier = String(fullDiskIdentifier[range])}
-                let totalCapacity = Int64(components[1]) ?? 0
-                let usedSpace = Int64(components[2]) ?? 0
-                let availableSpace = Int64(components[3]) ?? 0
+                let totalCapacity = UInt64(components[1]) ?? 0
+                let usedSpace = UInt64(components[2]) ?? 0
+                let availableSpace = UInt64(components[3]) ?? 0
                 return (diskIdentifier, totalCapacity * 512, usedSpace * 512, availableSpace * 512)
             }
         }
@@ -274,62 +276,62 @@ func getAnyDiskInfo(dskpath: String) -> (diskIdentifier: String, totalCapacity: 
     return nil
 }
 
-func isStorageSizeOK (sourceDisk: String, destinationDisk: String, destDMGDisk: String) -> Bool {
-//    check if there is capacity to storage both imaged (sparse & DMG)
+func isStorageSizeOK3 (sourceSparse: String, destinationDisk: String, destDMGDisk: String) -> Bool {
+    //    check if there is capacity to storage DMG from the size of the Sparse)
     var isCapacity = false
-    if let totalCapacity = getAnyDiskInfo(dskpath: sourceDisk)?.totalCapacity,
-       let availableSpace1 = getAnyDiskInfo(dskpath: destinationDisk)?.availableSpace,
-       let availableSpace2 = getAnyDiskInfo(dskpath: destDMGDisk)?.availableSpace,
-       2 * totalCapacity < availableSpace1  || (totalCapacity < availableSpace1) && (totalCapacity < availableSpace2) {
-        print("required capacity x 2 = \(2 * totalCapacity)")
-        print("Available Space = \(availableSpace1 + availableSpace2)")
-        print("Available Space 1 = \(availableSpace1)")
-        print("Available Space 2 = \(availableSpace2)")
-        isCapacity = true
-        print(isCapacity)
-    }
-     else {
-        isCapacity = false
-         print(isCapacity)
-         if let availableSpace2 = getAnyDiskInfo(dskpath: destDMGDisk)?.availableSpace {
-             print("availableSpace2: \(availableSpace2)")
-         }
+    if let totalCapacity = getAnyDiskInfo(dskpath: sourceSparse)?.totalCapacity,
+       let availableSpace1 = getAnyDiskInfo(dskpath: destinationDisk)?.availableSpace {
+        if Double(totalCapacity) < (1.05 * Double(availableSpace1))  {
+            print("required capacity x 1.05 = \(1.05 * Double(totalCapacity))")
+            print("Available Space = \(availableSpace1)")
+            isCapacity = true
+            print(isCapacity)
+            
+        }
+        else {
+            isCapacity = false
+            print(isCapacity)
+        }
+    
     }
     
     return isCapacity
 }
 
-func isStorageSizeOK2(sourceDisk: String, destinationDisk: String, destDMGDisk: String) -> Bool {
-    if let totalCapacity = getAnyDiskInfo(dskpath: sourceDisk)?.totalCapacity,
-       let availableSpace1 = getAnyDiskInfo(dskpath: destinationDisk)?.availableSpace {
-        
-        let availableSpace2 = getAnyDiskInfo(dskpath: destDMGDisk)?.availableSpace ?? 0
-        print("required capacity x 2 = \(2 * totalCapacity)")
-        print("Available Space = \(availableSpace1 + availableSpace2)")
-        print("Available Space 1 = \(availableSpace1)")
-        print("Available Space 2 = \(availableSpace2)")
-        
-        if 2 * totalCapacity < availableSpace1 ||
-            (totalCapacity < availableSpace1 && totalCapacity < availableSpace2) {
-            return true
+func isStorageSizeOK1(sourceDisk: String, destinationDisk: String, destDMGDisk: String) -> Bool {
+    if CaseInfoData.shared.isdmgEnabled {
+        if let totalCapacity = getAnyDiskInfo(dskpath: sourceDisk)?.totalCapacity,
+           let availableSpace1 = getAnyDiskInfo(dskpath: destinationDisk)?.availableSpace {
+            
+            let availableSpace2 = getAnyDiskInfo(dskpath: destDMGDisk)?.availableSpace ?? 0
+            print("required capacity x 2 = \(2 * totalCapacity)")
+            print("Available Space = \(availableSpace1 + availableSpace2)")
+            print("Available Space 1 = \(availableSpace1)")
+            print("Available Space 2 = \(availableSpace2)")
+            
+            if 2 * totalCapacity < availableSpace1 ||
+                (totalCapacity < availableSpace1 && totalCapacity < availableSpace2) {
+                return true
+            }
         }
+        return false
     }
-    return false
-}
-    
+            else {
+                if let totalCapacity = getAnyDiskInfo(dskpath: sourceDisk)?.totalCapacity,
+                   let availableSpace1 = getAnyDiskInfo(dskpath: destinationDisk)?.availableSpace {
+            
+                    print("required capacity x 1 = \(1 * totalCapacity)")
+                    print("Available Space = \(availableSpace1)")
+                    print("Available Space 1 = \(availableSpace1)")
+                    
+                    if 1 * totalCapacity < availableSpace1  {
+                        return true
+                    }
+                }
+                return false
+            }
+            }
 
-//func checkFullDiskAccess() -> Bool {
-////    Not working, should be checked manually before start the app
-//    let fileManager = FileManager.default
-//    let path = NSHomeDirectory() + "/Library/Application Support"
-//    
-//    do {
-//        let _ = try fileManager.contentsOfDirectory(atPath: path)
-//        return true // Able to access the directory
-//    } catch {
-//        return false // Access denied
-//    }
-//}
 
 
 func detachSparse (diskAssig: String) -> String {
@@ -838,9 +840,14 @@ func acqlogDeviceInfo(filePath: String) {
 func acqlogTitleProcesses (filePath: String) {
     let fileWriter = FileWriter(filePath: filePath)
     if let writer = fileWriter {
-    writer.write("       ┌─┐┬─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐┌─┐\n")
-    writer.write("       ├─┘├┬┘│ ││  ├┤ └─┐└─┐├┤ └─┐\n")
-    writer.write("       ┴  ┴└─└─┘└─┘└─┘└─┘└─┘└─┘└─┘\n")
+        writer.write("\n")
+        writer.write("                 ┬─┐ ┌─┐ ┌─┐ ┬ ┬ ┬  ┌┬┐ ┌─┐\n")
+        writer.write("                 ├┬┘ ├┤  └─┐ │ │ │   │  └─┐\n")
+        writer.write("                 ┴└─ └─┘ └─┘ └─┘ ┴─┘ ┴  └─┘\n")
+//        writer.write("                 ┬─┐┌─┐┌─┐┬ ┬┬ ┌┬┐┌─┐\n")
+//        writer.write("                 ├┬┘├┤ └─┐│ ││  │ └─┐\n")
+//        writer.write("                 ┴└─└─┘└─┘└─┘┴─┘┴ └─┘\n")
+        writer.write("\n")
     }
         else {
         // Handle error: Failed to initialize FileWriter
@@ -860,7 +867,7 @@ func acqlogDiskInfo(filePath: String) {
         
         
         writer.write("\n")
-        writer.write(dskinfoTarget(volName: extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? dskMainData2()))
+        writer.write(dskinfoTarget(volName: extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? dskMainData2()))
         writer.write(String(repeating: "=", count: 88))
         writer.write("\n")
     }
@@ -984,7 +991,7 @@ func extractData(from text: String) -> [String: Int64] {
 
     var results = [String: Int64]()
     print("inside extractData")
-    let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+    let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
     print2Log(filePath: logfilePath, text2p: "inside func extracData for log")
     for pattern in patterns {
         let regex = try! NSRegularExpression(pattern: pattern, options: [])
@@ -1297,4 +1304,18 @@ func isDestinationInRoot(path: String) -> Bool {
 func isImageNameAtPath(path: String) -> Bool {
     let fileManager = FileManager.default
         return fileManager.fileExists(atPath: path)
+}
+
+
+func getFileSize(filePath: String) -> UInt64? {
+    do {
+        let attributes = try FileManager.default.attributesOfItem(atPath: filePath)
+        if let fileSize = attributes[FileAttributeKey.size] as? UInt64 {
+            // File size is in bytes
+            return fileSize
+        }
+    } catch {
+        print("Error getting file size: \(error)")
+    }
+    return nil
 }

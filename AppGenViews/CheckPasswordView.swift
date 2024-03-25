@@ -64,25 +64,25 @@ struct CheckPasswordView: View {
                  }
                  Spacer()
                  HStack (spacing: 80){
-                     Text("Type:\(authModel.licenseType) SN: \(authModel.licenseSerial)")
-                         .frame(width: 170)
-                         .padding(.horizontal, 5)
+                     Text("\(authModel.licenseType) SN: \(authModel.licenseSerial)")
+                         .frame(width: 220)
+                         .padding(.horizontal, 3)
                          .background(.white).opacity(0.7)
                          .cornerRadius(6)
  //                    Spacer()
                      Text("License exp date: \(authModel.licenseExpDate)")
                          .frame(width: 200)
-                         .padding(.horizontal, 5)
+                         .padding(.horizontal, 3)
                          .background(.white).opacity(0.7)
                          .cornerRadius(6)
                  }
-                 
-                 .padding()
+                 .padding(.horizontal, 5)
+                 .padding(.vertical, 15)
              }
              .frame(width: 550, height: 350)
              .background(gradient)
              .cornerRadius(20)
- //            .padding(50)
+//             .padding(15)
          }
         .frame(width: 900, height: 610)
         .background()
@@ -113,26 +113,26 @@ struct CheckPasswordView: View {
 
     private func handlePasswordCheck() {
         authModel.validatePassword(password)
-        print("password in review: \(authModel.isPasswordCorrect)")
+//        print("password in review: \(authModel.isPasswordCorrect)")
         if authModel.isPasswordCorrect {
-            print("correct password entered...")
+//            print("correct password entered...")
             authModel.rootPassword = password
-            print("passw captured: \(authModel.rootPassword)")
+//            print("passw captured: \(authModel.rootPassword)")
             AuthenticationViewModel.shared.rootPassword = password
         } else {
-            print("false, check attemps?")
+//            print("false, check attemps?")
             passwordAttempts += 1
-            print("passwordAttempts: \(passwordAttempts)")
+//            print("passwordAttempts: \(passwordAttempts)")
 //            DispatchQueue.main.async {
                 if passwordAttempts >= 3 {
                     alertMessage = "Maximum attempts reached. Access denied. The app will now quit. You should run it again once you have an admin password for this computer"
                     showAlert = true
-                    print("showAlert final: \(showAlert)")
+//                    print("showAlert final: \(showAlert)")
                     // Additional logic to handle max attempts reached
                 } else {
                     alertMessage = "Incorrect password. Please try again. You have \(String(3 - passwordAttempts)) attempt(s) left"
                     showAlert = true
-                    print("showAlert <=3: \(showAlert)")
+//                    print("showAlert <=3: \(showAlert)")
                 }
 //            }
         }

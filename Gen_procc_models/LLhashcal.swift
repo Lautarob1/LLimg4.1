@@ -169,9 +169,13 @@ class HashingViewModel2: ObservableObject {
     @Published var showDoneButton = false
     @Published var showProc = false
     @Published var stepIndex = 0
+//    var filesinList: Int = FileSelectionManager.shared.selectedFiles.count
+//    var filesCounter: Int = 0
 
     private var hashStartTime: Date?
     private var timer: Timer?
+    private var filesCounter: Int = 0
+    private var filesinList: Int = FileSelectionManager.shared.selectedFiles.count
     
     func startHashing(filePath: String, hashType: String) {
         hashStartTime = Date()
@@ -186,21 +190,38 @@ class HashingViewModel2: ObservableObject {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.updateElapsedTime()
         }
-        print("hash string entering hashViewModel: \(hashType)")
+        
+        self.filesCounter += 1
+        
+        print("total files before hashlargefile2: \(self.filesinList)")
+        print("file count before entering hashlargefile2: \(self.filesCounter)")
+
+        print("hashing entering hashViewModel: \(hashType)")
         switch hashType {
             case "SHA256":
             hashLargeFile2SHA256(filePath: filePath, viewModel: self) { result in
                   DispatchQueue.main.async {
                       self.hashResult = result
                       print("hash result in model: \(self.hashResult)")
-                      printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni)
-                      self.anyprocIsRunning = false
-                      self.showDoneButton = true
-                      self.stepIndex = 1
+                      printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni, file: filePath)
+                      print("file count inside dispatch: \(self.filesCounter)")
+                      print("total files inside dispath: \(self.filesinList)")
+                      if self.filesCounter <= self.filesinList {
+                          self.anyprocIsRunning = false
+                          self.showDoneButton = true
+                          self.stepIndex = 1
+                          self.timer?.invalidate()
+                          self.timer = nil
+                          print("inside proc that set the finals")
+                          print("counter >= filesinList")
+                      } else
+                      {
+                          print("counter < filesinList")
+                          self.stepIndex = 0
+                          self.hashProgressByt = 0
+                      }
                       // Optionally update additionalResult or other properties
                       // Invalidate timer as hash process is finished
-                      self.timer?.invalidate()
-                      self.timer = nil
                   }
               }
             case "SHA1":
@@ -208,7 +229,7 @@ class HashingViewModel2: ObservableObject {
                   DispatchQueue.main.async {
                       self.hashResult = result
                       print("hash result in model: \(self.hashResult)")
-                      printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni)
+                      printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni, file: filePath)
                       self.anyprocIsRunning = false
                       self.showDoneButton = true
                       self.stepIndex = 1
@@ -223,7 +244,7 @@ class HashingViewModel2: ObservableObject {
                   DispatchQueue.main.async {
                       self.hashResult = result
                       print("hash result in model: \(self.hashResult)")
-                      printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni)
+                      printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni, file: filePath)
                       self.anyprocIsRunning = false
                       self.showDoneButton = true
                       self.stepIndex = 1
@@ -266,6 +287,7 @@ func hashLargeFile2SHA256(filePath: String, viewModel: HashingViewModel2, comple
         let bufferSize = 1024 * 1024 // 1 MB
         let fileAttributes = try? FileManager.default.attributesOfItem(atPath: filePath)
         let fileSize = fileAttributes?[.size] as? UInt64 ?? 0
+//        viewModel.hashProgressByt = 0 this is wrong, must be done inside the main thread
         print("filePath within 256: \(filePath)")
         guard let file = FileHandle(forReadingAtPath: filePath) else {
             DispatchQueue.main.async {
@@ -284,8 +306,10 @@ func hashLargeFile2SHA256(filePath: String, viewModel: HashingViewModel2, comple
                     _ = CC_SHA256_Update(&context, buffer.baseAddress, CC_LONG(data.count))
                 }
                 DispatchQueue.main.async {
-                    viewModel.hashProgressByt += Double(data.count)
-                    viewModel.hashProgressPct = viewModel.hashProgressByt / Double(fileSize)
+                    viewModel.hashProgressByt += Double(data.count) / 1000
+                    viewModel.hashProgressPct = (viewModel.hashProgressByt * 1000) / Double(fileSize)
+                    print("viewModel.hashprogressKB: \(viewModel.hashProgressByt)")
+                    print("viewModel.hashprogressPct: \(viewModel.hashProgressPct)")
 //                    print("% avance \(viewModel.hashProgressPct)")
 //                    print("% time elapsed \(viewModel.elapsedTime)")
                     // Optionally update other ViewModel properties related to progress here
@@ -411,9 +435,9 @@ func hashLargeFile2MD5(filePath: String, viewModel: HashingViewModel2, completio
     }
 }
 
-func printHashLog (hashVal: String, iniTime: String) {
-    let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
-    let file = FileSelectionManager.shared.selectedFiles.first?.path
+func printHashLog (hashVal: String, iniTime: String, file: String) {
+    let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
+    let file = file
     let hashTimeIni = iniTime
     let hashLength = hashVal.utf8.count
     print("hashLength: \(hashLength)")

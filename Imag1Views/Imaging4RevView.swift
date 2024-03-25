@@ -54,7 +54,7 @@ struct Imaging4RevView: View {
                             TgtSelect4HashViewRev()
                             VStack (alignment: .leading){
                                 Text("Log file will be in: \n")
-                                Text(DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info")
+                                Text(DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info")
                                 
                             }
                             
@@ -109,7 +109,7 @@ struct Imaging4RevView: View {
                     
                 }
                 .onAppear() {
-                    let destHashReport = DiskDataManager.shared.selectedStorageOption
+                    let destHashReport = DiskDataManager.shared.selectedStorageDestin
                     if validatePath(path: destHashReport) {
                         let imgName = validateInput(name: CaseInfoData.shared.imageName)
                         print("dst disk: \(destHashReport)")

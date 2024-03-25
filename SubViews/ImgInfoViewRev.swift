@@ -33,7 +33,7 @@ struct ImgInfoViewRev: View {
                         .font(.headline)
                         .padding(.leading, 3)
                         .frame(width: 150, alignment: .leading)
-                    Text(DiskDataManager.shared.selectedStorageOption)
+                    Text(DiskDataManager.shared.selectedStorageDestin)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 200, alignment: .leading)
                 }
@@ -48,7 +48,7 @@ struct ImgInfoViewRev: View {
                     Text("Device to be imaged:")
                         .font(.headline)
                         .frame(width: 150, alignment: .leading)
-                    Text("\(DiskDataManager.shared.selectedDskOption)")
+                    Text("\(DiskDataManager.shared.selectedDskOrigen)")
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 200, alignment: .leading)
                 }

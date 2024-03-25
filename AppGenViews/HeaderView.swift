@@ -17,7 +17,7 @@ struct HeaderView: View {
         ZStack {
             Image("LLimager_Window2")
                 .resizable()
-                .frame(width: 900, height: 60)
+                .frame(width: 900, height: 100)
                 .scaledToFit()
 
             // Alignment of the text

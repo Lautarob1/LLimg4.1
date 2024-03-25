@@ -43,7 +43,7 @@ struct ImgInfoHashView: View {
                 }
                 HStack {
                     FilePickerView(path2img: "Destination for report", butlabel: "Select..." ) { selectedPath in
-                        DiskDataManager.shared.selectedStorageOption = selectedPath}
+                        DiskDataManager.shared.selectedStorageDestin = selectedPath}
                                         }
   
 

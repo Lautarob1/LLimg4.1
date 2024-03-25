@@ -44,8 +44,8 @@ struct ImgInfoView1: View {
                     HStack {
                         ComboBoxView(
                             selectedDskOption: Binding(
-                                get: { DiskDataManager.shared.selectedDskOption },
-                                set: { DiskDataManager.shared.selectedDskOption = $0 }
+                                get: { DiskDataManager.shared.selectedDskOrigen },
+                                set: { DiskDataManager.shared.selectedDskOrigen = $0 }
                             ),
                             isComboDisabled: Binding(
                                 get: { DiskDataManager.shared.isComboDisabled },
@@ -67,7 +67,7 @@ struct ImgInfoView1: View {
                     }
                     HStack {
                         FilePickerView(path2img: path2img, butlabel: "Select..." ) { selectedPath in
-                            DiskDataManager.shared.selectedStorageOption = selectedPath}
+                            DiskDataManager.shared.selectedStorageDestin = selectedPath}
                                             }
             
                         // Other UI elements
@@ -117,7 +117,7 @@ struct ImgInfoView1: View {
                 if caseInfoData.isdmgEnabled {
                     HStack {
                         FilePickerWithCheckView(path2img: "Diff path to DMG", butlabel: "Select...", enablefb: "Uncheck to choose a different path for final image")  { selectedPath in
-                            DiskDataManager.shared.selected2ndStorageOption = selectedPath}
+                            DiskDataManager.shared.selected2ndStorageDestin = selectedPath}
 
                     }
                     .padding()

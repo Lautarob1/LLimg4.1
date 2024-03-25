@@ -37,7 +37,7 @@ struct ImgConvSparseView: View {
                     }
                     HStack {
                         FilePickerView(path2img: "DESTINATION path", butlabel: "Select..." ) { selectedPath in
-                            DiskDataManager.shared.selectedStorageOption = selectedPath}
+                            DiskDataManager.shared.selectedStorageDestin = selectedPath}
                     }  // Other UI elements
                 }
                 
@@ -82,7 +82,7 @@ struct ImgConvSparseView: View {
                         }
                         HStack {
                             FilePickerView(path2img: "DESTINATION path", butlabel: "Select..." ) { selectedPath in
-                                DiskDataManager.shared.selectedStorageOption = selectedPath}
+                                DiskDataManager.shared.selectedStorageDestin = selectedPath}
                         }  // Other UI elements
                     }
                     

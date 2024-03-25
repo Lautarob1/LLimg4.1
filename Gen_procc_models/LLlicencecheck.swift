@@ -61,7 +61,7 @@ func licenseFile()  -> String {
 //        print("After read file \(AuthenticationViewModel.shared.licenseFileFound)")
         // Now fileContents contains the text of your file
     } catch {
-        print("in catch -no file found- \(AuthenticationViewModel.shared.licenseFileFound)")
+//        print("in catch -no file found- \(AuthenticationViewModel.shared.licenseFileFound)")
         fileContents = "Error reading file: \(error.localizedDescription)"
 //        return("Error reading file: \(error)")
     }

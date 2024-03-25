@@ -73,7 +73,7 @@ struct testFuncView: View {
                  let sourceMP = "/"
                 let destinationMP = "/Volumes/llidata"
                 let destinationDMG = ""
-                  output = String( isStorageSizeOK2 (sourceDisk: sourceMP, destinationDisk: destinationMP, destDMGDisk: destinationDMG))
+                  output = String( isStorageSizeOK1 (sourceDisk: sourceMP, destinationDisk: destinationMP, destDMGDisk: destinationDMG))
             }
             
             Button ("Root disk ID") {

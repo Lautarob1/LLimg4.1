@@ -265,17 +265,21 @@ class ConsoleViewModel: ObservableObject {
     class FileSizeChecker2: ObservableObject {
         static let shared = FileSizeChecker2()
         @Published var fileSizeInGB: Double = 0.0
+        var totalSizeInGB: Double = 0.0
+        @Published var pctAdvance: Double = 0.0
         private var timer: Timer?
         var filePath: String?
         
         func startMonitoring() {
+            print("starting start monioring in FSChecker2 with filepath \(filePath ?? "defaultvalueinStartMonitoring")")
             guard let filePath = filePath else {
                 print("File path not set")
+                // total disk size here to be used in pct advance calcs
                 return
             }
             
             timer?.invalidate()  // Stop any existing timer
-            timer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            timer = Timer.scheduledTimer(withTimeInterval: 0.2, repeats: true) { [weak self] _ in
                 self?.updateFileSize()
             }
         }
@@ -284,30 +288,33 @@ class ConsoleViewModel: ObservableObject {
             timer?.invalidate()
         }
         
+        
         private func updateFileSize() {
             guard let filePath = filePath else {
                 return
             }
             
             let fileManager = FileManager.default
+//            print(" in filesizechk2 filepath: \(filePath)")
             do {
                 let attributes = try fileManager.attributesOfItem(atPath: filePath)
                 if let fileSize = attributes[.size] as? Int64 {
                     // Convert file size to GB
                     let fileSizeInGB = Double(fileSize) / 1_000_000_000
-                    FileSizeChecker2.shared.fileSizeInGB = fileSizeInGB
-                    print("fileSizeinGB within updateFSize: \(fileSizeInGB) just before entering DispatchQueque")
+                    let pctAdvanceImgDev = fileSizeInGB / FileSizeChecker2.shared.totalSizeInGB
+//                    print("inside filechk2 totalSizeinGB: \(totalSizeInGB)")
+//                    print("inside filechk2 FileSizeChecker2.shared.totalSizeInGB: \(FileSizeChecker2.shared.totalSizeInGB)")
+//                    print("inside filechk2 percenAdvance: \(pctAdvanceImgDev)")
                     DispatchQueue.main.async {
                         self.fileSizeInGB = fileSizeInGB
-                        print("in FileSizeChecker2 size DMG \(fileSizeInGB)")
-                        FileSizeChecker2.shared.fileSizeInGB = fileSizeInGB
-                        print("after copying size in FileSizeChecker2 \(FileSizeChecker2.shared.fileSizeInGB)")
+                        self.pctAdvance = pctAdvanceImgDev
                     }
                 }
             } catch {
                 print("Error getting file size: \(error)")
             }
         }
+
     }
  
 class FileSizeChecker3: ObservableObject {
@@ -319,10 +326,12 @@ class FileSizeChecker3: ObservableObject {
     var filePath: String?
     
     func startMonitoring() {
+        print("starting start monioring with filepath \(filePath)")
         guard let filePath = filePath else {
             print("File path not set")
             // total disk size here to be used in pct advance calcs
-            let sourceDisk = "/dev/" + (extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/")
+            let sourceDisk = "/dev/" + (extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? "/")
+            print("source DSK: \(sourceDisk)")
             if let totalCapacity = getAnyDiskInfo(dskpath: sourceDisk)?.totalCapacity {
                 let totalSizeInGB = totalCapacity / 1_000_000_000
                 print("Total capacity: \(totalCapacity)")
@@ -355,9 +364,9 @@ class FileSizeChecker3: ObservableObject {
                 // Convert file size to GB
                 let fileSizeInGB = Double(fileSize) / 1_000_000_000
                 let pctAdvanceImgDev = fileSizeInGB / FileSizeChecker3.shared.totalSizeInGB
-                print("inside filechk3 totalSizeinGB: \(totalSizeInGB)")
-                print("inside filechk3 FileSizeChecker3.shared.totalSizeInGB: \(FileSizeChecker3.shared.totalSizeInGB)")
-                print("inside filechk3 percenAdvance: \(pctAdvanceImgDev)")
+//                print("inside filechk3 totalSizeinGB: \(totalSizeInGB)")
+//                print("inside filechk3 FileSizeChecker3.shared.totalSizeInGB: \(FileSizeChecker3.shared.totalSizeInGB)")
+//                print("inside filechk3 percenAdvance: \(pctAdvanceImgDev)")
                 DispatchQueue.main.async {
                     self.fileSizeInGB = fileSizeInGB
                     self.pctAdvance = pctAdvanceImgDev

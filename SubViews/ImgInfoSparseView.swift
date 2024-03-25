@@ -43,7 +43,7 @@ struct ImgInfoSparseView: View {
             }
             HStack {
                 FilePickerView(path2img: "DESTINATION path", butlabel: "Select..." ) { selectedPath in
-                    DiskDataManager.shared.selectedStorageOption = selectedPath}
+                    DiskDataManager.shared.selectedStorageDestin = selectedPath}
             }
                 
                 VStack (alignment: .leading)

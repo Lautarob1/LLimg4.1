@@ -51,11 +51,11 @@ struct DiskinfoViewRev: View {
         .background()
         .onAppear {
 //            print("detailed disk info for: \(DiskDataManager.shared.selectedDskOption)")
-            let sourceDisk = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? "/")
-            let destinationDisk = DiskDataManager.shared.selectedStorageOption
-            let destDMGDisk = DiskDataManager.shared.selected2ndStorageOption
+            let sourceDisk = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? "/")
+            let destinationDisk = DiskDataManager.shared.selectedStorageDestin
+            let destDMGDisk = DiskDataManager.shared.selected2ndStorageDestin
             dskfileInfoDict1 = diskutilInfo(for: getDiskIDCapacityAvSpace(diskPath: sourceDisk).diskID ?? dskMainData2())
-            let destinDisk = DiskDataManager.shared.selectedStorageOption
+            let destinDisk = DiskDataManager.shared.selectedStorageDestin
 //            guard dskfileInfoDict2 = diskutilInfo(for: (getDiskIDCapacityAvSpace(diskPath: destinationDisk).diskID  else {
 //                print("File path not set")
 //                return

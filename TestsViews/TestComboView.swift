@@ -14,8 +14,8 @@ struct TestComboView: View {
             Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
             ComboBoxView(
                 selectedDskOption: Binding(
-                    get: { DiskDataManager.shared.selectedDskOption },
-                    set: { DiskDataManager.shared.selectedDskOption = $0 }
+                    get: { DiskDataManager.shared.selectedDskOrigen },
+                    set: { DiskDataManager.shared.selectedDskOrigen = $0 }
                 ),
                 
                 isComboDisabled: Binding(
@@ -27,8 +27,8 @@ struct TestComboView: View {
             )
             .environmentObject(DiskDataManager.shared)
             Button("testCombo"){
-                print(DiskDataManager.shared.selectedDskOption)
-                print(extractusedDisk(from: DiskDataManager.shared.selectedDskOption))
+                print(DiskDataManager.shared.selectedDskOrigen)
+                print(extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen))
             }
         }
         .frame(width: 400, height: 200)

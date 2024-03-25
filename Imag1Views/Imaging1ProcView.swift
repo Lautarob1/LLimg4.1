@@ -100,9 +100,9 @@ struct Imaging1ProcView: View {
                             print("process starts")
                             showControls = false
                             
-                            let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+                            let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
                             print("LogfilePath: \(logfilePath)")
-                            logfilePathEx = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).LLeX"
+                            logfilePathEx = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).LLeX"
 
                             acqlogHeader(filePath: logfilePath)
                             acqlogHeader(filePath: logfilePathEx)
@@ -459,12 +459,12 @@ struct Imaging1ProcView: View {
  
     func sparseLog() {
         print("entering sparse log, path for log file")
-        print(DiskDataManager.shared.selectedStorageOption)
+        print(DiskDataManager.shared.selectedStorageDestin)
         print(CaseInfoData.shared.imgfilePath)
-        let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         print("logfilePath: \(logfilePath)")
         let imgName = CaseInfoData.shared.imageName
-        let sparsePath = DiskDataManager.shared.selectedStorageOption
+        let sparsePath = DiskDataManager.shared.selectedStorageDestin
         acqlogTitleProcesses(filePath: logfilePath)
         print2Log(filePath: logfilePath, text2p: "Sparse image process\(String(repeating: "-", count: 40))\n")
         print2Log(filePath: logfilePath, text2p: "Start time:     \(sparseTimeIni)")
@@ -477,10 +477,10 @@ struct Imaging1ProcView: View {
     
     func dmgLog() {
         print("entering dmg log, path for log file:")
-        print(DiskDataManager.shared.selectedStorageOption)
-        let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+        print(DiskDataManager.shared.selectedStorageDestin)
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         let imgName = CaseInfoData.shared.imageName
-        let dmgPath = DiskDataManager.shared.selectedStorageOption
+        let dmgPath = DiskDataManager.shared.selectedStorageDestin
         print("logfilePath: \(logfilePath)")
         print2Log(filePath: logfilePath, text2p: "DMG image process\(String(repeating: "-", count: 40))\n")
         print2Log(filePath: logfilePath, text2p: "Start time:     \(dmgTimeIni)")
@@ -493,10 +493,10 @@ struct Imaging1ProcView: View {
     
     func createSparseContainer () -> String {
         let imgName = CaseInfoData.shared.imageName
-        let sparsePath = DiskDataManager.shared.selectedStorageOption
+        let sparsePath = DiskDataManager.shared.selectedStorageDestin
         print("in createSparseCont: imgName=\(imgName)")
         let passw = AuthenticationViewModel.shared.rootPassword
-        let dsk2bImaged = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? getRootFileSystemDiskID()!)
+        let dsk2bImaged = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID()!)
         print("disk to be imaged: \(dsk2bImaged)")
         let imgSize = getDiskIDCapacityAvSpace(diskPath: dsk2bImaged).capacity!
         maxValue = convertSizeStringToDouble(imgSize)
@@ -511,7 +511,7 @@ struct Imaging1ProcView: View {
     func mountsparseContanier() -> String {
         let imgName = CaseInfoData.shared.imageName+".sparseimage"
         let passw = AuthenticationViewModel.shared.rootPassword
-        let sparsePath = DiskDataManager.shared.selectedStorageOption
+        let sparsePath = DiskDataManager.shared.selectedStorageDestin
         print("mount sparse imgname: \(imgName)")
         print("mount sparse passw: \(passw)")
         print("mount sparse sparsePath: \(sparsePath)")
@@ -523,11 +523,11 @@ struct Imaging1ProcView: View {
     func createsparseImage () {
         let imgName = CaseInfoData.shared.imageName
         let passw = AuthenticationViewModel.shared.rootPassword
-        let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
-        let dsk2bImaged = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOption) ?? getRootFileSystemDiskID()!)
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
+        let dsk2bImaged = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID()!)
         print("starting sparse...")
         print(" disk to be imaged \(dsk2bImaged)")
-        let sparsePath = DiskDataManager.shared.selectedStorageOption
+        let sparsePath = DiskDataManager.shared.selectedStorageDestin
         print("sparse path: \(sparsePath)")
         sparseTimeIni=LLTimeManager.getCurrentTimeString()
         let loginiTime = "        Sparse Image Start Time \(LLTimeManager.getCurrentTimeString())\n"
@@ -568,20 +568,20 @@ struct Imaging1ProcView: View {
             return
         }
         stepIndex = 1
-        let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         let passw = AuthenticationViewModel.shared.rootPassword
         print("in dmg, logfilePath: \(logfilePath)")
         print("in dmg, password: \(passw)")
         print("in dmg, fullImagePath: \(fullimagePath)")
         showdmgvalues = true
         if CaseInfoData.shared.dmgfilePath == "" {
-            CaseInfoData.shared.dmgfilePath = DiskDataManager.shared.selectedStorageOption
+            CaseInfoData.shared.dmgfilePath = DiskDataManager.shared.selectedStorageDestin
         }
         var path2dmg = ""
-        if DiskDataManager.shared.selected2ndStorageOption == "" {
-            path2dmg = DiskDataManager.shared.selectedStorageOption
+        if DiskDataManager.shared.selected2ndStorageDestin == "" {
+            path2dmg = DiskDataManager.shared.selectedStorageDestin
         } else {
-            path2dmg = DiskDataManager.shared.selected2ndStorageOption
+            path2dmg = DiskDataManager.shared.selected2ndStorageDestin
         }
         print("in dmg, path to store DMG: \(path2dmg)")
         dmgTimeIni=LLTimeManager.getCurrentTimeString()
@@ -611,14 +611,14 @@ struct Imaging1ProcView: View {
         print("in hash calculations \(procStep[stepIndex])")
         let imgName = CaseInfoData.shared.imageName
         var pathFile = ""
-        if DiskDataManager.shared.selected2ndStorageOption == "" {
-            pathFile = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).dmg"
+        if DiskDataManager.shared.selected2ndStorageDestin == "" {
+            pathFile = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).dmg"
         } else {
-            pathFile = DiskDataManager.shared.selected2ndStorageOption + "/\(CaseInfoData.shared.imageName).dmg"
+            pathFile = DiskDataManager.shared.selected2ndStorageDestin + "/\(CaseInfoData.shared.imageName).dmg"
         }
 
         print("path to dmg in hash calc: \(pathFile)")
-        let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         print2Log(filePath: logfilePath, text2p: "Hash DMG process\(String(repeating: "-", count: 40))\n")
         let hashTimeIni = LLTimeManager.getCurrentTimeString()
         print2Log(filePath: logfilePath, text2p: "Start time:     \(hashTimeIni)")
@@ -654,7 +654,7 @@ struct Imaging1ProcView: View {
     }
     
     func processNoHash() {
-        let logfilePath = DiskDataManager.shared.selectedStorageOption + "/\(CaseInfoData.shared.imageName).info"
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         print2Log(filePath: logfilePath, text2p: "No hash calculation selected")
     }
      

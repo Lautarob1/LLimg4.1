@@ -41,7 +41,7 @@ struct TgtInfoViewRev: View {
         .frame(width:430, height: 250)
         .background()
         .onAppear {
-            let destinDisk = DiskDataManager.shared.selectedStorageOption
+            let destinDisk = DiskDataManager.shared.selectedStorageDestin
                 dskfileInfoDict2 = diskutilInfo(for: (getDiskIDCapacityAvSpace(diskPath: destinDisk).diskID ?? "invalid"))
             if destinDisk == "invalid" {
                 isDiskValid = false
