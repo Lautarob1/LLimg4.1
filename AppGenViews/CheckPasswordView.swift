@@ -79,12 +79,12 @@ struct CheckPasswordView: View {
                  .padding(.horizontal, 5)
                  .padding(.vertical, 15)
              }
-             .frame(width: 550, height: 350)
+             .frame(width: 570, height: 400)
              .background(gradient)
              .cornerRadius(20)
 //             .padding(15)
          }
-        .frame(width: 900, height: 610)
+        .frame(maxHeight: 700)
         .background()
         .onAppear() {
             DispatchQueue.main.async {

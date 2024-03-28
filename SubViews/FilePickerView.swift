@@ -16,9 +16,11 @@ struct FilePickerView: View {
     
     var body: some View {
         HStack {
+            Text("Path:")
+                .padding(.leading, 3)
             Text(path2img) //, text: $filePath)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
-                .frame(width: 310, alignment: .leading)
+                .frame(width: 260, alignment: .leading)
                 .padding()
 
             Button(butlabel) {
@@ -43,6 +45,6 @@ struct FilePickerView: View {
 
 #Preview {
 //    FilePickerView(butlabel: "Browse...")
-    FilePickerView(path2img: "path", butlabel: "Browse...") { selectedPath in
+    FilePickerView(path2img: "path", butlabel: "Select...") { selectedPath in
         CaseInfoData.shared.imgfilePath = selectedPath}
 }

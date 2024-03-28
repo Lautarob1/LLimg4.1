@@ -20,7 +20,7 @@ struct LLimg_sw01App: App {
                     if authModel.isPasswordCorrect {
                         // Show MenuView only if the password is correct and lic not expired
                         MenuView(authModel: AuthenticationViewModel())
-                            .frame(width: 900, height: 600)
+                            .frame(minWidth: 900)
                     } else {
                         // Otherwise, show CheckPasswordView
                         CheckPasswordView(authModel: authModel)

@@ -113,14 +113,14 @@ struct ImgInfoView1: View {
                     Text("if checked a DMG will be produced")
                     Spacer()
                 }
-
+                .padding(.bottom, 15)
                 if caseInfoData.isdmgEnabled {
                     HStack {
                         FilePickerWithCheckView(path2img: "Diff path to DMG", butlabel: "Select...", enablefb: "Uncheck to choose a different path for final image")  { selectedPath in
                             DiskDataManager.shared.selected2ndStorageDestin = selectedPath}
 
                     }
-                    .padding()
+//                    .padding()
                     
                     VStack (alignment: .leading)
                     {

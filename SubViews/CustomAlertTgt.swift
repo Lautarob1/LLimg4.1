@@ -46,7 +46,7 @@ struct CustomAlertTgt: View {
 
             
             VStack (alignment: .leading, spacing: 5) {
-                Text("Make sure to have enough space on the destination disk.")
+                Text("Make sure there is enough space on the destination disk.")
                     .font(.system(size: 12))
 //                Text(message1b)
 //                + Text(llImager)

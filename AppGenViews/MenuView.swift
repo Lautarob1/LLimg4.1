@@ -39,10 +39,8 @@ struct MenuView: View {
     
     var body: some View {
         ZStack {
-            
-            VStack (spacing: 70){
-                VStack {
-                    Spacer()
+                VStack (spacing: 0) {
+//                    Spacer()
                     LazyVGrid(columns: columns, spacing: 70) {
                         ForEach(1...4, id: \.self) { optionID in
                             ZStack {
@@ -52,7 +50,7 @@ struct MenuView: View {
                                     Image("img_but\(optionID)")
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 170, height: 170)
+                                        .frame(width: 175, height: 175)
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 .onHover(perform: { hovering in
@@ -87,15 +85,39 @@ struct MenuView: View {
                             }
                         }
                     }
-                    .frame(width: 900, height: 700)
-                    Spacer()
+                    .padding(.top, 50)
+                    .padding(.bottom, 20)
+//                    .frame(minHeight: 610)
+                    Button("E x i t")
+                    {
+                        NSApplication.shared.terminate(nil)
+                    }
+                    .font(.system(size: 20, weight: .bold, design: .default))
+                    .foregroundColor(Color("LL_blue"))
+                    .frame(width: 170,height: 40)
+                    .background(.white)
+                    .cornerRadius(10)
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(.bottom, 10)
+                    VStack {
+                        Text(" e-forensics inc. Copyright 2023-2024. All rights reserved.")
+                            .foregroundColor(.white)
+                            .frame(maxHeight: 25)
+                            .padding(.bottom, 10)
+                    }
+//                    .padding(.top, 50)
+//                    .frame(minWidth: 900)
+
                 }
-            }
+                .frame(minHeight: 680)
+                
+//            }
             if showAlert0 {
                 CustomAlertView0(onOK: {showAlert0 = false})
             }
+
         }
-        .frame(width: 900, height: 620)
+//        .frame(minWidth: 900)
         .background(gradient)
         .sheet(item: $selectedOption) { option in
             switch option.id {
@@ -120,7 +142,7 @@ struct MenuView: View {
                     buttonView(for: index)
                 }
             }
-            .padding(.bottom, 70)
+            .padding(.bottom, 20)
         }
         
         private func buttonView(for index: Int) -> some View {
@@ -133,19 +155,17 @@ struct MenuView: View {
                     Image(buttonImages[index - 1])
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 170, height: 170)
+                        .frame(width: 175, height: 175)
                         .background(.white)
                         .cornerRadius(15)
-//                        .padding(0)
+                        .padding(0)
                         .overlay(tooltipOverlay(for: index))
                 }
             }
             .onHover { isHovering in
                 hoverStates[index] = isHovering
             }
-//            .sheet(isPresented: binding(for: index)) {
-//                viewForIndex(index)
-//            }
+
         }
         
         private func tooltipOverlay(for index: Int) -> some View {

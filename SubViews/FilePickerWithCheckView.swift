@@ -20,8 +20,16 @@ struct FilePickerWithCheckView: View {
         var body: some View {
             VStack {
                 HStack {
+                    Toggle(enablefb, isOn: $isButtonDisabled)
+                        .padding(.leading, 10)
+                    Spacer()
+                }
+                HStack {
+                    Text("Path:")
+                        .padding(.leading, 3)
                     Text(path2img) //, text: $filePath)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .frame(width: 260, alignment: .leading)
                         .padding()
                 Button(butlabel) {
                         let openPanel = NSOpenPanel()
@@ -38,14 +46,10 @@ struct FilePickerWithCheckView: View {
                     .disabled(isButtonDisabled)
                 }
                 // Checkbox (Toggle)
-                HStack {
-                    Toggle(enablefb, isOn: $isButtonDisabled)
-                        .padding(.leading, 10)
-                    Spacer()
-                }
+
                 
             }
-            .frame(width: 410)
+//            .frame(width: 410)
             .background()
         }
 }
