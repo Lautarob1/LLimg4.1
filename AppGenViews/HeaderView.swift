@@ -20,7 +20,7 @@ struct HeaderView: View {
         ZStack {
             Image("LLimager_Window2") // header_w120
                 .resizable()
-                .frame(minWidth: 900)
+                .frame(minHeight: 100)
                 .scaledToFit()
             
             // Alignment of the text
@@ -89,10 +89,10 @@ struct HeaderView: View {
                 
             }
         }
-        .padding(.bottom, -10)
+        .padding(.vertical, 0)
         .frame(minWidth: 900)
     }
-        Spacer()
+//        Spacer()
     }
     
     func showPDF() {

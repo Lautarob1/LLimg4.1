@@ -13,7 +13,7 @@ struct TgtSelectSparseView: View {
     @State private var selectedItems = Set<UUID>()
     @ObservedObject private var fileSelectionManager = FileSelectionManager()
     @State private var stillWorking = false
-    let path2img: String = "Targeted sparse Image"
+    let path2img: String = "Select only one sparse Image"
 
     
     var body: some View {
@@ -35,9 +35,11 @@ struct TgtSelectSparseView: View {
                     
                     if openPanel.runModal() == .OK {
                         openPanel.urls.forEach { url in
-                            if url.path.contains("sparseimage") {
+                            if url.path.contains("sparseimage") && fileSelectionManager.selectedFiles.count < 1 {
                                 fileSelectionManager.addFile(path: url.path)
                                 FileSelectionManager.shared.addFile(path: url.path)
+                                print("files selected  \(fileSelectionManager.selectedFiles.count)")
+                                print("files selected (shared)  \(FileSelectionManager.shared.selectedFiles.count)")
                             }
                         }
                     }
@@ -48,7 +50,6 @@ struct TgtSelectSparseView: View {
 
                       
                 }
-//                .disabled(stillWorking)
                 .frame(width:140, height: 25)
     
 
