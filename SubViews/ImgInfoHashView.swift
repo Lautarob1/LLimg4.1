@@ -54,7 +54,7 @@ struct ImgInfoHashView: View {
                     {
                         Text("Hash file")
                             .padding(.leading, 10)
-                        OptionButtonsView()
+                        OptionButtonsView2()
                     }
                     .padding()
                     .background()

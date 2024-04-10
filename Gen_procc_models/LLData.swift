@@ -31,6 +31,32 @@ class DiskDataManager: ObservableObject {
         self.selectedDskOrigen = self.comboInfo.first!
     }
 
+    func findMtPtByIdent(_ ident: String) -> String? {
+        // Use 'first(where:)' to find the tuple where 'ident' matches the parameter
+        if let item = dskData.first(where: { $0.ident == ident }) {
+            // If found, return the 'mtPt' value
+            return item.mtPt
+        } else {
+            // If not found, return nil
+            print("mtPt not found, returning root and not nil")
+            return "/"
+//            return nil
+        }
+    }
+    
+    func findSizeByIdent(_ ident: String) -> String? {
+        // Use 'first(where:)' to find the tuple where 'ident' matches the parameter
+        if let item = dskData.first(where: { $0.ident == ident }) {
+            // If found, return the 'mtPt' value
+            return item.size
+        } else {
+            // If not found, return nil
+            print("size not found, returning 500G and not nil")
+            return "500G"
+//            return nil
+        }
+    }
+
 }
 
 

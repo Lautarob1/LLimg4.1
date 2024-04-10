@@ -45,7 +45,8 @@ struct Imaging2ProcView: View {
     @State private var stepIndex: Int = 0
     @State private var fileUpdCounter: Int = 0
     @State private var anyprocIsRunning: Bool = false
-//    @State private var issparseMounted = false
+    @State private var nilSource = false
+    @State private var isSparseMounted = false
     @State private var logfilePath: String = ""
     @State private var logfilePathEx: String = ""
     @ObservedObject private var fileSizeChecker2 = FileSizeChecker2()
@@ -340,6 +341,17 @@ struct Imaging2ProcView: View {
         print("log path for file eX: \(logfilePathEx)")
         // create sparse container for Logical file
         sviewModel.output=createSparseContainer()
+        if  nilSource {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+            sviewModel.output="Creating container for sparse fails. Error in source Disk size"
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "😬"
+            alertMsg = "The sparse container could not be created. Could not determine source Disk size"
+            stepIndex = 4
+
+            return
+        }
+
         print2Log(filePath: logfilePathEx, text2p: "Temp and collec process-------------------------------\n")
 //        print(sviewModel.output)
         print("after create sparse Container")
@@ -400,6 +412,17 @@ struct Imaging2ProcView: View {
             showdmgvalues = true
             createdmgImage()
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+            if  isSparseMounted {
+                print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+                sviewModel.output="Unmount sparse process fails."
+                imageName = "person.crop.circle.badge.exclamationmark"
+                alertTitle = "😬"
+                alertMsg = "The sparse image could not be unmounted. Please unmount it from Finder or disk Util and then run convert process"
+                stepIndex = 4
+
+                return
+            }
+            
             print("4th process (create dmg) done....")
         }
         else {
@@ -561,8 +584,19 @@ struct Imaging2ProcView: View {
         let sparsePath = DiskDataManager.shared.selectedStorageDestin
         print("in createSparseCont: imgName=\(imgName)")
         let passw = AuthenticationViewModel.shared.rootPassword
-        let dskWithImagedFF = (extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID()!)
-        print("disk to be imaged: \(dskWithImagedFF)")
+        print("selected DSK org \(DiskDataManager.shared.selectedDskOrigen)")
+
+        // Attempt to extract the disk ID from the selected disk origin, falling back to the root file system disk ID if necessary. If both are nil, set `nilSource` to true.
+        var dskIDWithImagedFF = ""
+        if let dskIDWithImagedFF = extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID() {
+            // Use `dskIDWithImagedFF` here, as it is guaranteed to be non-nil.
+            print("Disk ID with Imaged FF: \(dskIDWithImagedFF)")
+        } else {
+            // If both `extractusedDisk` and `getRootFileSystemDiskID` return nil, set `nilSource` to true.
+            nilSource = true
+        }
+
+        guard let dskWithImagedFF = DiskDataManager.shared.findMtPtByIdent(dskIDWithImagedFF) else { return "/" }
         let imgSize = getDiskIDCapacityAvSpace(diskPath: dskWithImagedFF).capacity!
         maxValue = convertSizeStringToDouble(imgSize)
         print("maxValue (value from image size in create sparse container \(maxValue)")
@@ -630,9 +664,11 @@ struct Imaging2ProcView: View {
     func createdmgImage() {
         let imgName = CaseInfoData.shared.imageName
         let defaultImagePath = "/Volumes/llidata/\(imgName).sparseimage"
+        let fullimagePath = "\(DiskDataManager.shared.selectedStorageDestin)/\(imgName).sparseimage"
         print("inside createdmgImage...")
-        let fullimagePath = fileSizeChecker2.filePath ?? defaultImagePath
-        print("fileSizechecker2.filePath: \(String(describing: fileSizeChecker2.filePath))")
+//        let fullimagePath = fileSizeChecker2.filePath ?? defaultImagePath
+//        print("fileSizechecker2.filePath: \(String(describing: fileSizeChecker2.filePath))")
+//        let fullimagePath = "/Volumes/llidata/\(imgName).sparseimage"
         print("fileSizechecker2.filePath: \(String(describing: fullimagePath))")
         let isMounted = isSparseImageMounted(imagePath: fullimagePath)
         print(isMounted ? "Image is mounted" : "Image is not mounted")
@@ -640,6 +676,8 @@ struct Imaging2ProcView: View {
         guard let devDiskMt = extractDiskIdentifier2(from: hdiInfo, imagePath: fullimagePath)
         else {
             print("error in dsk id for")
+            let logfilePath2 = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName)_error.info"
+            print2Log(filePath: logfilePath2, text2p: "Failed to unmount sparse")
             return
             }
         sparseSizeBytes = getFileSize(filePath: fullimagePath) ?? 0
@@ -647,18 +685,22 @@ struct Imaging2ProcView: View {
         print("values for mounted sparse, used and total:")
         print(getAnyDiskInfo(dskpath: fullimagePath)?.usedSpace ?? 0)
         print(getAnyDiskInfo(dskpath: fullimagePath)?.totalCapacity ?? 0)
-        print("to be Unmounted: \(devDiskMt)")
+//        print("to be Unmounted: \(devDiskMt)")
+        print("to be Unmounted: \(fullimagePath)")
         if isMounted {
             Thread.sleep(forTimeInterval: 3)
             unmountSparseImage(dskimageMt: devDiskMt)
+//            unmountSparseImage(dskimageMt: fullimagePath)
         }
         let isMounted2 = isSparseImageMounted(imagePath: fullimagePath)
         if isMounted2 {
             Thread.sleep(forTimeInterval: 5)
-            unmountSparseImageForce(dskimageMt: devDiskMt)
+//            unmountSparseImageForce(dskimageMt: devDiskMt)
+            unmountSparseImageForce(dskimageMt: fullimagePath)
         }
         if isSparseImageMounted(imagePath: fullimagePath) {
             print("image still mounted after 2 attemps")
+            isSparseMounted = true
             return
         }
         let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"

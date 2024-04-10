@@ -20,7 +20,9 @@ class ConsoleViewModel: ObservableObject {
     
     func executeSudoCommand(command: String, passw: String) -> String {
         print("entering ConsoleViewModel-executeSudoCommand")
-        let fullCommand = "echo \(passw) | sudo -S \(command)"
+        let caffeinatedCommand = "caffeinate -m -i -- \(command)"
+        let fullCommand = "echo \(passw) | sudo -S \(caffeinatedCommand)"
+//        let fullCommand = "echo \(passw) | sudo -S \(command)"
         let process = Process()
         let pipe = Pipe()
         process.environment = ProcessInfo.processInfo.environment
@@ -45,7 +47,9 @@ class ConsoleViewModel: ObservableObject {
     
     func executeSudoCommand2(command: String, passw: String)  // -> String
     {
-        let fullCommand = "echo \(passw) | sudo -S \(command)"
+        let caffeinatedCommand = "caffeinate -m -i -- \(command)"
+        let fullCommand = "echo \(passw) | sudo -S \(caffeinatedCommand)"
+//        let fullCommand = "echo \(passw) | sudo -S \(command)"
         let process = Process()
         let pipe = Pipe()
         //            let streamViewModel=StreamViewModel()
@@ -90,7 +94,8 @@ class ConsoleViewModel: ObservableObject {
     func executeSudoCommand3(command: String, passw: String)  // -> String
     {
         print("in sudoCmd3... CMD: \(command)")
-        let fullCommand = "echo \(passw) | sudo -S \(command)"
+        let caffeinatedCommand = "caffeinate -m -i -- \(command)"
+        let fullCommand = "echo \(passw) | sudo -S \(caffeinatedCommand)"
         let process = Process()
         let pipe = Pipe()
         process.environment = ProcessInfo.processInfo.environment

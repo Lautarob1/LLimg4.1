@@ -209,7 +209,7 @@ class HashingViewModel2: ObservableObject {
                       if self.filesCounter <= self.filesinList {
                           self.anyprocIsRunning = false
                           self.showDoneButton = true
-                          self.stepIndex = 1
+//                          self.stepIndex = 1
                           self.timer?.invalidate()
                           self.timer = nil
                           print("inside proc that set the finals")
@@ -232,7 +232,7 @@ class HashingViewModel2: ObservableObject {
                       printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni, file: filePath)
                       self.anyprocIsRunning = false
                       self.showDoneButton = true
-                      self.stepIndex = 1
+//                      self.stepIndex = 1
                       // Optionally update additionalResult or other properties
                       // Invalidate timer as hash process is finished
                       self.timer?.invalidate()
@@ -247,7 +247,7 @@ class HashingViewModel2: ObservableObject {
                       printHashLog (hashVal: self.hashResult, iniTime: self.hashTimeIni, file: filePath)
                       self.anyprocIsRunning = false
                       self.showDoneButton = true
-                      self.stepIndex = 1
+//                      self.stepIndex = 1
                       // Optionally update additionalResult or other properties
                       // Invalidate timer as hash process is finished
                       self.timer?.invalidate()
@@ -291,14 +291,15 @@ func hashLargeFile2SHA256(filePath: String, viewModel: HashingViewModel2, comple
         print("filePath within 256: \(filePath)")
         guard let file = FileHandle(forReadingAtPath: filePath) else {
             DispatchQueue.main.async {
-                completion("Failed to open file")
+                completion("Failed to open file: \(filePath)")
             }
+            viewModel.stepIndex = 2
             return
         }
         
         var context = CC_SHA256_CTX()
         CC_SHA256_Init(&context)
-        
+        viewModel.stepIndex = 1
         while autoreleasepool(invoking: {
             let data = file.readData(ofLength: bufferSize)
             if data.count > 0 {
@@ -345,12 +346,13 @@ func hashLargeFile2SHA1(filePath: String, viewModel: HashingViewModel2, completi
             DispatchQueue.main.async {
                 completion("Failed to open file")
             }
+            viewModel.stepIndex = 2
             return
         }
         
         var context = CC_SHA1_CTX()
         CC_SHA1_Init(&context)
-        
+        viewModel.stepIndex = 1
         while autoreleasepool(invoking: {
             let data = file.readData(ofLength: bufferSize)
             if data.count > 0 {
@@ -395,11 +397,13 @@ func hashLargeFile2MD5(filePath: String, viewModel: HashingViewModel2, completio
             DispatchQueue.main.async {
                 completion("Failed to open file")
             }
+            viewModel.stepIndex = 2
             return
         }
         
         var context = CC_MD5_CTX()
         CC_MD5_Init(&context)
+        viewModel.stepIndex = 1
         
         while autoreleasepool(invoking: {
             let data = file.readData(ofLength: bufferSize)

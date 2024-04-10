@@ -664,22 +664,23 @@ func acqlogHeader(filePath: String) {
     FileDelete.deleteIfExists(filePath: filePath)
     let fileWriter = FileWriter(filePath: filePath)
     if let writer = fileWriter {
-        writer.write("██╗     ██╗         ██╗███╗   ███╗ █████╗  ██████╗ ███████╗██████╗     ██╗   ██╗██╗  ██╗\n")
-        writer.write("██║     ██║         ██║████╗ ████║██╔══██╗██╔════╝ ██╔════╝██╔══██╗    ██║   ██║██║  ██║\n")
-        writer.write("██║     ██║         ██║██╔████╔██║███████║██║  ███╗█████╗  ██████╔╝    ██║   ██║███████║\n")
-        writer.write("██║     ██║         ██║██║╚██╔╝██║██╔══██║██║   ██║██╔══╝  ██╔══██╗    ╚██╗ ██╔╝╚════██║\n")
-        writer.write("███████╗███████╗    ██║██║ ╚═╝ ██║██║  ██║╚██████╔╝███████╗██║  ██║     ╚████╔╝      ██║\n")
-        writer.write("╚══════╝╚══════╝    ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝      ╚═══╝       ╚═╝\n")
+//        writer.write("██╗     ██╗         ██╗███╗   ███╗ █████╗  ██████╗ ███████╗██████╗     ██╗   ██╗██╗  ██╗\n")
+//        writer.write("██║     ██║         ██║████╗ ████║██╔══██╗██╔════╝ ██╔════╝██╔══██╗    ██║   ██║██║  ██║\n")
+//        writer.write("██║     ██║         ██║██╔████╔██║███████║██║  ███╗█████╗  ██████╔╝    ██║   ██║███████║\n")
+//        writer.write("██║     ██║         ██║██║╚██╔╝██║██╔══██║██║   ██║██╔══╝  ██╔══██╗    ╚██╗ ██╔╝╚════██║\n")
+//        writer.write("███████╗███████╗    ██║██║ ╚═╝ ██║██║  ██║╚██████╔╝███████╗██║  ██║     ╚████╔╝      ██║\n")
+//        writer.write("╚══════╝╚══════╝    ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝      ╚═══╝       ╚═╝\n")
+        writer.write("L L I M A G E R    V 4 \n")
         writer.write("\n")
         writer.write(String(repeating: "=", count: 88))
         writer.write("\n")
         writer.write("LLimager V 4.0")
         writer.write(" -  Mac Computers Forensics Imager\n")
         writer.write("\n")
-//        writer.write("        A C Q U I S I T I O N    L O G    D E T A I L S \n")
-        writer.write("        ╔═╗╔═╗╔═╗ ╦ ╦╦╔═╗╦╔╦╗╦╔═╗╔╗╔  ╦  ╔═╗╔═╗  ╔╦╗╔═╗╔╦╗╔═╗╦╦  ╔═╗\n")
-        writer.write("        ╠═╣║  ║═╬╗║ ║║╚═╗║ ║ ║║ ║║║║  ║  ║ ║║ ╦   ║║║╣  ║ ╠═╣║║  ╚═╗\n")
-        writer.write("        ╩ ╩╚═╝╚═╝╚╚═╝╩╚═╝╩ ╩ ╩╚═╝╝╚╝  ╩═╝╚═╝╚═╝  ═╩╝╚═╝ ╩ ╩ ╩╩╩═╝╚═╝\n")
+        writer.write("        A C Q U I S I T I O N    D E T A I L  \n")
+//        writer.write("        ╔═╗╔═╗╔═╗ ╦ ╦╦╔═╗╦╔╦╗╦╔═╗╔╗╔  ╦  ╔═╗╔═╗  ╔╦╗╔═╗╔╦╗╔═╗╦╦  ╔═╗\n")
+//        writer.write("        ╠═╣║  ║═╬╗║ ║║╚═╗║ ║ ║║ ║║║║  ║  ║ ║║ ╦   ║║║╣  ║ ╠═╣║║  ╚═╗\n")
+//        writer.write("        ╩ ╩╚═╝╚═╝╚╚═╝╩╚═╝╩ ╩ ╩╚═╝╝╚╝  ╩═╝╚═╝╚═╝  ═╩╝╚═╝ ╩ ╩ ╩╩╩═╝╚═╝\n")
         
         writer.write(String(repeating: "-", count: 88))
         writer.write("\n")
@@ -769,7 +770,7 @@ func writecaseNotes(_ caseNotes: String, lineLength: Int = 50) -> [String] {
         return casenotesFormated
     }
 
-func exclogHeader(filePath: String) {    
+func exclogHeader(filePath: String) {
     FileDelete.deleteIfExists(filePath: filePath)
     let fileWriter = FileWriter(filePath: filePath)
     if let writer = fileWriter {
@@ -841,12 +842,10 @@ func acqlogTitleProcesses (filePath: String) {
     let fileWriter = FileWriter(filePath: filePath)
     if let writer = fileWriter {
         writer.write("\n")
-        writer.write("                 ┬─┐ ┌─┐ ┌─┐ ┬ ┬ ┬  ┌┬┐ ┌─┐\n")
-        writer.write("                 ├┬┘ ├┤  └─┐ │ │ │   │  └─┐\n")
-        writer.write("                 ┴└─ └─┘ └─┘ └─┘ ┴─┘ ┴  └─┘\n")
-//        writer.write("                 ┬─┐┌─┐┌─┐┬ ┬┬ ┌┬┐┌─┐\n")
-//        writer.write("                 ├┬┘├┤ └─┐│ ││  │ └─┐\n")
-//        writer.write("                 ┴└─└─┘└─┘└─┘┴─┘┴ └─┘\n")
+        writer.write("                          R E S U L T S")
+//        writer.write("                 ┬─┐ ┌─┐ ┌─┐ ┬ ┬ ┬  ┌┬┐ ┌─┐\n")
+//        writer.write("                 ├┬┘ ├┤  └─┐ │ │ │   │  └─┐\n")
+//        writer.write("                 ┴└─ └─┘ └─┘ └─┘ ┴─┘ ┴  └─┘\n")
         writer.write("\n")
     }
         else {

@@ -49,7 +49,7 @@ struct Imaging1ProcView: View {
     @State var percentage: CGFloat = 0.6
     @State private var logfilePath: String = ""
     @State private var logfilePathEx: String = ""
-//    @State private var issparseMounted = false
+    @State private var nilSource = false
     @StateObject private var fileSizeChecker = FileSizeChecker()
     @StateObject private var fileSizeChecker2 = FileSizeChecker()
     @ObservedObject private var fileSizeChecker3 = FileSizeChecker3()
@@ -320,6 +320,15 @@ struct Imaging1ProcView: View {
         // create sparse container
         sviewModel.output=createSparseContainer()
         print(sviewModel.output)
+        if  nilSource {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+            sviewModel.output="Creating container for sparse fails. Error in source Disk size"
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "😬"
+            alertMsg = "The sparse container could not be created. Could not determine source Disk size"
+            stepIndex = 4
+            return
+        }
         if  sviewModel.output.contains("failed") {
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             sviewModel.output="Creating container for sparse fails. The processing cannot continue. Press esc to return to main menu"
@@ -496,12 +505,24 @@ struct Imaging1ProcView: View {
         let sparsePath = DiskDataManager.shared.selectedStorageDestin
         print("in createSparseCont: imgName=\(imgName)")
         let passw = AuthenticationViewModel.shared.rootPassword
-        let dsk2bImaged = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID()!)
-        print("disk to be imaged: \(dsk2bImaged)")
-        let imgSize = getDiskIDCapacityAvSpace(diskPath: dsk2bImaged).capacity!
+        var dskID2bImaged = ""
+        if let dskID2bImaged = extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID() {
+            // Use `dskIDWithImagedFF` here, as it is guaranteed to be non-nil.
+            print("Disk ID with Imaged FF: \(dskID2bImaged)")
+        } else {
+            // If both `extractusedDisk` and `getRootFileSystemDiskID` return nil, set `nilSource` to true.
+            nilSource = true
+        }
+
+        guard let dskID2bImaged = DiskDataManager.shared.findSizeByIdent(dskID2bImaged) else { return "/" }
+        
+//        let dsk2bImaged = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID()!)
+//        print("disk to be imaged: \(dsk2bImaged)")
+        guard let dsk2bImaged = DiskDataManager.shared.findSizeByIdent(dskID2bImaged) else { return "/" }
+        let imgSize = getDiskIDCapacityAvSpace(diskPath: dsk2bImaged).capacity ?? "500G"
         maxValue = convertSizeStringToDouble(imgSize)
         FileSizeChecker3.shared.totalSizeInGB = maxValue
-        print("imgSize calculated from getDisk (line 1060) \(imgSize)")
+        print("imgSize calculated from getDisk \(imgSize)")
         print("in createSparseCont: passw= \(passw)")
         print("in createSparseCont: sparsePath= \(sparsePath)")
         print("sudo hdiutil create -size \(imgSize) -type SPARSE -fs APFS -volname \(imgName) \(sparsePath)/\(imgName)")

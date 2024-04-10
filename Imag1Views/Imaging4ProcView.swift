@@ -60,7 +60,7 @@ struct Imaging4ProcView: View {
     @State var maxValue: CGFloat = 0.7
     @State var currentValue: CGFloat = 0.6
     @State var percentage: CGFloat = 0.6
-    let procStep = ["Hashing Files...", "Processing Finished"]
+    let procStep = ["Hashing Files...", "Processing Finished", "Error occured"]
     @State var alertMsg: String = ""
     @State var alertTitle: String = ""
     @State var showCustomAlert: Bool = false
@@ -105,9 +105,9 @@ struct Imaging4ProcView: View {
                             acqlogTitleProcesses(filePath: logfilePath)
                             hashViewModel.showProc = true
 //                            showProc = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+//                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                             hashingfullProcess()
-                            }
+//                            }
                             print("after fullprocess--- END")
                         }) {
                             Text("Click to start process")
@@ -315,8 +315,6 @@ struct Imaging4ProcView: View {
     func hashcalculations() {
         
         print("inside hashcalculations...")
-//        print("timerH in hashCalc \(timerHash.timeElapsedFormatted)")
-//        print("timer in hash calc \(timer.elapsedTimeString)")
         if DiskDataManager.shared.selectedHashOption == "NO-HASH" {
             hashViewModel.stepIndex = 1
             return
@@ -324,7 +322,6 @@ struct Imaging4ProcView: View {
         logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         let whichHash = DiskDataManager.shared.selectedHashOption
         for file in FileSelectionManager.shared.selectedFiles {
-//            let hashTimeIni = LLTimeManager.getCurrentTimeString()
             switch whichHash {
             case "SHA256":
                 print("switch case 256")
@@ -344,7 +341,6 @@ struct Imaging4ProcView: View {
                 print("Invalid selection")
             }
         }
-//        hashViewModel.stepIndex = 1
         }
 
     

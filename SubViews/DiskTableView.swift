@@ -81,7 +81,7 @@ struct DiskTableView: View {
     
     var body: some View {
         VStack(spacing: 1) {
-            Text("Main Sintherized disk is highlighted in yellow")
+            Text("Main synthesized disk is highlighted in yellow")
                 .font(.headline)
                 .padding()
             TableHeaderView()

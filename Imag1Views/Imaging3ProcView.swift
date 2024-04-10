@@ -43,7 +43,7 @@ struct Imaging3ProcView: View {
     @State private var stepIndex: Int = 0
     @State private var fileUpdCounter: Int = 0
     @State private var anyprocIsRunning: Bool = false
-//    @State private var issparseMounted = false
+    @State private var issparseMounted = false
     @State private var logfilePath: String = ""
     @State private var logfilePathEx: String = ""
     @ObservedObject private var fileSizeChecker = FileSizeChecker()
@@ -66,7 +66,7 @@ struct Imaging3ProcView: View {
     @State var maxValue: CGFloat = 0.7
     @State var currentValue: CGFloat = 0.6
     @State var percentage: CGFloat = 0.6
-    let procStep = ["Creating DMG...", "Hashing DMG...", "Processing Finished"]
+    let procStep = ["Creating DMG...", "Hashing DMG...", "Processing Finished", "Error"]
     @State var alertMsg: String = ""
     @State var alertTitle: String = ""
     @State var showCustomAlert: Bool = false
@@ -317,7 +317,23 @@ struct Imaging3ProcView: View {
     func ConvertImagefullProcess () {
         showProc = true
         anyprocIsRunning = true
-
+        guard let fullsparsePath = FileSelectionManager.shared.selectedFiles.first?.path else {
+            // rise alert here: sparse hot found
+            print("sparse not found")
+            return  }
+        print("fileSizechecker3.filePath: \(fileSizeChecker3.filePath ?? "not set")")
+        let hdiInfo = loaddhiutilInfo()
+//        print("hdiInfo for unmount sparse \(hdiInfo)")
+        if let devDiskMt = extractDiskIdentifier2(from: hdiInfo, imagePath: fullsparsePath) {
+            print("devDiskMt error in dsk id for")
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "😬"
+            alertMsg = "The sparse container is mounted. Hit scape to go to review, Unmount the image from FInder or Disk Util and then restart the process by clinking create DMG"
+            stepIndex = 3
+            showCustomAlert = true
+            print("to be Unmounted: \(devDiskMt)")
+            return
+        }
         
         // DMG creation
         titleImgSize = "DMG size"
@@ -325,9 +341,9 @@ struct Imaging3ProcView: View {
         print("about to enter dmg process...")
         showdmgvalues = true
         timer.startTimer()
+        acqlogTitleProcesses(filePath: logfilePath)
         createdmgImage()
         stepIndex = 1
-        acqlogTitleProcesses(filePath: logfilePath)
         print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
         print("1st process (create dmg) done....")
         hashcalculations()
@@ -359,29 +375,14 @@ struct Imaging3ProcView: View {
         let imgName = CaseInfoData.shared.imageName
 //        FileSelectionManager.shared.selectedFiles
         let dmgPath = DiskDataManager.shared.selectedStorageDestin
-        guard let fullsparsePath = FileSelectionManager.shared.selectedFiles.first?.path else {
-            // rise alert here: sparse hot found
-            print("sparse not found")
-            return  }
+
         sparseGB = Double(FileSelectionManager.shared.selectedFiles.first!.size) / 1_000_000_000
         print("sparseGB: \(sparseGB)")
         fileSizeChecker3.filePath = "\(dmgPath)/\(imgName).dmg"
         let defaultImagePath = "/Volumes/llidata/\(imgName).dmg"
         print("inside createdmgImage...")
         let fulldmgPath = fileSizeChecker3.filePath ?? defaultImagePath
-//        print("fileSizechecker3.filePath: \(String(describing: fileSizeChecker3.filePath))")
-        print("fileSizechecker3.filePath: \(fileSizeChecker3.filePath ?? "not set")")
-        let hdiInfo = loaddhiutilInfo()
-        print("hdiInfo for unmount sparse \(hdiInfo)")
-        if let devDiskMt = extractDiskIdentifier2(from: hdiInfo, imagePath: fullsparsePath) {
-            print("devDiskMt error in dsk id for")
-            imageName = "person.crop.circle.badge.exclamationmark"
-            alertTitle = "😬"
-            alertMsg = "The sparse container was mounted"
-            stepIndex = 4
-            print("to be Unmounted: \(devDiskMt)")
-            return
-        }
+
         let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         let passw = AuthenticationViewModel.shared.rootPassword
         print("in dmg, logfilePath: \(logfilePath)")
@@ -390,7 +391,10 @@ struct Imaging3ProcView: View {
         if CaseInfoData.shared.dmgfilePath == "" {
             CaseInfoData.shared.dmgfilePath = DiskDataManager.shared.selectedStorageDestin
         }
-
+        guard let fullsparsePath = FileSelectionManager.shared.selectedFiles.first?.path else {
+            // rise alert here: sparse hot found
+            print("sparse not found")
+            return  }
         dmgTimeIni=LLTimeManager.getCurrentTimeString()
         fileSizeChecker3.startMonitoring()
         sviewModel.executeSudoCommand2(command: "hdiutil convert \(fullsparsePath) -format UDZO -o \(dmgPath)/\(imgName).dmg", passw: passw)
@@ -452,32 +456,6 @@ struct Imaging3ProcView: View {
         let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
         print2Log(filePath: logfilePath, text2p: "No hash calculation selected")
     }
-    
-//    private func setupTimer() {
-//        print("setup timer for gauge")
-//        timerGauge2 = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-//                self.updateSizeForGauge()
-//            }
-//        }
-    
-//    func updateSizeForGauge() {
-//        fileUpdCounter += 1
-//        print("in updateSize4G count: \(fileUpdCounter)")
-//        print("in updateSize4G entering fSChecker3: \(fileSizeChecker3.fileSizeInGB)")
-//        print("in updateSize4G -> maxValue: \(self.maxValue) ")
-//        print("in updateSize4G -> currentValue: \(self.currentValue) ")
-//        if currentValue < maxValue {
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-//            print("inside updateSize4G in dispatch fSChecker3: \(fileSizeChecker3.fileSizeInGB)")
-//                currentValue = fileSizeChecker3.fileSizeInGB
-//                print("currentValue inside update being updated \(self.currentValue)")
-//            }
-//        } else {
-//                            self.timerGauge2?.invalidate()
-//                            self.timerGauge2 = nil
-//            }
-//
-//    }
      
 }
 
