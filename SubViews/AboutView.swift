@@ -64,13 +64,16 @@ struct AboutView: View {
                     + Text(llImager)
                     .italic()
                     + Text(" Version 4.01")
-                    Spacer(minLength: 50)
+                    Spacer(minLength: 30)
                     Text(message1b)
                     + Text(llImager)
                     .italic()
                     + Text(" is a product of e-forensics inc. Copyright 2023-2024. All rights reserved.")
-                    Spacer(minLength: 50)
-                    HStack (spacing: 100){
+                    Text("\nhttps://e-forensicsinc.com")
+                    Spacer(minLength: 20)
+
+                    Text("https://llimager.com")
+                    HStack (spacing: 80){
                         Spacer()
                         Button("OK") {
                             onOK()
