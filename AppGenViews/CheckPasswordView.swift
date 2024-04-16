@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AppKit
 
 struct CheckPasswordView: View {
     @ObservedObject var authModel: AuthenticationViewModel
@@ -14,7 +15,9 @@ struct CheckPasswordView: View {
     @State private var showAlert = false
     @State private var showingAlert = false
     @State private var alertMessage: String = ""
-    @FocusState private var isPasswordFieldFocused: Bool
+//    the 2 lines below are changes to make it work in MacOS 11
+//    @FocusState private var isPasswordFieldFocused: Bool
+    @State var isPasswordFocused11: Bool
     let gradient = LinearGradient(gradient: Gradient(colors: [Color("LL_orange"), Color(.gray)]),
                                   startPoint: .top,
                                   endPoint: .bottom)
@@ -44,14 +47,21 @@ struct CheckPasswordView: View {
                  Text("An admin password for this computer is required:")
                      .foregroundColor(.white)
                      .font(.title)
-                 SecureField("Password", text: $password)
-                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                     .frame(width: 300, height: 20)
-                     .focused($isPasswordFieldFocused)
-                     .onSubmit {
-                         handlePasswordCheck()
-                     }
-                     .padding()
+                 if #available(macOS 12.0, *) {
+                     SecureField("Password", text: $password)
+                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                         .frame(width: 300, height: 20)
+//                          .focused($isPasswordFieldFocused)
+                         .onSubmit {
+                             handlePasswordCheck()
+                         }
+                         .padding()
+                 } else {
+                     // Fallback on earlier versions
+                     SecureField("Password", text: $password)
+                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                         .frame(width: 300, height: 20)
+                 }
                  
                  VStack {
                      Button("Enter")
@@ -67,13 +77,13 @@ struct CheckPasswordView: View {
                      Text("\(authModel.licenseType) SN: \(authModel.licenseSerial)")
                          .frame(width: 220)
                          .padding(.horizontal, 3)
-                         .background(.white).opacity(0.7)
+                         .background(Color.white).opacity(0.7)
                          .cornerRadius(6)
  //                    Spacer()
                      Text("License exp date: \(authModel.licenseExpDate)")
                          .frame(width: 200)
                          .padding(.horizontal, 3)
-                         .background(.white).opacity(0.7)
+                         .background(Color.white).opacity(0.7)
                          .cornerRadius(6)
                  }
                  .padding(.horizontal, 5)
@@ -85,10 +95,10 @@ struct CheckPasswordView: View {
 //             .padding(15)
          }
         .frame(minHeight: 620)
-        .background()
+        .background(Color.clear)
         .onAppear() {
             DispatchQueue.main.async {
-                self.isPasswordFieldFocused = true
+                self.isPasswordFocused11 = true
             }
             if !authModel.isLicenseValid {
                 showAlert = true
@@ -139,6 +149,44 @@ struct CheckPasswordView: View {
     }
 
 
+
+    struct CustomSecureTextField: NSViewRepresentable {
+        class Coordinator: NSObject, NSTextFieldDelegate {
+            var parent: CustomSecureTextField
+
+            init(_ textField: CustomSecureTextField) {
+                self.parent = textField
+            }
+
+            func controlTextDidChange(_ obj: Notification) {
+                if let textField = obj.object as? NSSecureTextField {
+                    self.parent.text = textField.stringValue
+                }
+            }
+        }
+
+        @Binding var text: String
+        var isFirstResponder: Bool = false
+
+        func makeCoordinator() -> Coordinator {
+            Coordinator(self)
+        }
+
+        func makeNSView(context: Context) -> NSSecureTextField {
+            let textField = NSSecureTextField()
+            textField.delegate = context.coordinator
+            return textField
+        }
+
+        func updateNSView(_ nsView: NSSecureTextField, context: Context) {
+            nsView.stringValue = text
+            if isFirstResponder && !context.coordinator.parent.isFirstResponder {
+                nsView.becomeFirstResponder()
+                context.coordinator.parent.isFirstResponder = true
+            }
+        }
+    }
+
     
     
     private func exitApp() {
@@ -147,11 +195,15 @@ struct CheckPasswordView: View {
     }
 }
 
-struct CheckPasswordView_Previews: PreviewProvider {
-    static var previews: some View {
-        CheckPasswordView(authModel: AuthenticationViewModel())
-    }
-}
+//struct CheckPasswordView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        if #available(macOS 12.0, *) {
+//            CheckPasswordView(authModel: AuthenticationViewModel())
+//        } else {
+//            // Fallback on earlier versions
+//        }
+//    }
+//}
 
 //#Preview {
 //    let viewModel = AuthenticationViewModel()

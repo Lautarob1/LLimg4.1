@@ -57,7 +57,7 @@ struct ImgInfoHashView: View {
                         OptionButtonsView2()
                     }
                     .padding()
-                    .background()
+                    .background(Color.clear)
                 // if
             }
                 .frame(width: 420)

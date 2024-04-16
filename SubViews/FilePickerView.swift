@@ -38,7 +38,7 @@ struct FilePickerView: View {
             }
         }
 //        .frame(width: 420)
-        .background()
+        .background(Color.clear)
     }
 }
 

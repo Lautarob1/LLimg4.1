@@ -24,7 +24,7 @@ struct LLimg_sw01App: App {
                                 .frame(minWidth: 900)
                         } else {
                             // Otherwise, show CheckPasswordView
-                            CheckPasswordView(authModel: authModel)
+                            CheckPasswordView(authModel: authModel, isPasswordFocused11: true)
                         }
                     } else {
                         // Setting the state to show alert

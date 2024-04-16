@@ -90,6 +90,10 @@ struct ImgInfoTgtView: View {
 }
 
 
-#Preview {
-    ImgInfoTgtView()
-}
+//#Preview {
+//    if #available(macOS 12.0, *) {
+//        ImgInfoTgtView()
+//    } else {
+//        // Fallback on earlier versions
+//    }
+//}

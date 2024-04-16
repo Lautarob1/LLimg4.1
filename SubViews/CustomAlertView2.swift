@@ -31,7 +31,7 @@ struct CustomAlertView2: View {
 //                        .frame(width: 32, height: 32) // Set the frame to 32x32
 //                        .padding(3)
 
-                    Image(systemName: imageName)
+                    Image("alertImage256px")
                         .font(.largeTitle)
                         .foregroundColor(textColor)
                         .padding(3)

@@ -40,7 +40,7 @@ struct ComboBoxView: View {
             }
 
             .padding()
-            .background()
+            .background(Color.clear)
             
         }
         

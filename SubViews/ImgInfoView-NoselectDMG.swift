@@ -80,7 +80,8 @@ struct ImgInfoView: View {
                         OptionButtonsView()
                     }
                     .padding()
-                    .background()
+                    // background(Color.clear) is for compat with MacOS 11
+                    .background(Color.clear)
                 } // if
             }
                 .frame(width: 420, height: 500)

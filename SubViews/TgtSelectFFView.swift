@@ -48,7 +48,7 @@ struct TgtSelectFFView: View {
 
             }
 
-            .background()
+            .background(Color.clear)
 
 //            ScrollView {
                 List(selection: $selectedItems) {

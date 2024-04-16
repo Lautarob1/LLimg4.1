@@ -34,7 +34,7 @@ struct TestFileSelecTgtView: View {
                     }
                 }
             }
-            .background()
+            .background(Color.clear)
             
             List {
                 ForEach(fileSelectionManager.selectedFiles) { file in

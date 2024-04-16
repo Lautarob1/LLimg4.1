@@ -79,21 +79,25 @@ struct testDiskTableView: View {
             ScrollView {
                 ForEach(diskDataManager.dskData, id: \.num) { row in
                         let conditions = evaluateRowConditions(row)
-                    TableRowView(
-                        num: row.num,
-                        type: row.type,
-                        name: row.name,
-                        size: row.size,
-                        ident: row.ident,
-                        extract: row.extract,
-                        mtPt: row.mtPt
+                    if #available(macOS 12.0, *) {
+                        TableRowView(
+                            num: row.num,
+                            type: row.type,
+                            name: row.name,
+                            size: row.size,
+                            ident: row.ident,
+                            extract: row.extract,
+                            mtPt: row.mtPt
+                            
+                        )
                         
-                    )
-
-//                    .background(isSysDisk ?  .red.opacity(0.3) : .clear)
-                    .foregroundColor(conditions.isNoImg ? .blue : .primary)
-//                    .foregroundColor(conditions.isRoot ? .black : .red)
-                    .background(conditions.isRoot ?  .yellow.opacity(0.5) : .clear)
+                        //                    .background(isSysDisk ?  .red.opacity(0.3) : .clear)
+                        .foregroundColor(conditions.isNoImg ? .blue : .primary)
+                        //                    .foregroundColor(conditions.isRoot ? .black : .red)
+                        .background(conditions.isRoot ?  .yellow.opacity(0.5) : .clear)
+                    } else {
+                        // Fallback on earlier versions
+                    }
                 }
             }
         }

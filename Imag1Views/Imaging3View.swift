@@ -44,7 +44,7 @@ struct Imaging3View: View {
             }
             .frame(width: 20, height: 500)
             .padding(7)
-            .background()
+            .background(Color.clear)
             VStack {
                 ImgInfoSparseView()
                 

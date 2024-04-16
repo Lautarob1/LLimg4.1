@@ -38,7 +38,7 @@ struct HardinfoViewRev: View {
         }
         .frame(width:400)
         .padding(.horizontal, 10)
-        .background()
+        .background(Color.clear)
     }
 }
     

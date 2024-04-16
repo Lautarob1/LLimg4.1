@@ -45,23 +45,45 @@ class AuthenticationViewModel: ObservableObject {
         return licenseStatus
     }
     
-    func validatePassword(_ password: String) {
+    func validatePassword(_ passw: String) {
         // Replace this logic with your actual password validation
-        print("password entered: \(password)")
-        let output = executeSudoCommand(command: "Sudo -S whoami", password: password)
+        print("password entered: \(passw)")
+        let output = executeSudoCommand(command: "Sudo -S whoami", passw: passw)
         print("output from command: \(output)")
         if output.contains("root") {
             self.isPasswordCorrect = true
-            self.rootPassword = password
+            self.rootPassword = passw
         }
         else {
             isPasswordCorrect = false
-            //        executeSudoCommand(command: String, passw: String) -> String {
-            //            let fullCommand = "echo \(passw) | sudo -S \(command)"
-            isPasswordCorrect = (password == "passw")
+            // this is a password bypass only for tests
+//            isPasswordCorrect = (passw == "passw")
         }
     }
     
+    func executeSudoCommand(command: String, passw: String) -> String {
+        print("entering executeSudoCommand in initial page")
+        let fullCommand = "echo \(passw) | sudo -S \(command)"
+//        let fullCommand = "echo \(passw) | sudo -S \(command)"
+        let process = Process()
+        let pipe = Pipe()
+        process.environment = ProcessInfo.processInfo.environment
+        process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+        process.arguments = ["-c", fullCommand]
+        process.standardOutput = pipe
+        process.standardError = pipe
+        
+        do {
+            try process.run()
+            process.waitUntilExit()
+        } catch {
+            return "Error: \(error.localizedDescription)"
+        }
+        
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        print("about to leave ConsoleViewModel-executeSudoCommand")
+        return String(data: data, encoding: .utf8) ?? "Error decoding output"
+    }
     
     func executeCommand(command: String) -> String {
 //        print("entering ConsoleViewModel-executeCommand")

@@ -94,7 +94,7 @@ struct MenuView: View {
                     .font(.system(size: 20, weight: .bold, design: .default))
                     .foregroundColor(Color("LL_blue"))
                     .frame(width: 170,height: 40)
-                    .background(.white)
+                    .background(Color.white)
                     .cornerRadius(10)
                     .buttonStyle(PlainButtonStyle())
                     .padding(.bottom, 30)
@@ -156,7 +156,7 @@ struct MenuView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 180, height: 180)
-                        .background(.white)
+                        .background(Color.white)
                         .cornerRadius(15)
                         .padding(0)
                         .overlay(tooltipOverlay(for: index))
@@ -184,7 +184,7 @@ struct MenuView: View {
 
 }
 
-#Preview {
-    MenuView(authModel: AuthenticationViewModel())
-}
+//#Preview {
+//    MenuView(authModel: AuthenticationViewModel())
+//}
 

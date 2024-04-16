@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TgtSelectFFViewRev: View {
     @State private var filePath: String = ""
-    @StateObject private var fileSelectionManager = FileSelectionManager()
+    @ObservedObject private var fileSelectionManager = FileSelectionManager()
     let path2img: String = "Enter path"
     let butlabel: String = "Choose File"
     
@@ -22,7 +22,7 @@ ScrollView {
                 .padding(.vertical, 5)
      
                 }
-                .background()
+                .background(Color.clear)
 //                ScrollView {
                     List {
                         ForEach(FileSelectionManager.shared.selectedFiFo) { file in

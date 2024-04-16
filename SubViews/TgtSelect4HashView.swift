@@ -47,7 +47,7 @@ struct TgtSelect4HashView: View {
     
 
             }
-            .background()
+            .background(Color.clear)
 
 
             List(selection: $selectedItems) {

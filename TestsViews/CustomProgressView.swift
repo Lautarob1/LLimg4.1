@@ -14,11 +14,15 @@ struct CustomProgressView: View {
     var currrentValue: Double
 
     var body: some View {
-        ProgressView()
-            .scaleEffect(scale)
-            .progressViewStyle(CircularProgressViewStyle(tint: color))
-            .frame(width: 150, height: 150)
-            .background(backgroundColor)
+        if #available(macOS 11.0, *) {
+            ProgressView()
+                .scaleEffect(scale)
+                .progressViewStyle(CircularProgressViewStyle(tint: color))
+                .frame(width: 150, height: 150)
+                .background(backgroundColor)
+        } else {
+            // Fallback on earlier versions
+        }
     }
 }
 

@@ -50,7 +50,7 @@ struct FilePickerWithCheckView: View {
                 
             }
 //            .frame(width: 410)
-            .background()
+            .background(Color.clear)
         }
 }
 

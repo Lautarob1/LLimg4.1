@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(macOS 12.0, *)
 struct ImgConvSparseView: View {
     @ObservedObject private var diskDataManager = DiskDataManager.shared
     @ObservedObject private var caseInfoData = CaseInfoData.shared
@@ -52,7 +53,11 @@ struct ImgConvSparseView: View {
                         textColor: Color(.white),
                         backgroundColor: Color("LL_orange"),
                         onDismiss: {
-                            nameFieldIsFocused = true
+                            if #available(macOS 12.0, *) {
+                                nameFieldIsFocused = true
+                            } else {
+                                // Fallback on earlier versions
+                            }
                         })
                     .offset(y: -150.0)
                 }
@@ -116,7 +121,7 @@ struct ImgConvSparseView: View {
                     OptionButtonsView()
                 }
                 .padding()
-                .background()
+                .background(Color.clear)
                 // if
                 
                 
@@ -130,6 +135,11 @@ struct ImgConvSparseView: View {
 }
 
 
-#Preview {
-    ImgInfoTgtView()
-}
+//#Preview {
+//    if #available(macOS 12.0, *) {
+//        ImgInfoTgtView()
+//    } else {
+//        Text("no preview available")
+//      // Fallback on earlier versions
+//    }
+//}

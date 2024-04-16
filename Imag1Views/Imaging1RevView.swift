@@ -15,10 +15,12 @@ struct Imaging1RevView: View {
     @State private var showAlertSize: Bool = false
     @State private var disableBCreateImg: Bool = false
     @State private var validStorage: Bool = false
+    @State private var nilSource: Bool = false
     @State private var dupName: Bool = false
     @State private var alertText1: String = ""
     @State private var alertText2: String = ""
     @State private var alertText3: String = ""
+    @State private var alertText4: String = ""
     @Binding var selectedOption: MenuOption?
     @Binding var showReviewView: Bool
     @State private var showProcessView = false
@@ -104,7 +106,17 @@ struct Imaging1RevView: View {
                         
                     }
                     .onAppear() {
-                        let sourceDisk = "/dev/" + (extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? "/")
+                        let scDiskID = (extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID())
+                        print("scDisk after extractusedDisk \(scDiskID ?? "Not found scDiskID")")
+                        var sourceDisk = ""
+                        if let srcDisk = DiskDataManager.shared.findMtPtByIdent(scDiskID!)  {
+                            sourceDisk = srcDisk
+                            print("Disk ID to be imaged: \(sourceDisk)")
+                        } else {
+                            // If both `extractusedDisk` and `getRootFileSystemDiskID` return nil, set `nilSource` to true.
+                            nilSource = true
+                        }
+                        print("sourceDisk after if: \(sourceDisk)")
                         let destinationDisk = DiskDataManager.shared.selectedStorageDestin
                         if validatePath(path: destinationDisk) {
                             let destDMGDisk = DiskDataManager.shared.selected2ndStorageDestin
@@ -149,7 +161,7 @@ struct Imaging1RevView: View {
                     showAlert: $showAlertSize,
                     imageName: imageName,
                     title: "LLIMAGER Alert",
-                    message: "\(alertText1)  \(alertText2) \(alertText3) ",
+                    message: "\(alertText1)  \(alertText2) \(alertText3) \(alertText4) ",
                     fontSize1: 14,
                     fontSize2: 12,
                     textColor: Color(.white),

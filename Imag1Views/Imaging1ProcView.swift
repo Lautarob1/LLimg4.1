@@ -514,7 +514,7 @@ struct Imaging1ProcView: View {
             nilSource = true
         }
 
-        guard let dskID2bImaged = DiskDataManager.shared.findSizeByIdent(dskID2bImaged) else { return "/" }
+//        guard let dskID2bImaged = DiskDataManager.shared.findSizeByIdent(dskID2bImaged) else { return "/" }
         
 //        let dsk2bImaged = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID()!)
 //        print("disk to be imaged: \(dsk2bImaged)")
@@ -681,13 +681,13 @@ struct Imaging1ProcView: View {
      
 }
 
-struct Imaging1ProcView_Previews: PreviewProvider {
-    @State static var selectedOption: MenuOption? = MenuOption(id: 1)
-    
-    static var previews: some View {
-        Imaging1ProcView(selectedOption: $selectedOption)
-    }
-}
+//struct Imaging1ProcView_Previews: PreviewProvider {
+//    @State static var selectedOption: MenuOption? = MenuOption(id: 1)
+//    
+//    static var previews: some View {
+//        Imaging1ProcView(selectedOption: $selectedOption)
+//    }
+//}
 
 //#Preview {
 //    @State var selectedOption: MenuOption? = MenuOption(id: 1)

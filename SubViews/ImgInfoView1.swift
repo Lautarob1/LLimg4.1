@@ -140,6 +140,10 @@ struct ImgInfoView1: View {
 }
 
 #Preview {
-    ImgInfoView1()
+    if #available(macOS 12.0, *) {
+        ImgInfoView1()
+    } else {
+        // Fallback on earlier versions
+    }
                   
 }

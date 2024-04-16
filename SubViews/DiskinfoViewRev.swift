@@ -48,7 +48,7 @@ struct DiskinfoViewRev: View {
             // ...
         }
         .frame(width:430, height: 600)
-        .background()
+        .background(Color.clear)
         .onAppear {
 //            print("detailed disk info for: \(DiskDataManager.shared.selectedDskOption)")
             let sourceDisk = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? "/")

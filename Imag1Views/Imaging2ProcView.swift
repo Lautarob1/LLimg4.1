@@ -90,7 +90,7 @@ struct Imaging2ProcView: View {
                 .padding(.leading)
             //                    Spacer()  // Pushes the image to the left
             Text("Target Imaging Mac Computer SN \(deviceInfoData.shared.devSerial) (Case): \(CaseInfoData.shared.caseName)...")
-                .font(.title2)
+                .font(.title)
                 .padding(15)
                 .foregroundColor(Color("LL_blue"))
             Spacer()

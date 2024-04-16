@@ -80,7 +80,7 @@ struct ImgInfoViewRev: View {
             }
                 .frame(width: 400) //, height: 500)
                 .padding(.horizontal, 10)
-                .background()
+                .background(Color.clear)
             }
             
         }
