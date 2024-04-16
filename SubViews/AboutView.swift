@@ -11,10 +11,7 @@ struct AboutView: View {
 //    @Binding var showAlert0: Bool
     let imageLogo: String = "img_but1"
     let llImager = "IMAGER"
-    let message1a: String = "Full Disk Access Enabled for LL"
     let message1b: String = "LL"
-    let message1c: String = " has full disk access: "
-    let message1d: String = "System Preferences → Privacy and Security → Full Disk Access → ENABLE"
 
 //    let message4: String
 //    let message5: String
@@ -39,18 +36,7 @@ struct AboutView: View {
                         .scaledToFit()
                         .frame(width: 150, height: 150)
                         .padding(30)
-    //                    .cornerRadius(15)
-//                    HStack (spacing: 50) {
-//                        Image(systemName: "exclamationmark.triangle")
-//    //                        .font(.system(size: 18))
-//                            .foregroundColor(textColor)
-//                        Text("Caution")
-//                            .font(.system(size: fontSize1))
-//                            .foregroundColor(textColor)
-//                            .padding(5)
-//    //                    Spacer(minLength: 100)
-//                    }
-//                    .padding([.leading, .trailing], 30)
+
                 }
                 
                 VStack (alignment: .leading){
