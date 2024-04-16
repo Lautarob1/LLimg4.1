@@ -22,7 +22,7 @@ ScrollView {
                 .padding(.vertical, 5)
      
                 }
-                .background()
+                .background(Color.clear)
                 
                 List {
                     ForEach(FileSelectionManager.shared.selectedFiles) { file in

@@ -53,7 +53,7 @@ struct ImgInfoSparseView: View {
                     OptionButtonsView()
                 }
                 .padding()
-                .background()
+                .background(Color.clear)
                 // if
 
         }

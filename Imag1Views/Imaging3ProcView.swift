@@ -141,13 +141,14 @@ struct Imaging3ProcView: View {
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
 //                        .italic() 
                         .foregroundColor(.white) // Set the text color
-                        .frame(width: 840, height: 200, alignment: .leading)
+                        .frame(width: 840, alignment: .leading)
+                        .frame(minHeight: 150)
                         .padding(5)
                         .background(gradt2)   //Color("LL_blue"))  //.opacity(0.5))
                         .cornerRadius(14)
                     
                 }
-                .frame(width: 860, height: 200)
+                .frame(width: 860, height: 250)
                 .padding(5)
                 
                 HStack {
@@ -305,7 +306,7 @@ struct Imaging3ProcView: View {
                     Spacer()
                 }
             }
-            .frame(width: 900, height: 520)
+            .frame(width: 900, height: 600)
             .cornerRadius(15)
             .padding(5)
                 
@@ -363,6 +364,7 @@ struct Imaging3ProcView: View {
         print("entering Sparse to dmg log, path for log file:")
         print(DiskDataManager.shared.selectedStorageDestin)
         let logfilePath2 = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName)_error.info"
+        dmgSize = String(fileSizeChecker3.fileSizeInGB)
         print("logfilePath: \(logfilePath)")
         print2Log(filePath: logfilePath, text2p: "DMG image process ------------------\n")
         print2Log(filePath: logfilePath, text2p: "Start time:     \(dmgTimeIni)")

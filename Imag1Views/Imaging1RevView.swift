@@ -106,49 +106,57 @@ struct Imaging1RevView: View {
                         
                     }
                     .onAppear() {
-                        let scDiskID = (extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID())
-                        print("scDisk after extractusedDisk \(scDiskID ?? "Not found scDiskID")")
-                        var sourceDisk = ""
-                        if let srcDisk = DiskDataManager.shared.findMtPtByIdent(scDiskID!)  {
-                            sourceDisk = srcDisk
-                            print("Disk ID to be imaged: \(sourceDisk)")
-                        } else {
-                            // If both `extractusedDisk` and `getRootFileSystemDiskID` return nil, set `nilSource` to true.
-                            nilSource = true
-                        }
-                        print("sourceDisk after if: \(sourceDisk)")
-                        let destinationDisk = DiskDataManager.shared.selectedStorageDestin
-                        if validatePath(path: destinationDisk) {
-                            let destDMGDisk = DiskDataManager.shared.selected2ndStorageDestin
-                            let imgName = validateInput(name: CaseInfoData.shared.imageName)
-                            let destfullPathSp = destinationDisk + "/" + CaseInfoData.shared.imageName + ".sparseimage"
-                            dupName = isImageNameAtPath(path: destfullPathSp)
-                            
-                            let destfullPathDMG = destinationDisk + "/" + CaseInfoData.shared.imageName + ".sparseimage"
-                            dupName = isImageNameAtPath(path: destfullPathDMG)
-                            
-                            print("scr disk: \(sourceDisk )")
-                            print("dst disk: \(destinationDisk)")
-                            print("dst2 disk: \(destDMGDisk)")
-                            print("name of image: \(CaseInfoData.shared.imageName)")
-                            print("valid name?: \(imgName)")
-                            print("dupName?: \(dupName)")
-                            
-                            let sizeNoOK = !isStorageSizeOK1 (sourceDisk: sourceDisk , destinationDisk: destinationDisk, destDMGDisk: destDMGDisk)
-                            alertText1 = (sizeNoOK ? "😯 Not enough space in the destination disk for the selected source path"  : "")
-                            alertText2 = (imgName ? "" : "\n😳 Image Name invalid or empty")
-                            alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete sparse or DMG files with name: \(CaseInfoData.shared.imageName)" :  "" )
-                            imageName = "exclamationmark.triangle"
-                            if   sizeNoOK || !imgName || dupName {
+                        if doubleCheckLicense() {
+                            let scDiskID = (extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID())
+                            print("scDisk after extractusedDisk \(scDiskID ?? "Not found scDiskID")")
+                            var sourceDisk = ""
+                            if let srcDisk = DiskDataManager.shared.findMtPtByIdent(ident: scDiskID!)  {
+                                sourceDisk = srcDisk
+                                print("Disk ID to be imaged: \(sourceDisk)")
+                            } else {
+                                // If both `extractusedDisk` and `getRootFileSystemDiskID` return nil, set `nilSource` to true.
+                                nilSource = true
+                            }
+                            print("sourceDisk after if: \(sourceDisk)")
+                            let destinationDisk = DiskDataManager.shared.selectedStorageDestin
+                            if validatePath(path: destinationDisk) {
+                                let destDMGDisk = DiskDataManager.shared.selected2ndStorageDestin
+                                let imgName = validateInput(name: CaseInfoData.shared.imageName)
+                                let destfullPathSp = destinationDisk + "/" + CaseInfoData.shared.imageName + ".sparseimage"
+                                dupName = isImageNameAtPath(path: destfullPathSp)
+                                
+                                let destfullPathDMG = destinationDisk + "/" + CaseInfoData.shared.imageName + ".sparseimage"
+                                dupName = isImageNameAtPath(path: destfullPathDMG)
+                                
+                                print("scr disk: \(sourceDisk )")
+                                print("dst disk: \(destinationDisk)")
+                                print("dst2 disk: \(destDMGDisk)")
+                                print("name of image: \(CaseInfoData.shared.imageName)")
+                                print("valid name?: \(imgName)")
+                                print("dupName?: \(dupName)")
+                                
+                                let sizeNoOK = !isStorageSizeOK1 (sourceDisk: sourceDisk , destinationDisk: destinationDisk, destDMGDisk: destDMGDisk)
+                                alertText1 = (sizeNoOK ? "😯 Not enough space in the destination disk for the selected source path"  : "")
+                                alertText2 = (imgName ? "" : "\n😳 Image Name invalid or empty")
+                                alertText3 = (dupName ? "\n🤔 Dest file exists, rename or delete sparse or DMG files with name: \(CaseInfoData.shared.imageName)" :  "" )
+                                imageName = "exclamationmark.triangle"
+                                if   sizeNoOK || !imgName || dupName {
+                                    disableBCreateImg = true
+                                    showAlertSize = true
+                                }
+                            }
+                            else {
+                                alertText1 = "Selected path for destination is empty ot invalid"
+                                imageName = "folder.badge.questionmark"
                                 disableBCreateImg = true
                                 showAlertSize = true
                             }
                         }
                         else {
-                            alertText1 = "Selected path for destination is empty ot invalid"
-                            imageName = "folder.badge.questionmark"
-                            disableBCreateImg = true
-                            showAlertSize = true
+                                alertText1 = "No license present. Please make sure the disk with the license is still connected."
+                                imageName = "externaldrive.connected.to.line.below"
+                                disableBCreateImg = true
+                                showAlertSize = true
                         }
                     }
                     

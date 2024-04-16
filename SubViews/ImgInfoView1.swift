@@ -25,7 +25,7 @@ struct ImgInfoView1: View {
     @State private var isChecked: Bool = true
     @State private var isInputValid: Bool = true
     @State private var isPathValid: Bool = true
-    @FocusState private var nameFieldIsFocused: Bool
+//    @FocusState private var nameFieldIsFocused: Bool
     @State private var showCustomAlert: Bool = false
 
     
@@ -36,10 +36,18 @@ struct ImgInfoView1: View {
                 .foregroundColor(Color("LL_blue"))
                 ZStack {
                     VStack {
-                        TextField("Enter image name", text: $imageName)
-                        .focused($nameFieldIsFocused)
-                        .border(isInputValid ? Color.clear : Color.red)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        if #available(macOS 12.0, *) {
+                            TextField("Enter image name", text: $imageName)
+//                                .focused($nameFieldIsFocused)
+                                .border(isInputValid ? Color.clear : Color.red)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                        } else {
+                            // Fallback on earlier versions
+                            TextField("Enter image name", text: $imageName)
+//                                .focused($nameFieldIsFocused)
+                                .border(isInputValid ? Color.clear : Color.red)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                        }
 
                     HStack {
                         ComboBoxView(
@@ -84,7 +92,7 @@ struct ImgInfoView1: View {
                             textColor: Color(.white),
                             backgroundColor: Color("LL_orange"),
                             onDismiss: {
-                                    nameFieldIsFocused = true
+//                                    nameFieldIsFocused = true
                                     })
                         .offset(y: -100.0)
                     }
@@ -129,7 +137,7 @@ struct ImgInfoView1: View {
                         OptionButtonsView()
                     }
                     .padding()
-                    .background()
+                    .background(Color.clear)
                 } // if
             }
                 .frame(width: 420) //, height: 600)
@@ -139,11 +147,11 @@ struct ImgInfoView1: View {
 
 }
 
-#Preview {
-    if #available(macOS 12.0, *) {
-        ImgInfoView1()
-    } else {
-        // Fallback on earlier versions
-    }
-                  
-}
+//#Preview {
+//    if #available(macOS 12.0, *) {
+//        ImgInfoView1()
+//    } else {
+//        // Fallback on earlier versions
+//    }
+//                  
+//}

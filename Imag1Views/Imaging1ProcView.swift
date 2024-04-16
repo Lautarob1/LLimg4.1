@@ -53,7 +53,7 @@ struct Imaging1ProcView: View {
     @StateObject private var fileSizeChecker = FileSizeChecker()
     @StateObject private var fileSizeChecker2 = FileSizeChecker()
     @ObservedObject private var fileSizeChecker3 = FileSizeChecker3()
-    let procStep = ["Creating Sparse...", "Creating DMG...", "Hashing DMG...", "Processing Finished", "Error Ocurred"]
+    @State var procStep = ["Creating Sparse...", "Creating DMG...", "Hashing DMG...", "Processing Finished", "Error Ocurred"]
     @State var alertMsg: String = ""
     @State var alertTitle: String = ""
     @State var showCustomAlert: Bool = false
@@ -67,6 +67,9 @@ struct Imaging1ProcView: View {
                       endPoint: .bottom)
 //    var onComplete: () -> Void
     @Binding var selectedOption: MenuOption?
+    @State private var fileSystemType: String = "APFS"
+    @State private var disk2bImaged: String = "APFS"
+    @State private var isSparseStillMounted: Bool = false
     
     var body: some View {
         
@@ -144,13 +147,14 @@ struct Imaging1ProcView: View {
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
 //                        .italic()
                         .foregroundColor(.white) // Set the text color
-                        .frame(width: 840, height: 200, alignment: .leading)
+                        .frame(width: 840, alignment: .leading)
+                        .frame(minHeight: 150)
                         .padding(5)
                         .background(gradt2) //Color("LL_blue")) // .opacity(0.5)) // Set the background color
                         .cornerRadius(10)
                     
                 }
-                .frame(width: 860, height: 200)
+                .frame(width: 860, height: 250)
                 .padding(5)
                 
                 if showProc {
@@ -305,7 +309,7 @@ struct Imaging1ProcView: View {
                 Spacer()
             }
             .buttonStyle(PlainButtonStyle())
-            .frame(width: 880, height: 520)
+            .frame(width: 880, height: 600)
             .padding(5)
         }
         
@@ -344,6 +348,19 @@ struct Imaging1ProcView: View {
 
             return
         }
+        
+ 
+        
+        if  sviewModel.output.contains("Sorry, try again") {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+            sviewModel.output="Creating container for sparse fails. The processing cannot continue. Press esc to return to main menu"
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "😬"
+            alertMsg = "The sparse container could not be created due to a password failure"
+            stepIndex = 4
+
+            return
+        }
         // Mount sparse container
         print("1st process (create sparse Container), done....")
         sviewModel.output=mountsparseContanier()
@@ -351,6 +368,10 @@ struct Imaging1ProcView: View {
         if  sviewModel.output.contains("failed") {
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             sviewModel.output="Container was not mounted and that is required to continue... Press esc to return to main menu"
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "😬"
+            alertMsg = "The sparse container could not be mounted, which is needed to continue"
+            stepIndex = 4
             return
         }
         
@@ -362,14 +383,32 @@ struct Imaging1ProcView: View {
         print2Log(filePath: logfilePathEx, text2p: "Sparse Image process\(String(repeating: "-", count: 40))\n")
         print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
         print("3rd process (create sparse Image) done....")
-        
+        if  sviewModel.output.contains("Invalid argument") {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+            sviewModel.output = sviewModel.output + "\nRestoring data to sparse fails. The process fail. Press esc to return to main menu"
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "😬"
+            alertMsg = "An error that prevent to restore the data occured. See above for details"
+            stepIndex = 4
+
+            return
+        }
         // DMG creation
         if CaseInfoData.shared.isdmgEnabled {
             print("about to enter dmg process...")
             titleImgSize = "Creating DMG"
             titleGauge = "% DMG vs Total Disk"
             createdmgImage()
-            
+            if  isSparseStillMounted {
+                let sparsePath = DiskDataManager.shared.selectedStorageDestin
+                print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+                sviewModel.output = sviewModel.output + "\nUnmount sparse fails. The process fail. Press esc to return to main menu"
+                imageName = "person.crop.circle.badge.exclamationmark"
+                alertTitle = "😬"
+                alertMsg = "An error that prevent the sparse to be unmouned at \(sparsePath ) occurs. Unmount manually and use convert to generate DMG"
+                stepIndex = 4
+                return
+            }
             print2Log(filePath: logfilePathEx, text2p: "DMG Image process\(String(repeating: "-", count: 43))\n")
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             print("4th process (create dmg) done....")
@@ -377,7 +416,16 @@ struct Imaging1ProcView: View {
         else {
             return
         }
+        stepIndex = 2
+        print("stepIndex just before entering in hash \(stepIndex)")
+//        DispatchQueue.main.async {
+//            stepIndex = 2
+//            print("stepIndex \(stepIndex)")
+//            self.stepIndex = 2
+//            print("self.stepIndex \(self.stepIndex)")
+//        }
         hashcalculations()
+        timer.stopTimer()
         print("5th process (hash calcs) done....")
     }
     
@@ -429,7 +477,8 @@ struct Imaging1ProcView: View {
                 print("CMD output: \(output)")
                 print("Image successfully unmounted.")
             } else {
-                print("Failed to unmount the image.")
+                
+                print("Failed to unmount the image output = \(data)")
             }
         } catch {
             print("Failed to execute hdiutil command: \(error)")
@@ -437,6 +486,7 @@ struct Imaging1ProcView: View {
     }
     
     func unmountSparseImageForce(dskimageMt: String) {
+        print("inside FORCE unmount to try \(dskimageMt)")
         guard isSparseImageMounted(imagePath: dskimageMt) else {
             print("Image is not mounted or does not exist.")
             return
@@ -459,7 +509,7 @@ struct Imaging1ProcView: View {
                 print("CMD output: \(output)")
                 print("Image successfully unmounted.")
             } else {
-                print("Failed to unmount the image.")
+                print("Failed to unmount the image: data = \(data).")
             }
         } catch {
             print("Failed to execute hdiutil command: \(error)")
@@ -505,28 +555,39 @@ struct Imaging1ProcView: View {
         let sparsePath = DiskDataManager.shared.selectedStorageDestin
         print("in createSparseCont: imgName=\(imgName)")
         let passw = AuthenticationViewModel.shared.rootPassword
-        var dskID2bImaged = ""
-        if let dskID2bImaged = extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID() {
-            // Use `dskIDWithImagedFF` here, as it is guaranteed to be non-nil.
-            print("Disk ID with Imaged FF: \(dskID2bImaged)")
+        var dskID = ""
+        if let dskID2bImaged = extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen)  {
+            dskID = dskID2bImaged
+            print("Disk ID to be imaged: \(dskID2bImaged)")
         } else {
+            if let dskID2bImaged = getRootFileSystemDiskID() {
+                dskID = dskID2bImaged
+//                dskID2bImaged = getRootFileSystemDiskID()
+                print("disk to be imaged from default org=nil \(dskID2bImaged)")
+            }
             // If both `extractusedDisk` and `getRootFileSystemDiskID` return nil, set `nilSource` to true.
             nilSource = true
         }
 
-//        guard let dskID2bImaged = DiskDataManager.shared.findSizeByIdent(dskID2bImaged) else { return "/" }
-        
-//        let dsk2bImaged = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID()!)
-//        print("disk to be imaged: \(dsk2bImaged)")
-        guard let dsk2bImaged = DiskDataManager.shared.findSizeByIdent(dskID2bImaged) else { return "/" }
-        let imgSize = getDiskIDCapacityAvSpace(diskPath: dsk2bImaged).capacity ?? "500G"
+
+        guard let dsk2bImaged = DiskDataManager.shared.findMtPtByIdent(ident: dskID) else { return "/" }
+        print("disk to be imaged ID which is compatible with lower MacOS versions: \(dsk2bImaged)")
+        disk2bImaged = dsk2bImaged
+        let imgSize = getDiskIDCapacityAvSpace(diskPath: dsk2bImaged).capacity ?? "497G"
         maxValue = convertSizeStringToDouble(imgSize)
         FileSizeChecker3.shared.totalSizeInGB = maxValue
         print("imgSize calculated from getDisk \(imgSize)")
         print("in createSparseCont: passw= \(passw)")
         print("in createSparseCont: sparsePath= \(sparsePath)")
-        print("sudo hdiutil create -size \(imgSize) -type SPARSE -fs APFS -volname \(imgName) \(sparsePath)/\(imgName)")
-        sviewModel.output=sviewModel.executeSudoCommand(command: "sudo hdiutil create -size \(imgSize) -type SPARSE -fs APFS -volname \(imgName) \(sparsePath)/\(imgName)", passw: passw)
+        if let fsType = getFilesystemType(volumePath: dsk2bImaged) {
+            print("Filesystem type from diskutil info: \(fsType)")
+            if fsType.contains("HFS+") { fileSystemType = "HFS+"}
+            else {fileSystemType = fsType}
+        } else {
+            print("Could not determine filesystem type, default = APFS")
+        }
+        print("sudo hdiutil create -size \(imgSize) -type SPARSE -fs \(fileSystemType) -volname \(imgName) \(sparsePath)/\(imgName)")
+        sviewModel.output=sviewModel.executeSudoCommand(command: "sudo hdiutil create -size \(imgSize) -type SPARSE -fs \(fileSystemType) -volname \(imgName) \(sparsePath)/\(imgName)", passw: passw)
         return sviewModel.output
     }
     func mountsparseContanier() -> String {
@@ -544,10 +605,9 @@ struct Imaging1ProcView: View {
     func createsparseImage () {
         let imgName = CaseInfoData.shared.imageName
         let passw = AuthenticationViewModel.shared.rootPassword
-        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
-        let dsk2bImaged = "/dev/"+(extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? getRootFileSystemDiskID()!)
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(imgName).info"
         print("starting sparse...")
-        print(" disk to be imaged \(dsk2bImaged)")
+        print(" disk to be imaged \(disk2bImaged)")
         let sparsePath = DiskDataManager.shared.selectedStorageDestin
         print("sparse path: \(sparsePath)")
         sparseTimeIni=LLTimeManager.getCurrentTimeString()
@@ -555,7 +615,10 @@ struct Imaging1ProcView: View {
         timer.startTimer()
         fileSizeChecker3.filePath = "\(sparsePath)/\(imgName).sparseimage"
         fileSizeChecker3.startMonitoring()
-        sviewModel.executeSudoCommand2(command: "asr restore --source \(dsk2bImaged) --target /Volumes/\(imgName) --erase --noprompt", passw: passw)
+        let formatedDisk2bImaged = formattedPath4df(for: disk2bImaged)
+        print("command sent to terminal form asr restore:")
+        print("asr restore --source \(formatedDisk2bImaged) --target /Volumes/\(imgName) --erase --noprompt")
+        sviewModel.executeSudoCommand2(command: "asr restore --source \(formatedDisk2bImaged) --target /Volumes/\(imgName) --erase --noprompt", passw: passw)
 //        timer.stopTimer()
         sparseTimeEnd=LLTimeManager.getCurrentTimeString()
         sparseSize=String(format: "%.2f GB", fileSizeChecker3.fileSizeInGB)
@@ -565,27 +628,38 @@ struct Imaging1ProcView: View {
         sparseLog()
     }
     
-    func createdmgImage() {
+        func unmountSparse() {
+            
+            
+        }
+        
+        func createdmgImage() {
         let imgName = CaseInfoData.shared.imageName
         let defaultImagePath = "/Volumes/llidata/\(imgName).sparseimage"
-        print("inside createdmgImage...")
         let fullimagePath = fileSizeChecker3.filePath ?? defaultImagePath
+        print("inside createdmgImage with value to unmount... \(fullimagePath)")
         let isMounted = isSparseImageMounted(imagePath: fullimagePath)
         print(isMounted ? "Image is mounted" : "Image is not mounted")
         let hdiInfo = loaddhiutilInfo()
-        let devDiskMt = extractDiskIdentifier2(from: hdiInfo, imagePath: fullimagePath)!
-        print("to be Unmounted: \(devDiskMt)")
-        if isMounted {
-            Thread.sleep(forTimeInterval: 5)
-            unmountSparseImage(dskimageMt: devDiskMt)
-        }
-        let isMounted2 = isSparseImageMounted(imagePath: fullimagePath)
-        if isMounted2 {
-            Thread.sleep(forTimeInterval: 7)
-            unmountSparseImageForce(dskimageMt: devDiskMt)
-        }
+            if let devDiskMt = extractDiskIdentifier2(from: hdiInfo, imagePath: fullimagePath) {
+                print("to be Unmounted: \(devDiskMt)")
+                if isMounted {
+                    Thread.sleep(forTimeInterval: 5)
+                    unmountSparseImage(dskimageMt: devDiskMt)
+                }
+                let isMounted2 = isSparseImageMounted(imagePath: fullimagePath)
+                if isMounted2 {
+                    Thread.sleep(forTimeInterval: 7)
+                    unmountSparseImageForce(dskimageMt: devDiskMt)
+                }
+            }
+            else{
+                stepIndex = 4
+                return
+            }
         if isSparseImageMounted(imagePath: fullimagePath) {
             print("image still mounted after 2 attemps. Process canceled")
+            isSparseStillMounted = true
             return
         }
         stepIndex = 1
@@ -618,7 +692,6 @@ struct Imaging1ProcView: View {
         fileSizeChecker3.stopMonitoring()
         dmgSize=String(format: "%.2f GB", fileSizeChecker3.fileSizeInGB)
         print("exesudo3 finished.... dmg size: \(dmgSize)")
-//        dmgtimer.stopTimer()
         dmgTimeEnd=LLTimeManager.getCurrentTimeString()
 
   
@@ -629,23 +702,23 @@ struct Imaging1ProcView: View {
     func hashcalculations() {
         print("inside hashcalculations...")
         stepIndex = 2
-        print("in hash calculations \(procStep[stepIndex])")
+        print("in hash calculations after setting stepIndex again=\(stepIndex) -> \(procStep[stepIndex])")
         let imgName = CaseInfoData.shared.imageName
         var pathFile = ""
         if DiskDataManager.shared.selected2ndStorageDestin == "" {
-            pathFile = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).dmg"
+            pathFile = DiskDataManager.shared.selectedStorageDestin + "/\(imgName).dmg"
         } else {
-            pathFile = DiskDataManager.shared.selected2ndStorageDestin + "/\(CaseInfoData.shared.imageName).dmg"
+            pathFile = DiskDataManager.shared.selected2ndStorageDestin + "/\(imgName).dmg"
         }
 
         print("path to dmg in hash calc: \(pathFile)")
-        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName).info"
+        let logfilePath = DiskDataManager.shared.selectedStorageDestin + "/\(imgName).info"
         print2Log(filePath: logfilePath, text2p: "Hash DMG process\(String(repeating: "-", count: 40))\n")
         let hashTimeIni = LLTimeManager.getCurrentTimeString()
         print2Log(filePath: logfilePath, text2p: "Start time:     \(hashTimeIni)")
         switch DiskDataManager.shared.selectedHashOption {
         case "SHA256":
-            print("switch case 256")
+            print("switch case 256, stepIndex = \(stepIndex)")
             let hash256 =
             hashLargeFileSHA256 (filePath: pathFile, viewModel: hviewModel)
             let hashTimeEnd = LLTimeManager.getCurrentTimeString()
@@ -653,25 +726,25 @@ struct Imaging1ProcView: View {
             print2Log(filePath: logfilePath, text2p: "SHA256 hash:    \(String(describing: hash256)) \n")
             
         case "SHA1":
+            print("switch case Sha1, stepIndex = \(stepIndex)")
             let hashsha1 =
             hashLargeFileSHA1(filePath: pathFile)
             let hashTimeEnd = LLTimeManager.getCurrentTimeString()
             print2Log(filePath: logfilePath, text2p: "End time:       \(hashTimeEnd)")
-            print2Log(filePath: logfilePath, text2p: "SHA1 hash: \(String(describing: hashsha1)) \n")
+            print2Log(filePath: logfilePath, text2p: "SHA1 hash:      \(String(describing: hashsha1)) \n")
             
         case "MD5":
             let hashMD5 =
             hashLargeFileMD5(filePath: pathFile)
             let hashTimeEnd = LLTimeManager.getCurrentTimeString()
             print2Log(filePath: logfilePath, text2p: "End time:       \(hashTimeEnd)")
-            print2Log(filePath: logfilePath, text2p: "MD5 hash: \(String(describing: hashMD5)) \n")
+            print2Log(filePath: logfilePath, text2p: "MD5 hash:       \(String(describing: hashMD5)) \n")
             
         case "NO-HASH":
             processNoHash()
         default:
             print("Invalid selection")
         }
-        timer.stopTimer()
     }
     
     func processNoHash() {

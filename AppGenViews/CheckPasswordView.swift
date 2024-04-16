@@ -51,6 +51,7 @@ struct CheckPasswordView: View {
                      SecureField("Password", text: $password)
                          .textFieldStyle(RoundedBorderTextFieldStyle())
                          .frame(width: 300, height: 20)
+                     // commented because it wont work on OS11
 //                          .focused($isPasswordFieldFocused)
                          .onSubmit {
                              handlePasswordCheck()

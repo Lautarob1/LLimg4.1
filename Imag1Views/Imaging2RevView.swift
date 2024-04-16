@@ -49,7 +49,6 @@ struct Imaging2RevView: View {
                         VStack {
                             CaseInfoViewRev()
                             
-                            //                        ImgInfoViewRev()
                             HardinfoViewRev()
                         }
                         .padding(.trailing, 25)
@@ -106,6 +105,8 @@ struct Imaging2RevView: View {
                     }
                 }
                 .onAppear() {
+                    if doubleCheckLicense() {
+                    print("Dsk origen stored: \(DiskDataManager.shared.selectedDskOrigen)")
                     let sourceDisk = extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? "/"
                     let destinationDisk = DiskDataManager.shared.selectedStorageDestin
                     if validatePath(path: destinationDisk) {
@@ -143,6 +144,13 @@ struct Imaging2RevView: View {
                         imageName = "folder.badge.questionmark"
                         disableBCreateImg = true
                         showAlertTgt = true
+                    }
+                    }
+                    else {
+                            alertText1 = "No license present. Please make sure the disk with the license is still connected."
+                            imageName = "externaldrive.connected.to.line.below"
+                            disableBCreateImg = true
+                            showAlertTgt = true
                     }
                 }
             }

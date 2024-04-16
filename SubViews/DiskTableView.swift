@@ -123,7 +123,7 @@ struct DiskTableView: View {
             isNoImg = false
             isValVol = true
             }
-        print("isnoImg \(isNoImg), mtpt=\(row.mtPt), isRoot=\(isRoot) isValVol= \(isValVol)")
+//        print("isnoImg \(isNoImg), mtpt=\(row.mtPt), isRoot=\(isRoot) isValVol= \(isValVol)")
         return (isNoImg, isRoot, isValVol)
     }
 

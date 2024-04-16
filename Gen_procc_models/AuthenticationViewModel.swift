@@ -24,7 +24,7 @@ class AuthenticationViewModel: ObservableObject {
     func ValidateLicense() -> String {
 //         licenseStatus = "Expired"
 //        temp test (not working when using the app in other computer.
-        let filePath = "/Volumes/LLimager-Int/LLimager/llimager.lic"
+        let filePath = "/Volumes/llimager/llimager/llimager.lic"
         licenseFileFound = licencefileExistsAndCanBeRead(atPath: filePath)
 
         if licenseFileFound {
@@ -42,14 +42,16 @@ class AuthenticationViewModel: ObservableObject {
         else {
             self.licenseStatus = "File not found"
         }
+        AuthenticationViewModel.shared.licenseType = self.licenseType
+        AuthenticationViewModel.shared.licenseSerial = self.licenseSerial
         return licenseStatus
     }
     
     func validatePassword(_ passw: String) {
         // Replace this logic with your actual password validation
-        print("password entered: \(passw)")
+//        print("password entered: \(passw)")
         let output = executeSudoCommand(command: "Sudo -S whoami", passw: passw)
-        print("output from command: \(output)")
+//        print("output from command: \(output)")
         if output.contains("root") {
             self.isPasswordCorrect = true
             self.rootPassword = passw
@@ -62,7 +64,7 @@ class AuthenticationViewModel: ObservableObject {
     }
     
     func executeSudoCommand(command: String, passw: String) -> String {
-        print("entering executeSudoCommand in initial page")
+//        print("entering executeSudoCommand in initial page")
         let fullCommand = "echo \(passw) | sudo -S \(command)"
 //        let fullCommand = "echo \(passw) | sudo -S \(command)"
         let process = Process()
@@ -81,7 +83,7 @@ class AuthenticationViewModel: ObservableObject {
         }
         
         let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        print("about to leave ConsoleViewModel-executeSudoCommand")
+//        print("about to leave ConsoleViewModel-executeSudoCommand")
         return String(data: data, encoding: .utf8) ?? "Error decoding output"
     }
     
@@ -128,15 +130,18 @@ class AuthenticationViewModel: ObservableObject {
     }
 
     func checkSerialNumber () -> Bool {
+//        print("entering chk serial: \(self.licenseSerial)")
         let cmdOutput = executeCommand(command: "system_profiler SPUSBDataType")
-        let serialValid: Bool = false
+        var serialValid: Bool = false
         if cmdOutput.contains(self.licenseSerial) {
-            var serialValid = true
+            serialValid = true
+            
         }
 //        print("is serial Valid after ouput: \(isSerialValid)")
         // eliminate this lines within the second if{} only temp for test
-        if cmdOutput.contains("S6XGNS0W618693L") {
-            var serialValid = true
+//        if cmdOutput.contains("S6XGNS0W618693L") {
+         if cmdOutput.contains("S6XGNS0W933501E") {
+            serialValid = true
         }
 //        print("is serial Valid after serial added: \(isSerialValid)")
         return serialValid

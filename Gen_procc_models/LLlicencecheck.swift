@@ -53,7 +53,7 @@ func verifyHMAC(_ mac: Data, authenticating data: Data, using key: Data) -> Bool
 
 
 func licenseFile()  -> String {
-    let filePath = "/Volumes/LLimager-Int/LLimager/llimager.lic"
+    let filePath = "/Volumes/llimager/llimager/llimager.lic"
     var fileContents: String = ""
     do {
         fileContents = try String(contentsOf: URL(fileURLWithPath: filePath), encoding: .utf8)
@@ -110,8 +110,8 @@ func readLicense() -> String {
 
 func checkLicense (dateRef: String) -> String {
     var checkDate: String = ""
-    let dateString = "2023-11-16"
-
+    let dateString = dateRef
+//    print("exp date from dateref in checkLicense: \(dateRef)")
     // Create a DateFormatter
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -136,3 +136,47 @@ return checkDate
     
 }
 
+func executeCommand(command: String) -> String {
+//        print("entering ConsoleViewModel-executeCommand")
+    let process = Process()
+    let pipe = Pipe()
+    process.environment = ProcessInfo.processInfo.environment
+    process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+    process.arguments = ["-c", command]
+    process.standardOutput = pipe
+    process.standardError = pipe
+    
+    do {
+        try process.run()
+        process.waitUntilExit()
+    } catch {
+        return "Error: \(error.localizedDescription)"
+    }
+    
+    let data = pipe.fileHandleForReading.readDataToEndOfFile()
+//        print("about to leave ConsoleViewModel-executeSudoCommand")
+    return String(data: data, encoding: .utf8) ?? "Error decoding output"
+}
+
+
+func doubleCheckLicense () -> Bool {
+    let serial = AuthenticationViewModel.shared.licenseSerial
+    let type = AuthenticationViewModel.shared.licenseType
+    print("existing serial: \(serial)")
+    print("type of lic: \(AuthenticationViewModel.shared.licenseType)")
+    if type == "License" {
+        let cmdOutput = executeCommand(command: "system_profiler SPUSBDataType")
+        if cmdOutput.contains(serial) {
+            return true
+        }
+        else
+        {
+            // eliminate the line below for production
+            if cmdOutput.contains("S6XGNS0W933501E") {return true}
+            return false
+        }
+    }
+    else {
+        return true
+    }
+}

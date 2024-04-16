@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TgtSelectSparseViewRev: View {
     @State private var filePath: String = ""
-    @StateObject private var fileSelectionManager = FileSelectionManager()
+    @ObservedObject private var fileSelectionManager = FileSelectionManager()
     let path2img: String = "Enter path"
     let butlabel: String = "Choose File"
     

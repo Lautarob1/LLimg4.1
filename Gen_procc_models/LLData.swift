@@ -31,9 +31,13 @@ class DiskDataManager: ObservableObject {
         self.selectedDskOrigen = self.comboInfo.first!
     }
 
-    func findMtPtByIdent(_ ident: String) -> String? {
+    func findMtPtByIdent(ident: String) -> String? {
         // Use 'first(where:)' to find the tuple where 'ident' matches the parameter
+        print("in indMtPtByIdent, ident = \(ident)")
+        print("dskData.first = \(dskData.first)")
+        print("dskData.first \(dskData.first(where: { $0.ident == ident }))")
         if let item = dskData.first(where: { $0.ident == ident }) {
+            print("dskData.first inside if = \(dskData.first)")
             // If found, return the 'mtPt' value
             return item.mtPt
         } else {
@@ -44,8 +48,11 @@ class DiskDataManager: ObservableObject {
         }
     }
     
-    func findSizeByIdent(_ ident: String) -> String? {
+    func findSizeByIdent(ident: String) -> String? {
         // Use 'first(where:)' to find the tuple where 'ident' matches the parameter
+        print("in fileSizebyIdent, ident = \(ident)")
+        print("dskData.first \(dskData.first)")
+        print("dskData.first \(dskData.first(where: { $0.ident == ident }))")
         if let item = dskData.first(where: { $0.ident == ident }) {
             // If found, return the 'mtPt' value
             return item.size
@@ -160,7 +167,7 @@ class FileDelete {
                 print("Failed to delete file: \(error)")
             }
         } else {
-            print("File does not exist.")
+            print("File does not exist from FileDelete func (no file to delete).")
         }
     }
 }

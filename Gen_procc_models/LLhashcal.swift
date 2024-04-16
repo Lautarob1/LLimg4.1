@@ -60,9 +60,9 @@ func calculateSHA256Hash(for filePath: String) -> String? {
     return sha256Digest.map { String(format: "%02hhx", $0) }.joined()
 }
 
-func hashLargeFileMD5(filePath: String) -> String? {
+func hashLargeFileMD5(filePath: String) -> String {
     let bufferSize = 1024 * 1024 // 1 MB
-    guard let file = FileHandle(forReadingAtPath: filePath) else { return nil }
+    guard let file = FileHandle(forReadingAtPath: filePath) else { return "no file to process => nulo" }
     defer { file.closeFile() }
 
     var context = CC_MD5_CTX()
@@ -89,9 +89,9 @@ func hashLargeFileMD5(filePath: String) -> String? {
 }
 
 
-func hashLargeFileSHA1(filePath: String) -> String? {
+func hashLargeFileSHA1(filePath: String) -> String {
     let bufferSize = 1024 * 1024 // 1 MB
-    guard let file = FileHandle(forReadingAtPath: filePath) else { return nil }
+    guard let file = FileHandle(forReadingAtPath: filePath) else { return "no file to process => nulo" }
     defer { file.closeFile() }
 
     var context = CC_SHA1_CTX()
@@ -152,6 +152,9 @@ func hashLargeFileSHA256(filePath: String, viewModel: HashingViewModel) -> Strin
     }
     return digest.map { String(format: "%02hhx", $0) }.joined()
 }
+
+
+
 import Foundation
 import Combine
 import CommonCrypto

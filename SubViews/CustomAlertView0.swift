@@ -23,7 +23,7 @@ struct CustomAlertView0: View {
     let message4b: String = "LL"
     let message4c: String = " perform resource requirements checks. Nevertheless, confirm the destination drive has adequate space and is healthy (use Disk Utility in another Mac)"
     let message5a: String = "Post-Imaging: "
-    let message5b: String = "After imaging, safely eject the external drive and verify the image (visual and hash based"
+    let message5b: String = "After imaging, safely eject the external drive and verify the image (visual and hash based)"
     let message6a: String = "Back Up Data: "
     let message6b: String = "Ensure important data on the source is backed up"
 

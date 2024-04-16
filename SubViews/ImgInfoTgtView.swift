@@ -16,7 +16,7 @@ struct ImgInfoTgtView: View {
     @State private var isViewPresented = false
     @State private var isInputValid: Bool = true
     @State private var isChecked: Bool = true
-    @FocusState private var nameFieldIsFocused: Bool
+//    @FocusState private var nameFieldIsFocused: Bool
     @State private var showCustomAlert: Bool = false
     
     var body: some View {
@@ -30,7 +30,7 @@ struct ImgInfoTgtView: View {
                 ZStack {
                     VStack {
                         TextField("Enter image name", text: $imageName)
-                            .focused($nameFieldIsFocused)
+//                            .focused($nameFieldIsFocused)
                             .border(isInputValid ? Color.clear : Color.red)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                         
@@ -54,7 +54,7 @@ struct ImgInfoTgtView: View {
                             textColor: Color(.white),
                             backgroundColor: Color("LL_orange"),
                             onDismiss: {
-                                nameFieldIsFocused = true
+//                                nameFieldIsFocused = true
                             })
                         .offset(y: -180.0)
                     }
@@ -76,7 +76,7 @@ struct ImgInfoTgtView: View {
                     OptionButtonsView()
                 }
                 .padding()
-                .background()
+                .background(Color.clear)
                 // if
                 
                 

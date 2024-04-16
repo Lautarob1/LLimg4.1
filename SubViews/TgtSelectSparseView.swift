@@ -46,11 +46,10 @@ struct TgtSelectSparseView: View {
                     
                 })
                 {
-                    Text("Select Sparse Imag")
-
-                      
+                    Text("Select Sparse Image")
+                        .font(.system(size: 10))
                 }
-                .frame(width:140, height: 25)
+                .frame(width:150, height: 25)
     
 
             }
@@ -91,7 +90,7 @@ struct TgtSelectSparseView: View {
             }
             
         }
-        .frame(width: 420, height: 220)
+        .frame(width: 430, height: 220)
     }
     
 

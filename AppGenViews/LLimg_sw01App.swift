@@ -41,8 +41,8 @@ struct LLimg_sw01App: App {
                                     //                                            showingAlert = true
                                 }
                                 checkLicense = true
-                                // eliminafe the line below in production (it makes the license always valid)
-                                authModel.isLicenseValid = true
+                                // eliminate the line below in production (it makes the license always valid)
+//                                authModel.isLicenseValid = true
                             }
                     }
                     

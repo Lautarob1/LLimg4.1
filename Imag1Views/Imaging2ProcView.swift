@@ -159,13 +159,14 @@ struct Imaging2ProcView: View {
                         .font(.system(size: 11, weight: .bold, design: .default)) // Set font size, weight, and design
 //                        .italic() 
                         .foregroundColor(.white) // Set the text color
-                        .frame(width: 840, height: 300, alignment: .leading)
+                        .frame(width: 840, alignment: .leading)
+                        .frame(minHeight: 150)
                         .padding(5)
                         .background(gradt2) // "LL_blue")) // .opacity(0.5) Set the background color
                         .cornerRadius(14)
                     
                 }
-                .frame(width: 860, height: 200)
+                .frame(width: 860, height: 250)
                 .padding(5)
                 
                 HStack {
@@ -322,7 +323,7 @@ struct Imaging2ProcView: View {
                     Spacer()
                 }
             }
-            .frame(width: 900, height: 500)
+            .frame(width: 900, height: 600)
             .cornerRadius(25)
             .padding(5)
                 
@@ -596,7 +597,7 @@ struct Imaging2ProcView: View {
             nilSource = true
         }
 
-        guard let dskWithImagedFF = DiskDataManager.shared.findMtPtByIdent(dskIDWithImagedFF) else { return "/" }
+        guard let dskWithImagedFF = DiskDataManager.shared.findMtPtByIdent(ident: dskIDWithImagedFF) else { return "/" }
         let imgSize = getDiskIDCapacityAvSpace(diskPath: dskWithImagedFF).capacity!
         maxValue = convertSizeStringToDouble(imgSize)
         print("maxValue (value from image size in create sparse container \(maxValue)")
@@ -635,7 +636,9 @@ struct Imaging2ProcView: View {
 
     func copyItem(atPath srcPath: String, toPath dstPath: String) {
          let passw = AuthenticationViewModel.shared.rootPassword
-         let command = "cp -a \(srcPath) \(dstPath)"
+         let srcPathFormatted = formattedPath4df(for: srcPath)
+         let dstPathFormatted = formattedPath4df(for: dstPath)
+         let command = "cp -a \(srcPathFormatted) \(dstPath)"
          let fullCommand = "echo \(passw) | sudo -S \(command)"
          print(command)
          let process = Process()

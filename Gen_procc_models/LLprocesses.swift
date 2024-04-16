@@ -71,7 +71,7 @@ func loadDiskInfo() -> [String] {
 func extractDiskIdentifier(sparseMounted: String) -> String {
 //    using the command hdiutil info file loaddhiutilInfo, separate by device (section) and within a section, seeks
 //    corresponding image name and if found extract corresponding disk identifier (like disk3s1, disk4s2 etc). Only IMAGES
-    print("executing extDsk with \(sparseMounted)")
+    print("executing extDskid with \(sparseMounted)")
     let hdiResults = loaddhiutilInfo()
     print(hdiResults)
     if hdiResults.contains(sparseMounted) {
@@ -90,6 +90,7 @@ func extractDiskIdentifier(sparseMounted: String) -> String {
 
 func extractDiskIdentifier2(from text: String, imagePath: String) -> String? {
 //    from the output of
+    print("executing extractDiskIdentifier2 with \(imagePath)")
     // Split the text into sections based on "image-path"
     let sections = text.components(separatedBy: "image-path")
     
@@ -101,7 +102,7 @@ func extractDiskIdentifier2(from text: String, imagePath: String) -> String? {
             
             // Search for the line with "GUID_partition_scheme"
             for line in lines {
-                if line.contains("GUID_partition_scheme") {
+                if line.contains("GUID_partition_scheme") || line.contains("FDisk_partition_scheme") {
                     // Extract and return the disk identifier
                     let components = line.components(separatedBy: "\t")
                     return components.first?.trimmingCharacters(in: .whitespaces)
@@ -114,27 +115,27 @@ func extractDiskIdentifier2(from text: String, imagePath: String) -> String? {
     return nil
 }
 
-func loadStorageDevicesInfo() -> String {
-//    list all info for each storage device connected to a Mac
-    let process = Process()
-    let pipe = Pipe()
-    process.launchPath = "/usr/bin/diskutil"
-    process.arguments = ["info", "-all"]
-    process.standardOutput = pipe
-    
-    do {
-        try process.run()
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8) ?? ""
-        return output
-        
-    } catch {
-        print("Error executing dhiutil: \(error)")
-        return ""
-        
-    }
-    
-}
+//func loadStorageDevicesInfo() -> String {
+////    list all info for each storage device connected to a Mac
+//    let process = Process()
+//    let pipe = Pipe()
+//    process.launchPath = "/usr/bin/diskutil"
+//    process.arguments = ["info", "-all"]
+//    process.standardOutput = pipe
+//    
+//    do {
+//        try process.run()
+//        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+//        let output = String(data: data, encoding: .utf8) ?? ""
+//        return output
+//        
+//    } catch {
+//        print("Error executing dhiutil: \(error)")
+//        return ""
+//        
+//    }
+//    
+//}
 
 func loaddhiutilInfo() -> String {
 //    list all info for the IMAGES files found
@@ -236,18 +237,42 @@ func getSystemDiskInfo() -> (diskIdentifier: String, totalCapacity: UInt64, used
     return nil
 }
 
+func formattedPath4df(for path: String) -> String {
+    // Check if the path contains a space
+    if path.contains(" ") {
+        // If there are spaces, return the path enclosed in quotes
+        return "\"\(path)\""
+    } else {
+        // If there are no spaces, return the path as is
+        return path
+    }
+}
+
+
+//func executeCommand(command: String) -> String {
+////        print("entering ConsoleViewModel-executeCommand")
+//    let process = Process()
+//    let pipe = Pipe()
+//    process.environment = ProcessInfo.processInfo.environment
+//    process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+//    process.arguments = ["-c", command]
+//    process.standardOutput = pipe
+//    process.standardError = pipe
 
 func getAnyDiskInfo(dskpath: String) -> (diskIdentifier: String, totalCapacity: UInt64, usedSpace: UInt64, availableSpace: UInt64)? {
    // This func returns the total, available, and used bytes for disk dskpath (like /dev/disk1s1s1, the disk needs to be mounted
-    
+    let dskpathformatted = formattedPath4df(for: dskpath)
     let process = Process()
     let pipe = Pipe()
-
-    process.executableURL = URL(fileURLWithPath: "/bin/df")
-    process.arguments = [dskpath]
+    print("in getAnyDiskInfo with dskpath formated= \(dskpathformatted)")
+    print("in getAnyDiskInfo with dskpath formated= \(dskpath)")
+    let command = "df \(dskpathformatted)"
+    process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+    process.arguments = ["-c", command]
     process.standardOutput = pipe
 
     do {
+        print("in getAnyDiskInfo within Do argument passed: \(dskpath)")
         try process.run()
         process.waitUntilExit()
 
@@ -276,27 +301,27 @@ func getAnyDiskInfo(dskpath: String) -> (diskIdentifier: String, totalCapacity: 
     return nil
 }
 
-func isStorageSizeOK3 (sourceSparse: String, destinationDisk: String, destDMGDisk: String) -> Bool {
-    //    check if there is capacity to storage DMG from the size of the Sparse)
-    var isCapacity = false
-    if let totalCapacity = getAnyDiskInfo(dskpath: sourceSparse)?.totalCapacity,
-       let availableSpace1 = getAnyDiskInfo(dskpath: destinationDisk)?.availableSpace {
-        if Double(totalCapacity) < (1.05 * Double(availableSpace1))  {
-            print("required capacity x 1.05 = \(1.05 * Double(totalCapacity))")
-            print("Available Space = \(availableSpace1)")
-            isCapacity = true
-            print(isCapacity)
-            
-        }
-        else {
-            isCapacity = false
-            print(isCapacity)
-        }
-    
-    }
-    
-    return isCapacity
-}
+//func isStorageSizeOK3 (sourceSparse: String, destinationDisk: String, destDMGDisk: String) -> Bool {
+//    //    check if there is capacity to storage DMG from the size of the Sparse)
+//    var isCapacity = false
+//    if let totalCapacity = getAnyDiskInfo(dskpath: sourceSparse)?.totalCapacity,
+//       let availableSpace1 = getAnyDiskInfo(dskpath: destinationDisk)?.availableSpace {
+//        if Double(totalCapacity) < (1.05 * Double(availableSpace1))  {
+//            print("required capacity x 1.05 = \(1.05 * Double(totalCapacity))")
+//            print("Available Space = \(availableSpace1)")
+//            isCapacity = true
+//            print(isCapacity)
+//            
+//        }
+//        else {
+//            isCapacity = false
+//            print(isCapacity)
+//        }
+//    
+//    }
+//    
+//    return isCapacity
+//}
 
 func isStorageSizeOK1(sourceDisk: String, destinationDisk: String, destDMGDisk: String) -> Bool {
     if CaseInfoData.shared.isdmgEnabled {
@@ -1134,7 +1159,7 @@ func getDiskIDCapacityAvSpace(diskPath: String) -> (diskID: String?, capacity: S
     let pipe = Pipe()
 
     process.executableURL = URL(fileURLWithPath: "/bin/df")
-    process.arguments = ["-H", diskPath]  // '-H' uses human-readable format
+    process.arguments = ["-H", "\(diskPath)"]  // '-H' uses human-readable format
     process.standardOutput = pipe
 
     do {
@@ -1174,7 +1199,7 @@ func getVolumeCapacityDetails(volumePath: String) -> (totalCapacity: String?, av
     let pipe = Pipe()
 
     process.executableURL = URL(fileURLWithPath: "/bin/df")
-    process.arguments = ["-H", volumePath]  // '-H' for human-readable format
+    process.arguments = ["-H", "\(volumePath)"]  // '-H' for human-readable format
     process.standardOutput = pipe
 
     do {
@@ -1318,3 +1343,52 @@ func getFileSize(filePath: String) -> UInt64? {
     }
     return nil
 }
+
+
+
+func getFilesystemType(volumePath: String) -> String? {
+    let process = Process()
+    let pipe = Pipe()
+    print("entering func getFilesystemType")
+    print("with Volpath: \(volumePath)")
+    process.executableURL = URL(fileURLWithPath: "/usr/sbin/diskutil")
+    process.arguments = ["info", volumePath]
+    process.standardOutput = pipe
+
+    do {
+        print("in Do func2")
+        try process.run()
+        process.waitUntilExit()
+
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        let output = String(data: data, encoding: .utf8)
+//        print("after let output")
+//        print("data: \(data)")
+        print(output ?? "No output")
+        
+        // Parse the output line by line to find the "File System Personality" field
+        if let lines = output?.components(separatedBy: "\n") {
+            for line in lines {
+                if line.contains("File System Personality") {
+                    let components = line.split(separator: ":")
+                    if components.count > 1 {
+                        print("in func getfilesys at the end: ")
+                        print(components[1].trimmingCharacters(in: .whitespacesAndNewlines))
+                        return components[1].trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                }
+            }
+        }
+    } catch {
+        print("Failed to execute diskutil: \(error)")
+    }
+
+    return nil
+}
+
+//// Example usage
+//if let fsType = getFilesystemType(volumePath: "/Volumes/MyVolume") {
+//    print("Filesystem type: \(fsType)")
+//} else {
+//    print("Could not determine filesystem type.")
+//}
