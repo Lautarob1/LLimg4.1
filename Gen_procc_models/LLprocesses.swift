@@ -261,18 +261,20 @@ func formattedPath4df(for path: String) -> String {
 
 func getAnyDiskInfo(dskpath: String) -> (diskIdentifier: String, totalCapacity: UInt64, usedSpace: UInt64, availableSpace: UInt64)? {
    // This func returns the total, available, and used bytes for disk dskpath (like /dev/disk1s1s1, the disk needs to be mounted
+    if dskpath == "" {return ("no disk selected", 0, 0, 0) }
     let dskpathformatted = formattedPath4df(for: dskpath)
+    print("dskpathformatted: \(dskpathformatted)")
     let process = Process()
     let pipe = Pipe()
-    print("in getAnyDiskInfo with dskpath formated= \(dskpathformatted)")
-    print("in getAnyDiskInfo with dskpath formated= \(dskpath)")
+//    print("in getAnyDiskInfo with dskpath formatted= \(dskpathformatted)")
+//    print("in getAnyDiskInfo with dskpath unformatted= \(dskpath)")
     let command = "df \(dskpathformatted)"
     process.executableURL = URL(fileURLWithPath: "/bin/zsh")
     process.arguments = ["-c", command]
     process.standardOutput = pipe
 
     do {
-        print("in getAnyDiskInfo within Do argument passed: \(dskpath)")
+//        print("in getAnyDiskInfo within Do argument passed: \(dskpath)")
         try process.run()
         process.waitUntilExit()
 
@@ -280,6 +282,8 @@ func getAnyDiskInfo(dskpath: String) -> (diskIdentifier: String, totalCapacity: 
         let output = String(data: data, encoding: .utf8) ?? ""
 
         let lines = output.components(separatedBy: "\n")
+        print("lines in getAnyDiskInfo for \(dskpath): \(lines.count)")
+        print("content of lines in getAnyDiskInfo \(lines)")
         if lines.count > 1 {
             let components = lines[1].split(separator: " ", maxSplits: 7, omittingEmptySubsequences: true)
             if components.count >= 7 {
@@ -292,7 +296,9 @@ func getAnyDiskInfo(dskpath: String) -> (diskIdentifier: String, totalCapacity: 
                 let availableSpace = UInt64(components[3]) ?? 0
                 return (diskIdentifier, totalCapacity * 512, usedSpace * 512, availableSpace * 512)
             }
+            
         }
+        
     } catch {
         print("Error in func getAnyDiskInfo: \(error)")
         print("Called with parameter dskpath = \(dskpath)")
@@ -357,6 +363,50 @@ func isStorageSizeOK1(sourceDisk: String, destinationDisk: String, destDMGDisk: 
             }
             }
 
+func isStorageSizeOK2(sourceDisk: String, destinationDisk: String, destDMGDisk: String) -> Bool {
+    if CaseInfoData.shared.isdmgEnabled {
+        if let totalCapacity = getAnyDiskInfo(dskpath: sourceDisk)?.totalCapacity,
+           let availableSpace1 = getAnyDiskInfo(dskpath: destinationDisk)?.availableSpace {
+           let availableSpace2 = getAnyDiskInfo(dskpath: destDMGDisk)?.availableSpace ?? 0
+//            var availableSpace2: UInt64
+//            if destDMGDisk != "" {
+//                availableSpace2 = getAnyDiskInfo(dskpath: destDMGDisk)?.availableSpace ?? 0
+//            }
+//            else {
+//                availableSpace2 = 0
+//            }
+            print("sourceDisk: \(sourceDisk)")
+            print("destinationDisk: \(destinationDisk)")
+            print("destDMGDisk: \(destDMGDisk)")
+            let actualRequired = totalCapacity - (getAnyDiskInfo(dskpath: sourceDisk)?.availableSpace ?? 0)
+            print("required capacity x 2 used cap = \(Double(2 * totalCapacity) * 1.1)")
+            print("required capacity x 2 total - available = \(Double(2 * actualRequired) * 1.1)")
+            print("Available Space = \(availableSpace1 + availableSpace2)")
+            print("Available Space 1 = \(availableSpace1)")
+            print("Available Space 2 = \(availableSpace2)")
+            
+            if 2 * actualRequired < availableSpace1 ||
+                (actualRequired < availableSpace1 && actualRequired < availableSpace2) {
+                return true
+            }
+        }
+        return false
+    }
+            else {
+                if let totalCapacity = getAnyDiskInfo(dskpath: sourceDisk)?.totalCapacity,
+                   let availableSpace1 = getAnyDiskInfo(dskpath: destinationDisk)?.availableSpace {
+            
+                    print("required capacity x 1 = \(1 * totalCapacity)")
+                    print("Available Space = \(availableSpace1)")
+                    print("Available Space 1 = \(availableSpace1)")
+                    
+                    if 1 * totalCapacity < availableSpace1  {
+                        return true
+                    }
+                }
+                return false
+            }
+            }
 
 
 func detachSparse (diskAssig: String) -> String {

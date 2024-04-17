@@ -96,7 +96,7 @@ struct HeaderView: View {
     }
     
     func showPDF() {
-        let pdfPath = "/Volumes/llimager/llimager-manual.pdf"
+        let pdfPath = "/Volumes/llimager/llimager/llimager-manual.pdf"
         let pdfUrl = URL(fileURLWithPath: pdfPath)
             openPDFInNewWindow(url: pdfUrl)
   
