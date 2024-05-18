@@ -17,6 +17,10 @@ struct Imaging2View: View {
     @State private var showReviewView = false
     @State private var showAlertTgt = true
     
+    @State private var isFilterSelecVisible: Bool = false
+    @State private var appliedFilter: Bool = false
+    @State private var isFilterBeingApplied: Bool = false
+    
     var body: some View {
 
         ZStack {
@@ -48,8 +52,26 @@ struct Imaging2View: View {
                 .padding(7)
                 .background(Color.clear)
                 VStack {
-                    ImgInfoTgtView()
-                    
+                    ZStack {
+                        VStack {
+                            ImgInfoTgtView()
+                            if !isFilterBeingApplied {
+                                Toggle("Apply Filter", isOn: $appliedFilter)
+                                    .toggleStyle(SwitchToggleStyle(tint: .blue))
+                                    .offset(x: -130, y: -30) // Displace the toggle as specified
+                                    .padding(3)
+                            }
+                            else {
+                                Toggle("Filter is being applied", isOn: $isFilterBeingApplied)
+                                    .offset(x: -130, y: -30) // Displace the toggle as specified
+                                    .padding(3)
+                            }
+                        }
+                        if appliedFilter {
+                            FilterSelectView(isFilterSelecVisible: $isFilterSelecVisible, appliedFilter: $appliedFilter, isFilterBeingApplied: $isFilterBeingApplied)
+//                                .offset(y: -50)
+                        }
+                    }
                     HStack {
                         Button(action: {
                             showReviewView = true

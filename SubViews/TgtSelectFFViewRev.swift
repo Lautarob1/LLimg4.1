@@ -14,7 +14,7 @@ struct TgtSelectFFViewRev: View {
     let butlabel: String = "Choose File"
     
     var body: some View {
-ScrollView {
+
             VStack {
                 HStack {
                  Text("S O U R C E")
@@ -29,17 +29,18 @@ ScrollView {
                             HStack {
                                 Text(file.path)
                                     .font(.caption)
+                                    .frame(width: 385, height: 16, alignment: .leading)
  
                             }
                         }
-                        Spacer()
+
 
                     }
-//                }
+
 
             }
-            .frame(width: 420, height: 250)
-        }
+//        }
+        .frame(width: 400, height: 200)
     }
     
  

@@ -22,23 +22,25 @@ struct TgtInfoViewRev: View {
     
     
     var body: some View {
+        ScrollView {
         VStack (spacing: 3){
             // Display information from the first disk
             
             // Display information from the second disk
             Text("D E S T I N A T I O N")
                 .font(.headline)
-                .padding()
-            if isDiskValid {
-                displayDiskInfo(dskfileInfoDict2)
-            } else {
-                Text("No valid disk was selected for storage")
+                .padding(5)
+ 
+                if isDiskValid {
+                    displayDiskInfo(dskfileInfoDict2)
+                } else {
+                    Text("No valid disk was selected for storage")
+                }
             }
-            
             // Additional UI for calculations or other interactions
             // ...
         }
-        .frame(width:430, height: 250)
+        .frame(width:420, height: 220)
         .background(Color.clear)
         .onAppear {
             let destinDisk = DiskDataManager.shared.selectedStorageDestin
@@ -50,7 +52,7 @@ struct TgtInfoViewRev: View {
     }
     
     private func displayDiskInfo(_ dict: [String: String]) -> some View {
-        ScrollView {
+//        ScrollView {
             VStack (spacing: 2) {
                 ForEach(Array(dict), id: \.key) { key, value in
                     HStack {
@@ -63,7 +65,7 @@ struct TgtInfoViewRev: View {
                     }
                 }
             }
-        }
+//        }
         
     }
 }

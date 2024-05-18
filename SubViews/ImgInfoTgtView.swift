@@ -31,7 +31,7 @@ struct ImgInfoTgtView: View {
                     VStack {
                         TextField("Enter image name", text: $imageName)
 //                            .focused($nameFieldIsFocused)
-                            .border(isInputValid ? Color.clear : Color.red)
+//                            .border(isInputValid ? Color.clear : Color.red)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                         
                         HStack {

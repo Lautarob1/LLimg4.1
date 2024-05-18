@@ -1,4 +1,6 @@
 //
+//
+//
 //  OptionButtonsView.swift
 //  LLimg_sw01
 //
@@ -9,8 +11,7 @@ import SwiftUI
 
 struct OptionButtonsView: View {
     let buttonNames = ["SHA256", "SHA1", "MD5", "NO-HASH"] // Replace with actual button identifiers if needed
-//    @State private var selectedHashOption: String?
-//    DiskDataManager.shared.selectedHashOption
+
     @ObservedObject var diskDataManager = DiskDataManager.shared
     var body: some View {
         HStack {

@@ -25,6 +25,8 @@ struct Imaging2RevView: View {
     @Binding var selectedOption: MenuOption?
     @Binding var showReviewView: Bool
     @State private var showProcessView = false
+    @State private var isFilterBeingApplied: Bool = false
+    @State private var isFilterSelecVisible: Bool = false
     
     var body: some View {
         
@@ -51,11 +53,17 @@ struct Imaging2RevView: View {
                             
                             HardinfoViewRev()
                         }
-                        .padding(.trailing, 25)
+                        .padding(.trailing, 15)
                         VStack (spacing: 20){
                             TgtSelectFFViewRev()
                             TgtInfoViewRev()
+                            if isFilterBeingApplied {
+                            ShowFilterAppliedView()
+ 
+          
+                            }
                         }
+                        .frame(width: 420)
                         
                     }
                     
@@ -105,6 +113,7 @@ struct Imaging2RevView: View {
                     }
                 }
                 .onAppear() {
+                    FilterSelection.shared.isSpreadSheetFilterApplied = true
                     if doubleCheckLicense() {
                     print("Dsk origen stored: \(DiskDataManager.shared.selectedDskOrigen)")
                     let sourceDisk = extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? "/"
@@ -152,6 +161,9 @@ struct Imaging2RevView: View {
                             disableBCreateImg = true
                             showAlertTgt = true
                     }
+                        isFilterBeingApplied = FilterSelection.shared.isSpreadSheetFilterApplied || FilterSelection.shared.isDocumentFilterApplied || FilterSelection.shared.isMediaFilterApplied || FilterSelection.shared.isCustomFilterApplied || FilterSelection.shared.isDateFilterApplied
+                        print("onAppear: filter? \(isFilterBeingApplied)")
+                    
                 }
             }
             // show alert here

@@ -27,7 +27,7 @@ struct HeaderView: View {
             
             HStack {
                 Spacer()
-                Text("Version 4.0")
+                Text("Version 4.1")
                     .font(.headline)
                     .foregroundColor(.black)
                     .frame(width: 300, alignment: .leading)

@@ -36,6 +36,9 @@ class AuthenticationViewModel: ObservableObject {
             if self.licenseType == "License" {
                 self.isSerialValid = checkSerialNumber()
             }
+            else {
+                self.isSerialValid = true
+            }
             self.licenseStatus = checkLicense(dateRef: licenseDetails[2])
             if !self.isSerialValid {self.licenseStatus = self.licenseStatus + "-InvalidSerial"}
         }
