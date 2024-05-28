@@ -18,6 +18,10 @@ struct FilterDetailViewSSh: View {
                                   endPoint: .bottom)
 
     var body: some View {
+        let columns: [GridItem] = [
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ]
     
             VStack (alignment: .leading) {
                 if FilterSelection.shared.applySpreadsheetFilter {
@@ -26,30 +30,16 @@ struct FilterDetailViewSSh: View {
                     Text("spreadsheets")
                     ScrollView {
                         VStack (alignment: .leading)  {
-                        ForEach(filterSelection.spreadSheetTypes, id: \.self) { type in
-                            let isSelected = filterSelection.selectedSpreadsheetTypes.contains(type)
-                            Toggle(type, isOn: Binding(
-                                get: { isSelected },
-                                set: { newValue in
-                                    if newValue {
-                                        filterSelection.selectedSpreadsheetTypes.append(type)
-                                        
-                                        print("Selected : \(filterSelection.selectedSpreadsheetTypes)")
-                                        
-                                        print("All : \(filterSelection.selectedSpreadsheetTypes)")
-                                        
-                                        print("\(type) isSelected (add): \(filterSelection.selectedSpreadsheetTypes)")
-                                    }
+                            LazyVGrid(columns: columns, spacing: 10) {
+                                ForEach(filterSelection.spreadsheetTypes, id: \.self) { type in
+                                    Toggle(type, isOn: bindingForType(type))
                                     
-                                    else {
-                                        filterSelection.selectedSpreadsheetTypes.removeAll(where: { $0 == type })
-                                        print("\(type) isSelected (remove): \(filterSelection.selectedSpreadsheetTypes)")
-                                    }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                 }
-                            ))
-                        }
+                            }
                     } // inner VStack
-                        .frame(width: 180)
+                        .frame(width: 190)
+                        .padding(.leading, 15)
 //                        .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
                 }
 //
@@ -63,7 +53,7 @@ struct FilterDetailViewSSh: View {
  
                Spacer()
                 Button("OK") {
-                    filterSelection.isSpreadSheetFilterApplied = true
+                    filterSelection.isSpreadsheetFilterApplied = true
                     filterSelection.applySpreadsheetFilter = false
                     FilterSelection.shared.selectedSpreadsheetTypes = filterSelection.selectedSpreadsheetTypes
                     FilterSelection.shared.selectedAllTypes.append( contentsOf: filterSelection.selectedSpreadsheetTypes)
@@ -78,7 +68,22 @@ struct FilterDetailViewSSh: View {
                 Spacer()
     }
 
-
+    private func bindingForType(_ type: String) -> Binding<Bool> {
+        Binding<Bool>(
+            get: {
+                filterSelection.selectedSpreadsheetTypes.contains(type)
+            },
+            set: { newValue in
+                if newValue {
+                    if !filterSelection.selectedSpreadsheetTypes.contains(type) {
+                        filterSelection.selectedSpreadsheetTypes.append(type)
+                    }
+                } else {
+                    filterSelection.selectedSpreadsheetTypes.removeAll { $0 == type }
+                }
+            }
+        )
+    }
         
     }
     

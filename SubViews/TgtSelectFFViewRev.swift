@@ -23,13 +23,13 @@ struct TgtSelectFFViewRev: View {
      
                 }
                 .background(Color.clear)
-//                ScrollView {
+
                     List {
                         ForEach(FileSelectionManager.shared.selectedFiFo) { file in
                             HStack {
                                 Text(file.path)
-                                    .font(.caption)
-                                    .frame(width: 385, height: 16, alignment: .leading)
+                                    .font(.subheadline)
+//                                    .frame(width: 380, height: 16, alignment: .leading)
  
                             }
                         }
@@ -39,8 +39,8 @@ struct TgtSelectFFViewRev: View {
 
 
             }
-//        }
-        .frame(width: 400, height: 200)
+
+        .frame(width: 420, height: 180)
     }
     
  

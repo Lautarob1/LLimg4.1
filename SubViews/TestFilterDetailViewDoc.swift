@@ -66,7 +66,7 @@ struct TestFilterDetailViewDoc: View {
                 
                Spacer()
                 Button("OK") {
-                    filterSelection.isSpreadSheetFilterApplied = true
+                    filterSelection.isSpreadsheetFilterApplied = true
                     filterSelection.applySpreadsheetFilter = false
                     FilterSelection.shared.selectedSpreadsheetTypes = filterSelection.selectedSpreadsheetTypes
                     FilterSelection.shared.selectedAllTypes = filterSelection.selectedSpreadsheetTypes
@@ -83,7 +83,7 @@ struct TestFilterDetailViewDoc: View {
     }
     
     func testPrint() {
-        print("entering all \(filterSelection.spreadSheetTypes)")
+        print("entering all \(filterSelection.spreadsheetTypes)")
         print("entering Selec \(filterSelection.selectedSpreadsheetTypes)")
         
     }

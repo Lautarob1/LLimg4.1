@@ -16,7 +16,6 @@ struct TestFilterDetx2View: View {
             GridItem(.flexible())
         ]
         VStack {
-            // Use a scroll view to accommodate more items
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 20) {
                     ForEach(filterSelection.Types, id: \.self) { type in

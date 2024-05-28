@@ -7,6 +7,19 @@
 
 import SwiftUI
 
+struct NoBorderTextFieldStyle: TextFieldStyle {
+    func _body(configuration: TextField<_Label>) -> some View {
+        configuration
+            .padding(5)
+            .background(Color(.gray))
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color(.clear), lineWidth: 0)
+            )
+    }
+}
+
 struct ImgInfoTgtView: View {
     @ObservedObject private var diskDataManager = DiskDataManager.shared
     @ObservedObject private var caseInfoData = CaseInfoData.shared
@@ -32,7 +45,8 @@ struct ImgInfoTgtView: View {
                         TextField("Enter image name", text: $imageName)
 //                            .focused($nameFieldIsFocused)
 //                            .border(isInputValid ? Color.clear : Color.red)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+//                            .textFieldStyle(NoBorderTextFieldStyle())
+//                            .textFieldStyle(RoundedBorderTextFieldStyle())
                         
                         HStack {
                             TgtSelectFFView()

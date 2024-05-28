@@ -17,6 +17,7 @@ struct Imaging2ProcView: View {
     @ObservedObject var timer = ElapsedTimeTimer()
     @ObservedObject var dmgtimer = ElapsedTimeTimer()
     @ObservedObject var hviewModel = HashingViewModel()
+    @ObservedObject var filterSelection = FilterSelection()
     @State private var caseName: String = ""
     @State private var evidenceName: String = ""
     @State private var agentName: String = ""
@@ -400,8 +401,12 @@ struct Imaging2ProcView: View {
         
         // Sparse Creation
 
-        copyFF2sparseMain ()
-       
+        if FilterSelection.shared.isFilterBeingApplied  {
+            copyFF2SparseFilteredMain ()
+        }
+        else {
+            copyFF2sparseMain ()
+        }
         print("3rd process (create sparse Image) done....")
         
         // DMG creation
@@ -442,7 +447,35 @@ struct Imaging2ProcView: View {
     
     //  aux functions used
     // ====================================================
-   
+//    copyFF2SparseFilteredMain
+  
+    func copyFF2SparseFilteredMain () {
+        print("entering copyFF2SparseFilteredMain ")
+        let sparsePath = DiskDataManager.shared.selectedStorageDestin
+        let imgName = CaseInfoData.shared.imageName
+        print("max value in CopyFF2sparseMain \(maxValue)")
+        FileSizeChecker3.shared.totalSizeInGB = maxValue
+        fileSizeChecker3.filePath = "\(sparsePath)/\(imgName).sparseimage"
+        print("fileSizeChecker3.filePath in copyFF2SparseFilteredMain \(fileSizeChecker3.filePath ?? "No file Path")")
+        sleep(2)
+        fileSizeChecker3.startMonitoring()
+        sparseTimeIni=LLTimeManager.getCurrentTimeString()
+        let destinPath = "/Volumes/\(CaseInfoData.shared.imageName)"
+        print("destinPath with /Volumes hard coded: \(CaseInfoData.shared.imageName)")
+//        print("Total size from FselMng: \(FileSelectionManager.shared.totalSize)")
+        print("Total size FchkSi3 (GB): \(FileSizeChecker3.shared.totalSizeInGB)")
+        print("about to enter in copyFF2sparseFiltered...")
+        copyFF2sparseFiltered (fileItems: FileSelectionManager.shared.selectedFiFo, destPath: destinPath)
+        sparseTimeEnd=LLTimeManager.getCurrentTimeString()
+        sparseSize=String(format: "%.2f GB", fileSizeChecker3.fileSizeInGB)
+        fileSizeChecker3.stopMonitoring()
+        logicImgSize[0] = sparseSize
+        FileSizeChecker3.shared.fileSizeInGB = fileSizeChecker3.fileSizeInGB
+//        currentValue = fileSizeChecker3.fileSizeInGB
+        copyFFLog()
+        print("after copyFFLog...")
+    }
+    
     func copyFF2sparseMain () {
         print("entering copyFF2sparseMain ")
         let sparsePath = DiskDataManager.shared.selectedStorageDestin
@@ -451,7 +484,7 @@ struct Imaging2ProcView: View {
         print("max value in CopyFF2sparseMain \(maxValue)")
         FileSizeChecker3.shared.totalSizeInGB = maxValue
         fileSizeChecker3.filePath = "\(sparsePath)/\(imgName).sparseimage"
-        print("fileSizeChecker3.filePath in copyFF2sparseMain \(copyFF2sparseMain)")
+        print("fileSizeChecker3.filePath in copyFF2sparseMain \(fileSizeChecker3.filePath ?? "No file path for checker")")
         sleep(2)
         fileSizeChecker3.startMonitoring()
         sparseTimeIni=LLTimeManager.getCurrentTimeString()
@@ -617,7 +650,52 @@ struct Imaging2ProcView: View {
         sviewModel.output=sviewModel.executeSudoCommand(command: "sudo hdiutil attach \(sparsePath)/\(imgName)", passw: passw)
         return sviewModel.output
     }
+
     
+    func copyFF2sparseFiltered (fileItems: [FileFolderItem], destPath: String) {
+        print("inside copyFF2SparseFiltered, copying to: \(destPath)")
+//        print("fileItems: \(fileItems)")
+        let destinationPath = destPath
+        for file in fileItems {
+            let fileOrFolder = filterItemType(item: file)
+             
+        if fileOrFolder == "Directory"  {
+            print("going to copyFolder: \(file.path)")
+            let timeStampType = terminalTimeStamps(typeTime: FilterSelection.shared.whichDateFilterIsApplied)
+            copyWithFilterFolder(from: file.path,
+                                 to: destinationPath,
+                                 extensions: FilterSelection.shared.selectedAllTypes,
+                                 timestampType: timeStampType,
+                                 startDate: FilterSelection.shared.startDate,
+                                 endDate: FilterSelection.shared.endDate
+                                                            )
+        }
+            else {
+                print("going to copyItem: \(file.path)")
+                let timeStampType = terminalTimeStamps(typeTime: FilterSelection.shared.whichDateFilterIsApplied)
+                copyWithFilterItem(filePath: file.path,
+                                   to: destinationPath,
+                                   extensions: FilterSelection.shared.selectedAllTypes,
+                                   timestampType: timeStampType,
+                                   startTime: FilterSelection.shared.startDate,
+                                   endTime: FilterSelection.shared.endDate
+                                                              )
+                print("files copied after: \(filesCopied)")
+            }
+        }
+        }
+        
+
+
+func filterItemType(item: FileFolderItem) -> String {
+    let fileManager = FileManager.default
+    var isDir: ObjCBool = false
+    if fileManager.fileExists(atPath: item.path, isDirectory: &isDir) {
+        return isDir.boolValue ? "Directory" : "File"
+    } else {
+        return "Not Found"
+    }
+}
     func copyFF2sparse (fileItems: [FileFolderItem], destPath: String) {
         print("inside copyFF2Sparse, copying to: \(destPath)")
 //        print("fileItems: \(fileItems)")
@@ -630,7 +708,39 @@ struct Imaging2ProcView: View {
         }
         
     }
- 
+
+//    func copyWithFilterItem(
+//        atPath srcPath: String,
+//        toPath dstPath: String) {
+//         let passw = AuthenticationViewModel.shared.rootPassword
+//         let srcPathFormatted = formattedPath4df(for: srcPath)
+//         let dstPathFormatted = formattedPath4df(for: dstPath)
+//         let command = "cp -a \(srcPathFormatted) \(dstPath)"
+//         let fullCommand = "echo \(passw) | sudo -S \(command)"
+//         print(command)
+//         let process = Process()
+////         let pipe = Pipe()
+//         process.environment = ProcessInfo.processInfo.environment
+//         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+//         process.arguments = ["-c", fullCommand]
+//        do {
+//            try process.run()
+//            process.waitUntilExit()
+//        } catch {
+//            print("Error: \(error.localizedDescription)")
+//        }
+//        
+//         let status = process.terminationStatus
+//         if status == 0 {
+//             filesCopied += 1
+//         } else {
+//             filesNotCopied += 1
+//             let logfilePath2 = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName)_error.info"
+//             print2Log(filePath: logfilePath2, text2p: "Failed to copy \(srcPath). Exit code: \(status)")
+//             print("Failed to copy \(srcPath). Exit code: \(status)")
+//         }
+//     }
+
     
     // Function to copy a file or directory, including hidden files and preserving extended attributes
 

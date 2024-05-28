@@ -55,6 +55,7 @@ struct Imaging2View: View {
                     ZStack {
                         VStack {
                             ImgInfoTgtView()
+                                .zIndex(1)
                             if !isFilterBeingApplied {
                                 Toggle("Apply Filter", isOn: $appliedFilter)
                                     .toggleStyle(SwitchToggleStyle(tint: .blue))
@@ -69,9 +70,11 @@ struct Imaging2View: View {
                         }
                         if appliedFilter {
                             FilterSelectView(isFilterSelecVisible: $isFilterSelecVisible, appliedFilter: $appliedFilter, isFilterBeingApplied: $isFilterBeingApplied)
-//                                .offset(y: -50)
-                        }
+                                .zIndex(2)
                     }
+ 
+                    }
+
                     HStack {
                         Button(action: {
                             showReviewView = true

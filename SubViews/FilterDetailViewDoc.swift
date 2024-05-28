@@ -18,59 +18,49 @@ struct FilterDetailViewDoc: View {
                                   endPoint: .bottom)
 
     var body: some View {
-    
-            VStack (alignment: .leading) {
-                if FilterSelection.shared.applyDocumentFilter {
-                    
-                    
-                    Text("Word Processing, text, presentations")
-                    ScrollView {
-                        VStack (alignment: .leading)  {
-                        ForEach(filterSelection.documentTypes, id: \.self) { type in
-                            let isSelected = filterSelection.selectedDocumentTypes.contains(type)
-                            Toggle(type, isOn: Binding(
-                                get: { isSelected },
-                                set: { newValue in
-                                    if newValue {
-                                        filterSelection.selectedDocumentTypes.append(type)
-                                        
-                                        print("Selected : \(filterSelection.selectedDocumentTypes)")
-                                        
-                                        print("All : \(filterSelection.selectedDocumentTypes)")
-                                        
-                                        print("\(type) isSelected (add): \(filterSelection.selectedDocumentTypes)")
-                                    }
-                                    
-                                    else {
-                                        filterSelection.selectedDocumentTypes.removeAll(where: { $0 == type })
-                                        print("\(type) isSelected (remove): \(filterSelection.selectedDocumentTypes)")
-                                    }
-                                }
-                            ))
+        let columns: [GridItem] = [
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ]
+        VStack (alignment: .leading) {
+            if FilterSelection.shared.applyDocumentFilter {
+                
+                
+                Text("Word Processing, text, presentations")
+                ScrollView {
+                    VStack (alignment: .leading)  {
+                        LazyVGrid(columns: columns, spacing: 10) {
+                            ForEach(filterSelection.documentTypes, id: \.self) { type in
+                                Toggle(type, isOn: bindingForType(type))
+                                
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
                         }
-                    } // inner VStack
-                        .frame(width: 180)
+                } // inner VStack
+                    .frame(width: 190)
+                    .padding(.leading, 15)
+                    
 //                        .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
-                }
+            }
 //
             }
 
             HStack {
                 Button("Cancel") {
-                    filterSelection.applySpreadsheetFilter = false
+                    filterSelection.applyDocumentFilter = false
                 }
                 .padding(5)
  
                Spacer()
                 Button("OK") {
-                    filterSelection.isSpreadSheetFilterApplied = true
-                    filterSelection.applySpreadsheetFilter = false
+                    filterSelection.isDocumentFilterApplied = true
+                    filterSelection.applyDocumentFilter = false
                     FilterSelection.shared.selectedDocumentTypes = filterSelection.selectedDocumentTypes
                     FilterSelection.shared.selectedAllTypes.append( contentsOf: filterSelection.selectedDocumentTypes)
                 }
             }
             }
-            .frame(width: 225, height: 180)
+            .frame(width: 225, height: 170)
             .padding(5)
             .background(gradient)
             .foregroundColor(.white)
@@ -78,7 +68,22 @@ struct FilterDetailViewDoc: View {
                 Spacer()
     }
 
-
+    private func bindingForType(_ type: String) -> Binding<Bool> {
+        Binding<Bool>(
+            get: {
+                filterSelection.selectedDocumentTypes.contains(type)
+            },
+            set: { newValue in
+                if newValue {
+                    if !filterSelection.selectedDocumentTypes.contains(type) {
+                        filterSelection.selectedDocumentTypes.append(type)
+                    }
+                } else {
+                    filterSelection.selectedDocumentTypes.removeAll { $0 == type }
+                }
+            }
+        )
+    }
         
     }
     

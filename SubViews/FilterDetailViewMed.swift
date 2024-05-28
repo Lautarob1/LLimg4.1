@@ -37,24 +37,8 @@ struct FilterDetailViewMed: View {
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                             }
-//                        ForEach(filterSelection.mediaTypes, id: \.self) { type in
-//                            let isSelected = filterSelection.selectedMediaTypes.contains(type)
-//                            Toggle(type, isOn: Binding(
-//                                get: { isSelected },
-//                                set: { newValue in
-//                                    if newValue {
-//                                        filterSelection.selectedMediaTypes.append(type)
-//                                    }
-//                                    
-//                                    else {
-//                                        filterSelection.selectedMediaTypes.removeAll(where: { $0 == type })
-//                                        print("\(type) isSelected (remove): \(filterSelection.selectedMediaTypes)")
-//                                    }
-//                                }
-//                            ))
-//                        }
                     } // inner VStack
-                        .frame(width: 200)
+                        .frame(width: 190)
                         .padding(.leading, 15)
 //                        .foregroundColor(/*@START_MENU_TOKEN@*/.blue/*@END_MENU_TOKEN@*/)
                 }

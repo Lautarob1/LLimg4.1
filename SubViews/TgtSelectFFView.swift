@@ -20,7 +20,7 @@ struct TgtSelectFFView: View {
                 TextField(path2img, text: $filePath)
                     .font(.system(size: 12))
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-//                    .frame(width: 290, alignment: .leading)
+//                    .textFieldStyle(NoBorderTextFieldStyle())
                     .padding(2)
                 
                 Button(action: {
@@ -50,7 +50,7 @@ struct TgtSelectFFView: View {
 
             .background(Color.clear)
 
-//            ScrollView {
+
                 List(selection: $selectedItems) {
                     ForEach(FileSelectionManager.shared.selectedFiFo, id: \.id) { file in
                         HStack {
@@ -61,7 +61,7 @@ struct TgtSelectFFView: View {
                     }
 
                 }
-//            }
+
 
 
             HStack {

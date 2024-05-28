@@ -22,7 +22,7 @@ struct ShowFilterAppliedView: View {
                 .font(.caption)
                 .padding(.vertical, 5)
             HStack {
-                if FilterSelection.shared.isSpreadSheetFilterApplied {
+                if FilterSelection.shared.isSpreadsheetFilterApplied {
                     Image(systemName: "tablecells")
                         .font(.system(size: 30))
                         .frame(width:70, height: 34)
@@ -56,14 +56,18 @@ struct ShowFilterAppliedView: View {
             }
             
             Text("Colecting only files with extensions: ")
+                .frame(width: 380, alignment: .leading)
+                .font(.system(size: 11))
             Text("\(FilterSelection.shared.selectedAllTypes)")
                 .frame(width: 380, alignment: .leading)
                 if FilterSelection.shared.isDateFilterApplied {
                     let usedTimeStamps=FilterSelection.shared.whichDateFilterIsApplied
                     let usedStartTime=date2dateString(date: FilterSelection.shared.startDate)
                     let usedEndTime=date2dateString(date: FilterSelection.shared.endDate)
-                    Text("and falling within the following \(usedTimeStamps) timestamps: ")
+                    let terminalTime = terminalTimeStamps(typeTime: usedTimeStamps)
+                    Text("and falling within the following \(usedTimeStamps) timestamps(\(terminalTime)): ")
                         .frame(width: 380, alignment: .leading)
+//                    print("terminal time used: \(terminalTime)")
                     Text("Start date: \(usedStartTime) --> End Date: \(usedEndTime)")
                         .frame(width: 380, alignment: .leading)
                 }
@@ -71,7 +75,7 @@ struct ShowFilterAppliedView: View {
         }
         .frame(width: 380)
         }
-        .frame(width: 420, height: 100)
+        .frame(width: 420, height: 160)
     }
 }
 

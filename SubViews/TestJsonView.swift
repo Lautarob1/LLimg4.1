@@ -162,10 +162,23 @@ struct TestJsonView: View {
                     readJSONFromFile(at: fileURL)
                     }
                 }
+            Button("TestDateToStr") {
+              let date = Date()
+            print(date2dateString2(date: date))
+                    }
+
             }
+        .frame(width: 300, height: 200)
         }
     }
-    
+
+func date2dateString2(date: Date) -> String {
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"  // Set the date format to "yyyy-MM-dd"
+    print("date in date2Str: \(date)")
+    let dateString = dateFormatter.string(from: date)
+    return dateString
+}
 
 #Preview {
     TestJsonView()

@@ -116,8 +116,10 @@ func processSelectedJsonFile() {
         FilterSelection.shared.profileFilterUsed = url.lastPathComponent
         print(FilterSelection.shared.selectedSpreadsheetTypes)
         print(FilterSelection.shared.selectedCustomTypes)
-                                
         print(FilterSelection.shared.selectedDateParam)
+//                    if filterFiles[4].categDet.count != 0 {
+//                        FilterSelection.shared.isDateFilterApplied = true
+//                    }
     }
         else {
             print("bad profile file at: \(url)")
@@ -128,7 +130,7 @@ func processSelectedJsonFile() {
 
 func dateString2Date (dateStr: String) -> Date {
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyyMMdd"  // Set the date format according to the string
+    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"  // Set the date format according to the string
 
     if let date = dateFormatter.date(from: dateStr) {
         return date
@@ -141,12 +143,33 @@ func dateString2Date (dateStr: String) -> Date {
 
 func date2dateString(date: Date) -> String {
     let dateFormatter = DateFormatter()
-    dateFormatter.dateFormat = "yyyy-MM-dd"  // Set the date format to "yyyy-MM-dd"
-
+    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm"  // Set the date format to "yyyy-MM-dd"
+    print("date in date2Str: \(date)")
     let dateString = dateFormatter.string(from: date)
     return dateString
 }
 
+//"Accessed": "Last time the file was accessed",
+//"Modified": "Last time the content of the file was modified",
+//"Inode Δ": "inode  changes: permissions, location or content",
+//"Created": "Creation timestamp for the file"]
+
+
+func terminalTimeStamps(typeTime: String) -> String {
+    switch typeTime {
+    case "Accessed":
+        return "at"
+    case "Modified":
+        return "mt"
+    case "Inode Δ":
+        return "ct"
+    case "Created":
+        return "bt"
+    default:
+        return "mt"
+    }
+ 
+}
 
 func copyFilesWithExtensionsAndTime(sourcePath: String, destinationPath: String, extensions: [String], timeType: String, date1: Date, date2: Date) {
     let dateFormatter = DateFormatter()
@@ -186,3 +209,135 @@ func copyFilesWithExtensionsAndTime(sourcePath: String, destinationPath: String,
         print("Failed to start process: \(error)")
     }
 }
+
+
+
+
+func copyWithFilterFolder(
+    from folderPath: String,
+    to destinationPath: String,
+    extensions: [String],
+    timestampType: String,
+    startDate: Date? = nil,
+    endDate: Date? = nil
+) {
+    let fileManager = FileManager.default
+    print("in cpWithFilterFolder...")
+    // DateFormatter to format the modification times for the terminal command
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-ddTHH:mm"
+
+    // Date range string
+    var dateRangeString = ""
+    if let start = startDate {
+        dateRangeString += "-newer\(timestampType) '\(dateFormatter.string(from: start))'"
+    }
+    if let end = endDate {
+        if !dateRangeString.isEmpty {
+            dateRangeString += " !"
+        }
+        dateRangeString += "-newer\(timestampType) '\(dateFormatter.string(from: end))'"
+    }
+    var findCommand = "find \(folderPath) -type f"
+    // Extensions pattern
+    
+    if !extensions.isEmpty {
+        findCommand += " \\("
+        for (index, ext) in extensions.enumerated() {
+            if index > 0 {
+                findCommand += " -o"
+            }
+            findCommand += " -iname \"*\(ext)\""
+        }
+        findCommand += " \\)"
+    }
+    let destFolderPath = (destinationPath as NSString).appendingPathComponent(folderPath)
+    let today = Date()
+    let oneYearAgo = Calendar.current.date(byAdding: .year, value: -1, to: today)!
+    findCommand += " \\) -newermt '\(startDate ?? oneYearAgo)' ! -newermt '\(endDate ?? today)' -print0 | xargs -0 cp -a -t \(destFolderPath)"
+   
+    let process = Process()
+    process.launchPath = "/bin/bash"
+    process.arguments = ["-c", findCommand]
+    
+    do {
+        try process.run()
+        process.waitUntilExit()
+        if process.terminationStatus == 0 {
+            print("Files copied successfully.")
+        } else {
+            print("Failed to copy files. Exit status: \(process.terminationStatus)")
+        }
+    } catch {
+        print("Error running the process: \(error)")
+    }
+}
+
+
+func copyWithFilterItem(
+    filePath: String,
+    to destinationPath: String,
+    extensions: [String],
+    timestampType: String,
+    startTime: Date?,
+    endTime: Date?
+)
+{
+    let fileManager = FileManager.default
+    print("in copyWithFilter... ")
+    // Get the file extension
+    let fileExtension = (filePath as NSString).pathExtension
+    print("extensions allowed to pass: \(extensions)")
+    print("fileExt to review: \(fileExtension)")
+    guard extensions.contains(fileExtension) else {
+        print("File extension does not match.")
+        return
+    }
+    
+    // Get the file attributes
+    do {
+        let attributes = try fileManager.attributesOfItem(atPath: filePath)
+        var fileDate: Date?
+        
+        switch timestampType {
+        case "at":
+            fileDate = attributes[.creationDate] as? Date // Adjust if 'atime' key is different
+        case "mt":
+            fileDate = attributes[.modificationDate] as? Date
+        case "ct":
+            fileDate = attributes[.creationDate] as? Date
+        case "bt":
+            fileDate = attributes[.creationDate] as? Date // Adjust if 'Btime' key is different
+        default:
+            print("Invalid timestamp type.")
+            return
+        }
+        
+        // Check if file date is within the range
+        if let fileDate = fileDate {
+            if let startTime = startTime, fileDate < startTime {
+                print("File timestamp is before the start time.")
+                return
+            }
+            if let endTime = endTime, fileDate > endTime {
+                print("File timestamp is after the end time.")
+                return
+            }
+        } else {
+            print("File date not found.")
+            return
+        }
+        
+        // Construct the destination file path
+//        let fileName = (filePath as NSString).lastPathComponent
+        let destFilePath = (destinationPath as NSString).appendingPathComponent(filePath)
+        
+        // Copy the file
+        copyItem(atPath:  filePath, toPath:  destFilePath)
+        print("File copied successfully.")
+        
+    } catch {
+        print("Error: \(error)")
+    }
+}
+

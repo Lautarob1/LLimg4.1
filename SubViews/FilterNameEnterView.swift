@@ -9,7 +9,7 @@ import SwiftUI
 
 struct FilterNameEnterView: View {
     @Binding var showAlert: Bool
-    @Binding var name: String
+    @Binding var profileName: String
     var imageName: String = "pencil"
     var title: String = "Enter Profile Name"
     var message: String = ""
@@ -31,7 +31,7 @@ struct FilterNameEnterView: View {
                 .foregroundColor(textColor)
                 .padding(5)
             }
-            TextField("profile name with NO extension", text: $name)
+            TextField("enter profile name with NO extension", text: $profileName)
                 .font(.system(size: fontSize1))
                 .cornerRadius(8)
                 .foregroundColor(.gray)
@@ -56,7 +56,7 @@ struct FilterNameEnterView: View {
 //    @State private var showAlert = true
     FilterNameEnterView(
         showAlert: .constant(true),
-        name: .constant("profile name with NO extension")
+        profileName: .constant("profile name with NO extension")
 //                    imageName: "pencil"
 //                    title: "Enter Profile Name",
 //                    message: ""

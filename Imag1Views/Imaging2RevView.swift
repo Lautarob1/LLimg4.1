@@ -56,9 +56,12 @@ struct Imaging2RevView: View {
                         .padding(.trailing, 15)
                         VStack (spacing: 20){
                             TgtSelectFFViewRev()
+                                .frame(width: 400)
                             TgtInfoViewRev()
+                                .frame(width: 400)
                             if isFilterBeingApplied {
                             ShowFilterAppliedView()
+                                    .frame(width: 400)
  
           
                             }
@@ -113,7 +116,6 @@ struct Imaging2RevView: View {
                     }
                 }
                 .onAppear() {
-                    FilterSelection.shared.isSpreadSheetFilterApplied = true
                     if doubleCheckLicense() {
                     print("Dsk origen stored: \(DiskDataManager.shared.selectedDskOrigen)")
                     let sourceDisk = extractusedDisk(from: DiskDataManager.shared.selectedDskOrigen) ?? "/"
@@ -161,8 +163,9 @@ struct Imaging2RevView: View {
                             disableBCreateImg = true
                             showAlertTgt = true
                     }
-                        isFilterBeingApplied = FilterSelection.shared.isSpreadSheetFilterApplied || FilterSelection.shared.isDocumentFilterApplied || FilterSelection.shared.isMediaFilterApplied || FilterSelection.shared.isCustomFilterApplied || FilterSelection.shared.isDateFilterApplied
+                        isFilterBeingApplied = FilterSelection.shared.isSpreadsheetFilterApplied || FilterSelection.shared.isDocumentFilterApplied || FilterSelection.shared.isMediaFilterApplied || FilterSelection.shared.isCustomFilterApplied || FilterSelection.shared.isDateFilterApplied
                         print("onAppear: filter? \(isFilterBeingApplied)")
+                        FilterSelection.shared.isFilterBeingApplied = isFilterBeingApplied
                     
                 }
             }

@@ -40,7 +40,7 @@ struct TgtInfoViewRev: View {
             // Additional UI for calculations or other interactions
             // ...
         }
-        .frame(width:420, height: 220)
+        .frame(width:420, height: 190)
         .background(Color.clear)
         .onAppear {
             let destinDisk = DiskDataManager.shared.selectedStorageDestin

@@ -28,7 +28,7 @@ struct TestFilterDetailViewSSh: View {
 //                    HStack (alignment: .top) {
            
 
-                    ForEach(filterSelection.spreadSheetTypes, id: \.self) { type in Toggle(type, isOn: Binding<Bool>(
+                    ForEach(filterSelection.spreadsheetTypes, id: \.self) { type in Toggle(type, isOn: Binding<Bool>(
 //                        let isSelected = filterSelection.selectedSpreadsheetTypes.contains(type)
 //                       testPrint()
                         get: {filterSelection.selectedSpreadsheetTypes.contains(type)},
@@ -66,7 +66,7 @@ struct TestFilterDetailViewSSh: View {
                 
                Spacer()
                 Button("OK") {
-                    filterSelection.isSpreadSheetFilterApplied = true
+                    filterSelection.isSpreadsheetFilterApplied = true
                     filterSelection.applySpreadsheetFilter = false
                     FilterSelection.shared.selectedSpreadsheetTypes = filterSelection.selectedSpreadsheetTypes
                     FilterSelection.shared.selectedAllTypes = filterSelection.selectedSpreadsheetTypes
@@ -83,7 +83,7 @@ struct TestFilterDetailViewSSh: View {
     }
     
     func testPrint() {
-        print("entering all \(filterSelection.spreadSheetTypes)")
+        print("entering all \(filterSelection.spreadsheetTypes)")
         print("entering Selec \(filterSelection.selectedSpreadsheetTypes)")
         
     }
