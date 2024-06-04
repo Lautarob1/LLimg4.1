@@ -75,32 +75,34 @@ struct Imaging2View: View {
  
                     }
 
-                    HStack {
-                        Button(action: {
-                            showReviewView = true
-                        }) {
-                            Text("Review")
-                                .font(.custom("Helvetica Neue", size: 14))
-                                .frame(width: 100, height: 20)
-                                .foregroundColor(.white)
-                                .background(Color.blue)
-                                .cornerRadius(7)
-                                .padding(3)
-                        }
-                        .sheet(isPresented: $showReviewView) {
-                            Imaging2RevView(selectedOption: $selectedOption, showReviewView: $showReviewView)
-                        }
-                        Button(action: {
-                            initTgt()
-                            self.selectedOption = nil
-                        }) {
-                            Text("Cancel")
-                                .font(.custom("Helvetica Neue", size: 14))
-                                .frame(width: 100, height: 20)
-                                .foregroundColor(.white)
-                                .background(Color.blue)
-                                .cornerRadius(7)
-                                .padding(3)
+                        HStack {
+                            if !appliedFilter {
+                            Button(action: {
+                                showReviewView = true
+                            }) {
+                                Text("Review")
+                                    .font(.custom("Helvetica Neue", size: 14))
+                                    .frame(width: 100, height: 20)
+                                    .foregroundColor(.white)
+                                    .background(Color.blue)
+                                    .cornerRadius(7)
+                                    .padding(3)
+                            }
+                            .sheet(isPresented: $showReviewView) {
+                                Imaging2RevView(selectedOption: $selectedOption, showReviewView: $showReviewView)
+                            }
+                            Button(action: {
+                                initTgt()
+                                self.selectedOption = nil
+                            }) {
+                                Text("Cancel")
+                                    .font(.custom("Helvetica Neue", size: 14))
+                                    .frame(width: 100, height: 20)
+                                    .foregroundColor(.white)
+                                    .background(Color.blue)
+                                    .cornerRadius(7)
+                                    .padding(3)
+                            }
                         }
                     }
                     .padding()

@@ -70,6 +70,7 @@ struct Imaging1ProcView: View {
     @State private var fileSystemType: String = "APFS"
     @State private var disk2bImaged: String = "APFS"
     @State private var isSparseStillMounted: Bool = false
+    @State private var fontSizeMessage: CGFloat = 12
     
     var body: some View {
         
@@ -116,9 +117,10 @@ struct Imaging1ProcView: View {
                             if alertMsg == "" {
                                 print("after fullprocess--- END")
                                 imageName = "info.circle.fill"
-                                alertTitle = "😀"
+                                alertTitle = "✅  😀"
                                 alertMsg = "Process finished, press Done Button or esc to return to main menu"
                                 messageBelowTimer = "All Completed!"
+                                fontSizeMessage = 14
                                 stepIndex = 3
                             }
                             showCustomAlert = true
@@ -279,12 +281,10 @@ struct Imaging1ProcView: View {
                             title: alertTitle,
                             message: alertMsg,
                             fontSize1: 16,
-                            fontSize2: 12,
+                            fontSize2: fontSizeMessage,
                             textColor: Color(.white),
                             backgroundColor: Color("LL_blue")
-//                            onOK: {
-//                                print("hola")
-//                            }
+
                         )
                         .offset(y: -100.0)
                     }
@@ -328,7 +328,7 @@ struct Imaging1ProcView: View {
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             sviewModel.output="Creating container for sparse fails. Error in source Disk size"
             imageName = "person.crop.circle.badge.exclamationmark"
-            alertTitle = "😬"
+            alertTitle = "❌  😬"
             alertMsg = "The sparse container could not be created. Could not determine source Disk size"
             stepIndex = 4
             return
@@ -342,7 +342,7 @@ struct Imaging1ProcView: View {
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             sviewModel.output="Creating container for sparse fails. The processing cannot continue. Press esc to return to main menu"
             imageName = "person.crop.circle.badge.exclamationmark"
-            alertTitle = "😬"
+            alertTitle = "❌  😬"
             alertMsg = "The sparse container could not be created due to a password failure"
             stepIndex = 4
 
@@ -355,7 +355,7 @@ struct Imaging1ProcView: View {
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             sviewModel.output="Creating container for sparse fails. The processing cannot continue. Press esc to return to main menu"
             imageName = "person.crop.circle.badge.exclamationmark"
-            alertTitle = "😬"
+            alertTitle = "❌  😬"
             alertMsg = "The sparse container could not be created due to a password failure"
             stepIndex = 4
 
@@ -369,7 +369,7 @@ struct Imaging1ProcView: View {
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
             sviewModel.output="Container was not mounted and that is required to continue... Press esc to return to main menu"
             imageName = "person.crop.circle.badge.exclamationmark"
-            alertTitle = "😬"
+            alertTitle = "❌  😬"
             alertMsg = "The sparse container could not be mounted, which is needed to continue"
             stepIndex = 4
             return
@@ -382,17 +382,52 @@ struct Imaging1ProcView: View {
 
         print2Log(filePath: logfilePathEx, text2p: "Sparse Image process\(String(repeating: "-", count: 40))\n")
         print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+        
         print("3rd process (create sparse Image) done....")
-        if  sviewModel.output.contains("Invalid argument") {
+        if  sviewModel.output.contains("Operation not permitted") {
             print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
-            sviewModel.output = sviewModel.output + "\nRestoring data to sparse fails. The process fail. Press esc to return to main menu"
+            sviewModel.output = sviewModel.output + "\nRestoring data to sparse fails. Operation not permitted. Press esc to return to main menu"
             imageName = "person.crop.circle.badge.exclamationmark"
-            alertTitle = "😬"
-            alertMsg = "An error that prevent to restore the data occured. See above for details"
+            alertTitle = "❌  😬"
+            alertMsg = "An error that prevent to restore the data occured. Verify that the app has full disk access"
             stepIndex = 4
 
             return
         }
+
+//        if  sviewModel.output.contains("Invalid argument") {
+//            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+//            sviewModel.output = sviewModel.output + "\nRestoring data to sparse fails. The process fail. Press esc to return to main menu"
+//            imageName = "person.crop.circle.badge.exclamationmark"
+//            alertTitle = "❌  😬"
+//            alertMsg = "An error that prevent to restore the data occured. See above for details"
+//            stepIndex = 4
+//
+//            return
+//        }
+        
+//        if  sviewModel.output.contains("error 49244") {
+//            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+//            sviewModel.output = sviewModel.output + "\nRestoring data to sparse fails. Volume replication failed. Press esc to return to main menu"
+//            imageName = "person.crop.circle.badge.exclamationmark"
+//            alertTitle = "❌  😬"
+//            alertMsg = "Volume replication failed (error 49244). Try again after shutdown the Mac with no apps open. Also disabling any antivirus"
+//            stepIndex = 4
+//
+//            return
+//        }
+        if  !sviewModel.output.contains("Restore completed successfully") {
+            print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
+            sviewModel.output = sviewModel.output + "\nRestoring data to sparse fails. The process fail. Press esc to return to main menu"
+            imageName = "person.crop.circle.badge.exclamationmark"
+            alertTitle = "❌  😬"
+            alertMsg = "the restore process does not conclude successfully. Try the following: \n 1- shutdown the Mac. uncheck the box 'Reopen windows when logging back in' \n 2- Turn on the Mac and log in with admin credentials \n 3- Disable any antivirus and make sure no app is running \n 4- Use Disk Utility to run First Aid on the internal disk \n 5- Start Llimager and try again"
+            fontSizeMessage = 10
+            stepIndex = 4
+
+            return
+        }
+        
         // DMG creation
         if CaseInfoData.shared.isdmgEnabled {
             print("about to enter dmg process...")
@@ -404,7 +439,7 @@ struct Imaging1ProcView: View {
                 print2Log(filePath: logfilePathEx, text2p: sviewModel.output)
                 sviewModel.output = sviewModel.output + "\nUnmount sparse fails. The process fail. Press esc to return to main menu"
                 imageName = "person.crop.circle.badge.exclamationmark"
-                alertTitle = "😬"
+                alertTitle = "❌  😬"
                 alertMsg = "An error that prevent the sparse to be unmouned at \(sparsePath ) occurs. Unmount manually and use convert to generate DMG"
                 stepIndex = 4
                 return

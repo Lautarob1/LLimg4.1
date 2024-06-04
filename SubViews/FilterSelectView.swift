@@ -36,9 +36,9 @@ class FilterSelection: ObservableObject {
     @Published var startDate: Date = Date()
     @Published var endDate: Date = Date()
     @Published var dateFilterType: String = ""
-    @Published var selectedSpreadsheetTypes: [String] = ["xls*", "xlt*", "numbers", "csv", "ods*", "gnumeric", "gsheet"]
-    @Published var selectedMediaTypes: [String] = ["mp3", "wav", "mp4", "mov", "flv", "3gp", "mpeg", "jpg", "png", "gif", "psd", "bmp",  "tga", "tif*", "heic", "jpeg", "H264", "av1"]
-    @Published var selectedDocumentTypes: [String] = ["doc*", "dot*", "pdf", "ppt*", "pages", "rtf", "txt", "odp", "keynote"]
+    @Published var selectedSpreadsheetTypes: [String] = []
+    @Published var selectedMediaTypes: [String] = []
+    @Published var selectedDocumentTypes: [String] = []
     @Published var selectedCustomTypes: [String] = []
     @Published var selectedDateParam: [String] = []
     @Published var selectedAllTypes: [String] = []
@@ -75,6 +75,7 @@ struct FilterSelectView: View {
     @State var isFilterDetailVisible: Bool = false
     @State var showEnterName: Bool = false
     @State var profileName: String = ""
+    @State var saveProfile: Bool = false
     
     var body: some View {
         VStack {
@@ -104,12 +105,12 @@ struct FilterSelectView: View {
                             Text("Filter by Category")
                                 .font(.system(size: 14, weight: .bold))
                             if !filterSelection.isSpreadsheetFilterApplied {
-                                Toggle("Spreadsheet", isOn: $filterSelection.applySpreadsheetFilter)
+                                Toggle("Spreadsheets", isOn: $filterSelection.applySpreadsheetFilter)
                                     .padding(.leading, 5)
                             }
                             else {
                                 if #available(macOS 12.0, *) {
-                                    Toggle("Spreadsheet Filter Applied", isOn: $filterSelection.isSpreadsheetFilterApplied)
+                                    Toggle("Spreadsheets Filter Applied", isOn: $filterSelection.isSpreadsheetFilterApplied)
                                         .padding(.leading, 5)
                                         .frame(width: 200, height: 20, alignment: .leading)
                                         .foregroundColor(.white)
@@ -117,7 +118,7 @@ struct FilterSelectView: View {
                                         .cornerRadius(6)
                                     //                                .padding(.leading)
                                 } else {
-                                    Toggle("Spreadsheet Filter Applied", isOn: $filterSelection.isSpreadsheetFilterApplied)
+                                    Toggle("Spreadsheets Filter Applied", isOn: $filterSelection.isSpreadsheetFilterApplied)
                                         .padding(.leading, 5)
                                         .frame(width: 200, height: 20, alignment: .leading)
                                         .foregroundColor(.yellow)
@@ -126,12 +127,12 @@ struct FilterSelectView: View {
                                 
                             }
                             if !filterSelection.isDocumentFilterApplied {
-                                Toggle("documents", isOn: $filterSelection.applyDocumentFilter)
+                                Toggle("Documents", isOn: $filterSelection.applyDocumentFilter)
                                     .padding(.leading, 5)
                             }
                             else {
                                 if #available(macOS 12.0, *) {
-                                    Toggle("Document Filter Applied", isOn: $filterSelection.isDocumentFilterApplied)
+                                    Toggle("Documents Filter Applied", isOn: $filterSelection.isDocumentFilterApplied)
                                         .padding(.leading, 5)
                                         .frame(width: 200, height: 20, alignment: .leading)
                                         .foregroundColor(.white)
@@ -139,7 +140,7 @@ struct FilterSelectView: View {
                                         .cornerRadius(6)
                                     //                                .padding(.leading)
                                 } else {
-                                    Toggle("Document Filter Applied", isOn: $filterSelection.isDocumentFilterApplied)
+                                    Toggle("Documents Filter Applied", isOn: $filterSelection.isDocumentFilterApplied)
                                         .padding(.leading, 5)
                                         .frame(width: 200, height: 20, alignment: .leading)
                                         .foregroundColor(.yellow)
@@ -319,145 +320,164 @@ struct FilterSelectView: View {
                 .background(gradient)
                 .cornerRadius(10)
             }
-            HStack {
-                HStack {
-                    Button("Cancel") {
-                        //                    print(" cancel det apply filter \(applySpreadsheetFilter)")
-                        print(" cancel det types \(filterSelection.spreadsheetTypes)")
-                        self.isFilterSelecVisible = false
-                        self.isFilterBeingApplied = false
-                        self.appliedFilter = false
-                    }
-                    .padding(5)
-                    
-                    
-                    Button("Submit", action: {
-                        FilterSelection.shared.isSpreadsheetFilterApplied = filterSelection.isSpreadsheetFilterApplied
-                        FilterSelection.shared.isDocumentFilterApplied = filterSelection.isDocumentFilterApplied
-                        FilterSelection.shared.isMediaFilterApplied = filterSelection.isMediaFilterApplied
-                        FilterSelection.shared.isCustomFilterApplied = filterSelection.isCustomFilterApplied
-                        FilterSelection.shared.isDateFilterApplied = filterSelection.isDateFilterApplied
-                        print("was SSh filter selected \(filterSelection.isSpreadsheetFilterApplied)")
-                        if !filterSelection.isSpreadsheetFilterApplied {
-                            filterSelection.selectedSpreadsheetTypes = []
-                        }
-                        if !filterSelection.isDocumentFilterApplied {
-                            filterSelection.selectedDocumentTypes = []
-                        }
-                        if !filterSelection.isMediaFilterApplied {
-                            filterSelection.selectedMediaTypes = []
-                        }
-                        FilterSelection.shared.customExtValue = self.customExtValue
-                        FilterSelection.shared.selectedCustomTypes = filterSelection.selectedCustomTypes
-                        filterSelection.selectedAllTypes = filterSelection.selectedSpreadsheetTypes + filterSelection.selectedDocumentTypes +
-                        filterSelection.selectedMediaTypes +
-                        filterSelection.selectedCustomTypes
-                        FilterSelection.shared.selectedAllTypes = filterSelection.selectedAllTypes
-                        
-                        self.isFilterSelecVisible = false
-                        self.isFilterBeingApplied = true
-                        self.appliedFilter = false
-                        print("Submit FilterSelectedSh \(filterSelection.selectedSpreadsheetTypes)")
-                        print("Submit FilterCustom \(filterSelection.selectedCustomTypes)")
-                        print("Submit FilterSelectedSh.shared \(FilterSelection.shared.spreadsheetTypes)")
-                        print("SubmitFilterCustom.shared \(FilterSelection.shared.selectedCustomTypes)")
-                        print("FilterSelection.shared.startDate \(FilterSelection.shared.startDate)")
-                        print("FilterSelection.shared.endDate \(FilterSelection.shared.endDate)")
-                        print("FilterSelection.share which F \(FilterSelection.shared.whichDateFilterIsApplied)")
-                    })
-                }
-                .padding(4)
+            VStack {
                 
-                Spacer()
-                ZStack {
-                    HStack {
-                        Button("Load Profile", action: {
-                            processSelectedJsonFile()
-                            isProfileApplied = true
-                            if FilterSelection.shared.profileFilterUsed != "invalid" {
-                                if FilterSelection.shared.selectedSpreadsheetTypes.count > 0 {
-                                    filterSelection.selectedSpreadsheetTypes = FilterSelection.shared.selectedSpreadsheetTypes
-                                    filterSelection.applySpreadsheetFilter = false
-                                    filterSelection.isSpreadsheetFilterApplied = true
-                                    FilterSelection.shared.isSpreadsheetFilterApplied = true
-                                }
-                                if FilterSelection.shared.selectedDocumentTypes.count > 0 {
-                                    filterSelection.selectedDocumentTypes = FilterSelection.shared.selectedDocumentTypes
-                                    filterSelection.applyDocumentFilter = false
-                                    filterSelection.isDocumentFilterApplied = true
-                                    FilterSelection.shared.isDocumentFilterApplied = true
-                                }
-                                if FilterSelection.shared.selectedMediaTypes.count > 0 {
-                                    filterSelection.selectedMediaTypes = FilterSelection.shared.selectedMediaTypes
-                                    filterSelection.applyMediaFilter = false
-                                    filterSelection.isMediaFilterApplied = true
-                                    FilterSelection.shared.isMediaFilterApplied = true
-                                }
-                                if FilterSelection.shared.selectedCustomTypes.count > 0 {
-                                    filterSelection.applyCustomFilter = false
-                                    filterSelection.isCustomFilterApplied = true
-                                    FilterSelection.shared.isCustomFilterApplied = true
-                                }
-                                if FilterSelection.shared.selectedDateParam.count > 0 {
-                                    filterSelection.whichDateFilterIsApplied = filterSelection.whichDateFilterIsApplied
-                                    let dateFilterType = FilterSelection.shared.selectedDateParam[0]
-                                    filterSelection.whichDateFilterIsApplied = dateFilterType
-                                    FilterSelection.shared.whichDateFilterIsApplied = dateFilterType
-                                    let dateI = FilterSelection.shared.selectedDateParam[1]
-                                    initialDate = dateString2Date (dateStr: dateI)
-                                    let dateF = FilterSelection.shared.selectedDateParam[2]
-                                    finalDate = dateString2Date (dateStr: dateF)
-                                    FilterSelection.shared.startDate = initialDate
-                                    FilterSelection.shared.endDate = finalDate
-                                    FilterSelection.shared.selectedAllTypes = (
-                                    FilterSelection.shared.selectedSpreadsheetTypes +
-                                    FilterSelection.shared.selectedDocumentTypes +
-                                    FilterSelection.shared.selectedMediaTypes +
-                                    filterSelection.selectedCustomTypes)
-                                    filterSelection.applyDateFilter = false
-                                    filterSelection.isDateFilterApplied = true
-                                    FilterSelection.shared.isDateFilterApplied = true
-                                }
-                            }
-                            else {
-                                FilterSelection.shared.profileFilterUsed += " JSON"
-                            }
+                HStack {
+                    Spacer()
+                    Toggle("Save Profile", isOn: $saveProfile)
+                        .frame(width: 140, height: 20)
+                    if saveProfile {
+                        TextField("Enter profile name", text: $profileName)
+                            .frame(width: 250, height: 20)
+                            .foregroundColor(.black)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
                             
-                        }
-                        )
-                        .frame(width: 110)
-                        .font(.footnote)
-                        .padding(3)
-                        
-                        
-                        Button("Save Profile") {
-                            print("button Save Profile pressed")
-                            showEnterName = true
-                            print("SelDatePar shared: \(FilterSelection.shared.selectedDateParam)")
-                            print("SelDatePar from filter: \(filterSelection.selectedDateParam)")
-                            FilterSelection.shared.selectedDateParam = filterSelection.selectedDateParam
-//                            FilterSelection.shared.selectedDateParam[1] = date2dateString(date: self.initialDate)
-//                            FilterSelection.shared.selectedDateParam[2] = date2dateString(date: self.finalDate)
-                            print("SelDatePar shared after: \(FilterSelection.shared.selectedDateParam)")
-                            print("name for profile: \(profileName)")
-
-                            
-                            createJsonFilter(spreadSh: FilterSelection.shared.selectedSpreadsheetTypes,
-                                             docs: FilterSelection.shared.selectedDocumentTypes,
-                                             media: FilterSelection.shared.selectedMediaTypes,
-                                             custom: FilterSelection.shared.selectedCustomTypes,
-                                             date: FilterSelection.shared.selectedDateParam,
-                                             fileName: profileName
-                            )
-                            
-                        }
                     }
-//                    .frame(width: 120)
-                    .padding(3)
-                    .font(.footnote)
+                }
+                
+                HStack {
                     
-                    if showEnterName {
-                        FilterNameEnterView(showAlert: $showEnterName, profileName: $profileName)
+                    HStack {
+                        Button("Cancel") {
+                            filterSelection.selectedSpreadsheetTypes = []
+                            filterSelection.selectedDocumentTypes = []
+                            filterSelection.selectedMediaTypes = []
+                            filterSelection.selectedCustomTypes = []
+                            filterSelection.selectedDateParam = []
+                            print(" cancel det types \(filterSelection.spreadsheetTypes)")
+                            self.isFilterSelecVisible = false
+                            self.isFilterBeingApplied = false
+                            self.appliedFilter = false
+                        }
+                        .padding(5)
+                        
+                        
+                        Button("Submit", action: {
+                            FilterSelection.shared.isSpreadsheetFilterApplied = filterSelection.isSpreadsheetFilterApplied
+                            FilterSelection.shared.isDocumentFilterApplied = filterSelection.isDocumentFilterApplied
+                            FilterSelection.shared.isMediaFilterApplied = filterSelection.isMediaFilterApplied
+                            FilterSelection.shared.isCustomFilterApplied = filterSelection.isCustomFilterApplied
+                            FilterSelection.shared.isDateFilterApplied = filterSelection.isDateFilterApplied
+                            print("was SSh filter selected \(filterSelection.isSpreadsheetFilterApplied)")
+                            if !filterSelection.isSpreadsheetFilterApplied {
+                                filterSelection.selectedSpreadsheetTypes = []
+                            }
+                            if !filterSelection.isDocumentFilterApplied {
+                                filterSelection.selectedDocumentTypes = []
+                            }
+                            if !filterSelection.isMediaFilterApplied {
+                                filterSelection.selectedMediaTypes = []
+                            }
+                            FilterSelection.shared.customExtValue = self.customExtValue
+                            FilterSelection.shared.selectedCustomTypes = filterSelection.selectedCustomTypes
+                            filterSelection.selectedAllTypes = filterSelection.selectedSpreadsheetTypes + filterSelection.selectedDocumentTypes +
+                            filterSelection.selectedMediaTypes +
+                            filterSelection.selectedCustomTypes
+                            FilterSelection.shared.selectedAllTypes = filterSelection.selectedAllTypes
+                            
+                            self.isFilterSelecVisible = false
+                            self.isFilterBeingApplied = true
+                            self.appliedFilter = false
+                            print("Submit FilterSelectedSh \(filterSelection.selectedSpreadsheetTypes)")
+                            print("Submit FilterCustom \(filterSelection.selectedCustomTypes)")
+                            print("Submit FilterSelectedSh.shared \(FilterSelection.shared.spreadsheetTypes)")
+                            print("SubmitFilterCustom.shared \(FilterSelection.shared.selectedCustomTypes)")
+                            print("FilterSelection.shared.startDate \(FilterSelection.shared.startDate)")
+                            print("FilterSelection.shared.endDate \(FilterSelection.shared.endDate)")
+                            print("FilterSelection.share which F \(FilterSelection.shared.whichDateFilterIsApplied)")
+                        })
+                    }
+                    .padding(4)
+
+                    Spacer()
+                    ZStack {
+                        HStack {
+                            if !saveProfile {
+                                Button("Load Profile", action: {
+                                    processSelectedJsonFile()
+                                    isProfileApplied = true
+                                    if FilterSelection.shared.profileFilterUsed != "invalid" {
+                                        if FilterSelection.shared.selectedSpreadsheetTypes.count > 0 {
+                                            filterSelection.selectedSpreadsheetTypes = FilterSelection.shared.selectedSpreadsheetTypes
+                                            filterSelection.applySpreadsheetFilter = false
+                                            filterSelection.isSpreadsheetFilterApplied = true
+                                            FilterSelection.shared.isSpreadsheetFilterApplied = true
+                                        }
+                                        if FilterSelection.shared.selectedDocumentTypes.count > 0 {
+                                            filterSelection.selectedDocumentTypes = FilterSelection.shared.selectedDocumentTypes
+                                            filterSelection.applyDocumentFilter = false
+                                            filterSelection.isDocumentFilterApplied = true
+                                            FilterSelection.shared.isDocumentFilterApplied = true
+                                        }
+                                        if FilterSelection.shared.selectedMediaTypes.count > 0 {
+                                            filterSelection.selectedMediaTypes = FilterSelection.shared.selectedMediaTypes
+                                            filterSelection.applyMediaFilter = false
+                                            filterSelection.isMediaFilterApplied = true
+                                            FilterSelection.shared.isMediaFilterApplied = true
+                                        }
+                                        if FilterSelection.shared.selectedCustomTypes.count > 0 {
+                                            filterSelection.applyCustomFilter = false
+                                            filterSelection.isCustomFilterApplied = true
+                                            FilterSelection.shared.isCustomFilterApplied = true
+                                        }
+                                        if FilterSelection.shared.selectedDateParam.count > 0 {
+                                            filterSelection.whichDateFilterIsApplied = filterSelection.whichDateFilterIsApplied
+                                            let dateFilterType = FilterSelection.shared.selectedDateParam[0]
+                                            filterSelection.whichDateFilterIsApplied = dateFilterType
+                                            FilterSelection.shared.whichDateFilterIsApplied = dateFilterType
+                                            let dateI = FilterSelection.shared.selectedDateParam[1]
+                                            initialDate = dateString2Date (dateStr: dateI)
+                                            let dateF = FilterSelection.shared.selectedDateParam[2]
+                                            finalDate = dateString2Date (dateStr: dateF)
+                                            FilterSelection.shared.startDate = initialDate
+                                            FilterSelection.shared.endDate = finalDate
+                                            FilterSelection.shared.selectedAllTypes = (
+                                                FilterSelection.shared.selectedSpreadsheetTypes +
+                                                FilterSelection.shared.selectedDocumentTypes +
+                                                FilterSelection.shared.selectedMediaTypes +
+                                                filterSelection.selectedCustomTypes)
+                                            filterSelection.applyDateFilter = false
+                                            filterSelection.isDateFilterApplied = true
+                                            FilterSelection.shared.isDateFilterApplied = true
+                                        }
+                                    }
+                                    else {
+                                        FilterSelection.shared.profileFilterUsed += " JSON"
+                                    }
+                                    
+                                }
+                                )
+                                .frame(width: 110)
+                                .font(.footnote)
+                                .padding(3)
+                            }
+                            
+                            if saveProfile {
+                                Button("Save Profile") {
+                                    print("button Save Profile pressed")
+                                    showEnterName = true
+                                    profileName = sanitizeProfileName(in: profileName) + ".json"
+                                    print("sanitz name for profile: \(profileName)")
+                                    
+                                    createJsonFilter(spreadSh: FilterSelection.shared.selectedSpreadsheetTypes,
+                                                     docs: FilterSelection.shared.selectedDocumentTypes,
+                                                     media: FilterSelection.shared.selectedMediaTypes,
+                                                     custom: FilterSelection.shared.selectedCustomTypes,
+                                                     date: FilterSelection.shared.selectedDateParam,
+                                                     fileName: profileName
+                                    )
+                                    saveProfile = false
+                                    profileName = ""
+                                }
+                            } // if saveProfile end
+                        }
+    //                    .frame(width: 120)
+                        .padding(3)
+                        .font(.footnote)
+                        
+//                        if showEnterName {
+//                        FilterNameEnterView(showAlert: $showEnterName, profileName: $profileName)
+//                        }
                     }
                 }
             }

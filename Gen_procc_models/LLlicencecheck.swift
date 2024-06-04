@@ -121,8 +121,8 @@ func checkLicense (dateRef: String) -> String {
     if let date = dateFormatter.date(from: dateString) {
         // Compare with the current date
         let currentDate = Date()
-        
-        if date >= currentDate {
+// *************** Eliminate next line for prooduction **************
+        if date >= currentDate - 86400 {
             checkDate = "Valid"
 //            print("\(dateString) is not expired.")
         }  else {

@@ -64,7 +64,7 @@ struct Imaging2ProcView: View {
     @State var titleImgSize: String = "Image Size"
     @State var titleGauge: String = "% of Disk Size"
     @State var elapTime: [String] = ["Elapsed Time0", "Elapsed Time1", "Elapsed Time2"]
-    @State var imageSize: String = "Image Size in GB"
+    @State var imageSize: String = "Image Size in MB"
     @State var strokeWidth: CGFloat = 20
     @State var minValue: CGFloat = 0.0
     @State var maxValue: CGFloat = 0.7
@@ -230,7 +230,7 @@ struct Imaging2ProcView: View {
                     HStack(spacing: 0) { // Set spacing to 0 if you don't want any space between the VStacks
                         VStack {
                             // Content of the first VStack
-                            Text("\(stepIndex >= 1 ? fileSizeChecker2.fileSizeInGB :  fileSizeChecker3.fileSizeInGB, specifier: "%.2f") GB")
+                            Text("\(stepIndex >= 1 ? 1000 * fileSizeChecker2.fileSizeInGB :  1000 * fileSizeChecker3.fileSizeInGB, specifier: "%.2f") MB")
                                 .font(.system(size: 24, weight: .medium, design: .default)) // Customize the font here
                                 .frame(minWidth: 130, minHeight: 40)
                                 .padding(2) // Add padding around the text
@@ -273,7 +273,7 @@ struct Imaging2ProcView: View {
                         VStack {
                             if anyprocIsRunning {
                                 // Content of the third VStack
-                                CustomProgressView(scale: 3, color: .blue, backgroundColor: .clear, currrentValue: fileSizeChecker3.fileSizeInGB)
+                                CustomProgressView(scale: 3, color: .blue, backgroundColor: .clear, currrentValue: 1000 * fileSizeChecker3.fileSizeInGB)
                             } else {
                                 Text(messageBelowTimer)
                                     .font(.system(size: 24, weight: .medium, design: .default))
@@ -467,7 +467,7 @@ struct Imaging2ProcView: View {
         print("about to enter in copyFF2sparseFiltered...")
         copyFF2sparseFiltered (fileItems: FileSelectionManager.shared.selectedFiFo, destPath: destinPath)
         sparseTimeEnd=LLTimeManager.getCurrentTimeString()
-        sparseSize=String(format: "%.2f GB", fileSizeChecker3.fileSizeInGB)
+        sparseSize=String(format: "%.2f MB", 1000 * fileSizeChecker3.fileSizeInGB)
         fileSizeChecker3.stopMonitoring()
         logicImgSize[0] = sparseSize
         FileSizeChecker3.shared.fileSizeInGB = fileSizeChecker3.fileSizeInGB
@@ -495,11 +495,10 @@ struct Imaging2ProcView: View {
         print("about to enter in copyFF2sparse...")
         copyFF2sparse (fileItems: FileSelectionManager.shared.selectedFiFo, destPath: destinPath)
         sparseTimeEnd=LLTimeManager.getCurrentTimeString()
-        sparseSize=String(format: "%.2f GB", fileSizeChecker3.fileSizeInGB)
+        sparseSize=String(format: "%.2f MB", 1000 * fileSizeChecker3.fileSizeInGB)
         fileSizeChecker3.stopMonitoring()
         logicImgSize[0] = sparseSize
         FileSizeChecker3.shared.fileSizeInGB = fileSizeChecker3.fileSizeInGB
-//        currentValue = fileSizeChecker3.fileSizeInGB
         copyFFLog()
         print("after copyFFLog...")
     }
@@ -709,46 +708,17 @@ func filterItemType(item: FileFolderItem) -> String {
         
     }
 
-//    func copyWithFilterItem(
-//        atPath srcPath: String,
-//        toPath dstPath: String) {
-//         let passw = AuthenticationViewModel.shared.rootPassword
-//         let srcPathFormatted = formattedPath4df(for: srcPath)
-//         let dstPathFormatted = formattedPath4df(for: dstPath)
-//         let command = "cp -a \(srcPathFormatted) \(dstPath)"
-//         let fullCommand = "echo \(passw) | sudo -S \(command)"
-//         print(command)
-//         let process = Process()
-////         let pipe = Pipe()
-//         process.environment = ProcessInfo.processInfo.environment
-//         process.executableURL = URL(fileURLWithPath: "/bin/zsh")
-//         process.arguments = ["-c", fullCommand]
-//        do {
-//            try process.run()
-//            process.waitUntilExit()
-//        } catch {
-//            print("Error: \(error.localizedDescription)")
-//        }
-//        
-//         let status = process.terminationStatus
-//         if status == 0 {
-//             filesCopied += 1
-//         } else {
-//             filesNotCopied += 1
-//             let logfilePath2 = DiskDataManager.shared.selectedStorageDestin + "/\(CaseInfoData.shared.imageName)_error.info"
-//             print2Log(filePath: logfilePath2, text2p: "Failed to copy \(srcPath). Exit code: \(status)")
-//             print("Failed to copy \(srcPath). Exit code: \(status)")
-//         }
-//     }
-
     
     // Function to copy a file or directory, including hidden files and preserving extended attributes
 
     func copyItem(atPath srcPath: String, toPath dstPath: String) {
          let passw = AuthenticationViewModel.shared.rootPassword
          let srcPathFormatted = formattedPath4df(for: srcPath)
+//         dstPath = dstPath
+        
          let dstPathFormatted = formattedPath4df(for: dstPath)
-         let command = "cp -a \(srcPathFormatted) \(dstPath)"
+        
+         let command = "cp -a \(srcPathFormatted) \(dstPathFormatted)"
          let fullCommand = "echo \(passw) | sudo -S \(command)"
          print(command)
          let process = Process()
@@ -843,8 +813,8 @@ func filterItemType(item: FileFolderItem) -> String {
         print("after making false isMonitorActive-----")
         print("value for sviewModel.isMonitoringActive= \(sviewModel.isMonitoringActive)")
         fileSizeChecker2.stopMonitoring()
-        dmgSize=String(format: "%.2f GB", fileSizeChecker2.fileSizeInGB)
-        print("exesudo2 finished.... dmg size: \(dmgSize)")
+        dmgSize=String(format: "%.2f MB", 1000 * fileSizeChecker2.fileSizeInGB)
+        print("exesudo2 finished.... dmg size (MB): \(dmgSize)")
 //        timer.stopTimer()
         dmgTimeEnd=LLTimeManager.getCurrentTimeString()
 

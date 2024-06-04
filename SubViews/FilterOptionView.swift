@@ -9,13 +9,19 @@
 
 import SwiftUI
 
+//let messages: [String: String] = [
+//        "Accessed": "Last time the file was accessed",
+//        "Modified": "Last time the content of the file was modified",
+//        "Inode Δ": "inode  changes: permissions, location or content",
+//        "Created": "Creation timestamp for the file"]
+
 struct FilterOptionView: View {
     let buttonNames = ["Accessed", "Modified", "Inode Δ", "Created"]
     let messages: [String: String] = [
-            "Accessed": "Last time the file was accessed",
-            "Modified": "Last time the content of the file was modified",
-            "Inode Δ": "inode  changes: permissions, location or content",
-            "Created": "Creation timestamp for the file"]
+            "Accessed": "Last time accessed",
+            "Modified": "Last time modified",
+            "Inode Δ": "inode  changes",
+            "Created": "Creation timestamp"]
     @State private var hoveredName: String?
     @State private var name: String?
 //    @Binding var name: String?

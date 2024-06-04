@@ -49,7 +49,7 @@ struct AboutView: View {
                     Text(message1b)
                     + Text(llImager)
                     .italic()
-                    + Text(" Version 4.01")
+                    + Text(" Version 4.1.01")
                     Spacer(minLength: 30)
                     Text(message1b)
                     + Text(llImager)

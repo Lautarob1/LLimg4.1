@@ -749,7 +749,7 @@ func acqlogHeader(filePath: String) {
         writer.write("\n")
         writer.write(String(repeating: "=", count: 88))
         writer.write("\n")
-        writer.write("LLimager V 4.0")
+        writer.write("LLimager V 4.1")
         writer.write(" -  Mac Computers Forensics Imager\n")
         writer.write("\n")
         writer.write("        A C Q U I S I T I O N    D E T A I L  \n")
@@ -852,7 +852,7 @@ func exclogHeader(filePath: String) {
         writer.write("\n")
         writer.write(String(repeating: "=", count: 88))
         writer.write("\n")
-        writer.write("    LLimager V 4.0\n")
+        writer.write("    LLimager V 4.1\n")
         writer.write("      Mac Computers Forensics Imager\n")
         writer.write("\n")
         writer.write("        E X E C   L O G    D E T A I L S \n")
@@ -968,6 +968,32 @@ func acqlogTargetedFF (filePath: String) {
             writer.write(String(file.path)+"\n")
             
         }
+        if FilterSelection.shared.isFilterBeingApplied  {
+            writer.write(String(repeating: "-", count: 44))
+            writer.write("\nCollecting only files with extensions: \n")
+//            (FilterSelection.shared.selectedAllTypes)
+            let itemsPerLine = 14
+            let totalItems = FilterSelection.shared.selectedAllTypes.count
+        //    var lineItems = ""
+
+            for i in stride(from: 0, to: totalItems, by: itemsPerLine) {
+                let end = min(i + itemsPerLine, totalItems)
+                let lineItems = FilterSelection.shared.selectedAllTypes[i..<end]
+                print(lineItems.joined(separator: " "))
+                writer.write(lineItems.joined(separator: " "))
+                writer.write("\n")
+            }
+            if FilterSelection.shared.isDateFilterApplied {
+                let usedTimeStamps=FilterSelection.shared.whichDateFilterIsApplied
+                let usedStartTime=date2dateString(date: FilterSelection.shared.startDate)
+                let usedEndTime=date2dateString(date: FilterSelection.shared.endDate)
+                let terminalTime = terminalTimeStamps(typeTime: usedTimeStamps)
+                writer.write("and within the following \(usedTimeStamps) timestamps(\(terminalTime)): ")
+                writer.write("\n")
+                writer.write("Start date: \(usedStartTime) --> End Date: \(usedEndTime)")
+                writer.write("\n")
+            }
+        }
         writer.write(String(repeating: "=", count: 88))
     }
         else {
@@ -975,6 +1001,22 @@ func acqlogTargetedFF (filePath: String) {
         print("Failed to initialize FileWriter")
         return }
     
+}
+
+func stringArray2print (array: [String], filePath: String) {
+    let fileWriter = FileWriter(filePath: filePath)
+    if let writer = fileWriter {
+        let itemsPerLine = 15
+        let totalItems = array.count
+        //    var lineItems = ""
+        
+        for i in stride(from: 0, to: totalItems, by: itemsPerLine) {
+            let end = min(i + itemsPerLine, totalItems)
+            let lineItems = array[i..<end]
+            print(lineItems.joined(separator: " "))
+            writer.write(lineItems.joined(separator: " "))
+        }
+    }
 }
 
 func acqlogConv2Sparse (filePath: String) {
@@ -1087,8 +1129,8 @@ func extractData(from text: String) -> [String: Int64] {
     return results
 }
 
-import Foundation
-import CoreServices
+//import Foundation
+//import CoreServices
 
 func extractFileMetadata(at path: String) {
     let fileURL = URL(fileURLWithPath: path)
@@ -1280,40 +1322,6 @@ func parseVolumeCapacity(from output: String?) -> (totalCapacity: String?, avail
     return (nil, nil)
 }
 
-
-
-func copyTargeted2 (srcPaths: [String], destPath: String) {
-    print("inside copyTargeted, copying to: \(destPath)")
-    print("srcPaths: \(srcPaths)")
-    let destinationPath = "/Volumes/test05b"
-    
-//    if !FileManager.default.fileExists(atPath: destinationPath) {
-//        do {
-//            try FileManager.default.createDirectory(atPath: destinationPath, withIntermediateDirectories: true)
-//        } catch {
-//            print("Error creating destination directory: \(error.localizedDescription)")
-//            exit(1)
-//        }
-//    }
-    
-    for src in srcPaths {
-        copyItem(atPath: src, toPath: destinationPath)
-        
-//        let dst = (destinationPath as NSString).appendingPathComponent((src as NSString).lastPathComponent)
-//        if FileManager.default.isReadableFile(atPath: src) {
-//            if FileManager.default.fileExists(atPath: src, isDirectory: nil) {
-//                copyDirectoryContents(atPath: src, toPath: dst)
-//            } else {
-//                copyItem(atPath: src, toPath: dst)
-//                print("copied: \(src)")
-//            }
-//        } else {
-//            print("No read permission for \(src)")
-//        }
-//
-    }
-    
-}
 
 
 // Function to copy a file or directory, including hidden files and preserving extended attributes

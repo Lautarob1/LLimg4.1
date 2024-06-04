@@ -77,8 +77,11 @@ func createJsonFilter(spreadSh: [String], docs: [String], media: [String], custo
     let custom = FilterFiles(filterCat: "custom", categDet: custom)
     let dateFilter = FilterFiles(filterCat: "dateFilter", categDet: date)
 
-    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-    let jsonFile = documentsDirectory.appendingPathComponent(fileName)
+//    let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//    let jsonFile = documentsDirectory.appendingPathComponent(fileName)
+    let volumeDirectory = URL(fileURLWithPath: "/Volumes/llimager/llimager")
+    let jsonFile = volumeDirectory.appendingPathComponent(fileName)
+
 
     // Saving to JSON
     saveFilterFiles(to: jsonFile, filterFiles: [spreadsheets, documents, media, custom, dateFilter])
@@ -210,7 +213,11 @@ func copyFilesWithExtensionsAndTime(sourcePath: String, destinationPath: String,
     }
 }
 
-
+func sanitizeProfileName(in input: String) -> String {
+    let charsToReplace = CharacterSet(charactersIn: "!@#$%^&*/\\|")
+    let sanitizedName = input.unicodeScalars.map { charsToReplace.contains($0) ? "?" : String($0) }.joined()
+    return sanitizedName
+}
 
 
 func copyWithFilterFolder(
@@ -223,10 +230,12 @@ func copyWithFilterFolder(
 ) {
     let fileManager = FileManager.default
     print("in cpWithFilterFolder...")
+    
+    
     // DateFormatter to format the modification times for the terminal command
     let dateFormatter = DateFormatter()
     dateFormatter.dateFormat = "yyyy-MM-ddTHH:mm"
-
+    
     // Date range string
     var dateRangeString = ""
     if let start = startDate {
@@ -239,6 +248,7 @@ func copyWithFilterFolder(
         dateRangeString += "-newer\(timestampType) '\(dateFormatter.string(from: end))'"
     }
     var findCommand = "find \(folderPath) -type f"
+    print("early find command \(findCommand)")
     // Extensions pattern
     
     if !extensions.isEmpty {
@@ -254,8 +264,18 @@ func copyWithFilterFolder(
     let destFolderPath = (destinationPath as NSString).appendingPathComponent(folderPath)
     let today = Date()
     let oneYearAgo = Calendar.current.date(byAdding: .year, value: -1, to: today)!
-    findCommand += " \\) -newermt '\(startDate ?? oneYearAgo)' ! -newermt '\(endDate ?? today)' -print0 | xargs -0 cp -a -t \(destFolderPath)"
-   
+    print("in cpWithFilterFolder findCommand before check isFiltApp: \(findCommand)")
+    if FilterSelection.shared.isDateFilterApplied  {
+
+//        print("in cpWithFilterFolder datesRgtring (no dates): \(dateRangeString)")
+
+    findCommand += " -newer\(timestampType) '\(startDate ?? oneYearAgo)' ! -newer\(timestampType) '\(endDate ?? today)' -print0 | rsync --files-from=- --from0 / \(destinationPath)"
+    print("in cpWithFilterFolder findCommand when isFiltApp=true: \(findCommand)")
+    }
+    else {
+        findCommand += " -print0 | rsync --files-from=- --from0 / \(destinationPath)"
+        print("in cpWithFilterFolder findCommand when isFiltApp=false: \(findCommand)")
+    }
     let process = Process()
     process.launchPath = "/bin/bash"
     process.arguments = ["-c", findCommand]
@@ -289,7 +309,11 @@ func copyWithFilterItem(
     let fileExtension = (filePath as NSString).pathExtension
     print("extensions allowed to pass: \(extensions)")
     print("fileExt to review: \(fileExtension)")
-    guard extensions.contains(fileExtension) else {
+//    guard extensions.contains(fileExtension) else {
+//        print("File extension does not match.")
+//        return
+//    }
+    if !matchesExtension(fileExtension: fileExtension, patterns: extensions) {
         print("File extension does not match.")
         return
     }
@@ -331,13 +355,78 @@ func copyWithFilterItem(
         // Construct the destination file path
 //        let fileName = (filePath as NSString).lastPathComponent
         let destFilePath = (destinationPath as NSString).appendingPathComponent(filePath)
-        
+        print("destFilePath appendded used by cp cmd: \(destFilePath)")
+        print("sourfeFilePath used by cp cmd: \(filePath)")
         // Copy the file
+        createDirectoryStructureIfNeeded(sourceFilePath: filePath, destinationBasePath: destinationPath)
         copyItem(atPath:  filePath, toPath:  destFilePath)
-        print("File copied successfully.")
+        print("after copy item process")
         
     } catch {
         print("Error: \(error)")
     }
 }
 
+
+func createDirectoryStructureIfNeeded(sourceFilePath: String, destinationBasePath: String) {
+    let fileManager = FileManager.default
+    let sourceURL = URL(fileURLWithPath: sourceFilePath)
+    let directoryPath = sourceURL.deletingLastPathComponent().path
+    let destinationDirectoryURL = URL(fileURLWithPath: destinationBasePath).appendingPathComponent(directoryPath)
+
+    // Check if the directory already exists
+    if !fileManager.fileExists(atPath: destinationDirectoryURL.path) {
+        do {
+            // Create the necessary directories in the destination path
+            try fileManager.createDirectory(at: destinationDirectoryURL, withIntermediateDirectories: true, attributes: nil)
+            print("Directory structure created successfully at \(destinationDirectoryURL.path)")
+        } catch {
+            print("Error creating directory structure: \(error.localizedDescription)")
+        }
+    } else {
+        print("Directory already exists at \(destinationDirectoryURL.path)")
+    }
+}
+
+// Example usage
+//let sourceFilePath = "/Users/userAdmin/Documents/FilterTests/PDF_file11.pdf"
+//let destinationBasePath = "/Volumes/Vol12"
+//
+//createDirectoryStructureIfNeeded(sourceFilePath: sourceFilePath, destinationBasePath: destinationBasePath)
+
+//// Example usage
+//let sourceFilePath = "/Users/userAdmin/Documents/FilterTests/PDF_file11.pdf"
+//let destinationBasePath = "/Volumes/Vol12"
+//
+//createDirectoryStructure(sourceFilePath: sourceFilePath, destinationBasePath: destinationBasePath)
+
+
+// Define the extensions array with wildcard patterns
+let extensions = ["xls*", "doc*", "pdf"]
+
+// Define the file extension to check
+let fileExtension = "xlsx"
+
+// Function to check if a file extension matches any of the patterns in the extensions array
+func matchesExtension(fileExtension: String, patterns: [String]) -> Bool {
+    for pattern in patterns {
+        // Create a regular expression from the pattern by replacing * with a regex that matches any characters
+        let regexPattern = "^" + pattern.replacingOccurrences(of: "*", with: ".*") + "$"
+        
+        do {
+            let regex = try NSRegularExpression(pattern: regexPattern, options: [])
+            let range = NSRange(location: 0, length: fileExtension.utf16.count)
+            if regex.firstMatch(in: fileExtension, options: [], range: range) != nil {
+                return true
+            }
+        } catch {
+            print("Invalid regex: \(error.localizedDescription)")
+        }
+    }
+    return false
+}
+
+// Check if the file extension matches any of the patterns
+//let result = matchesExtension(fileExtension: fileExtension, patterns: extensions)
+
+//print("Does the file extension match any pattern? \(result)")

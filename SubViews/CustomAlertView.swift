@@ -43,7 +43,7 @@ struct CustomAlertView: View {
             .foregroundColor(.white)
             .padding()
         }
-        .frame(width: 300)  // , height: 140)
+        .frame(width: 320)  // , height: 140)
         .background(backgroundColor)
         .cornerRadius(20)
         .shadow(radius: 10)
@@ -56,9 +56,9 @@ struct CustomAlertView: View {
         showAlert: .constant(true),
                     imageName: "exclamationmark.triangle",
                     title: "Warning",
-                    message: "The sparse container could not be created due to a password failure! 😡",
+                    message: "the restore process does not conclude successfully. Try the following: \n 1- shutdown the Mac. uncheck the box 'Reopen windows when logging back in' \n 2- Turn on the Mac and log in with admin credentials \n 3- Disable any antivirus and make sure no app is running \n 4- Use Disk Utility to run First Aid on the internal disk \n 5- Start Llimager and try again" ,
                     fontSize1: 16,
-                    fontSize2: 14,
+                    fontSize2: 10,
         textColor: Color(.white),
                     backgroundColor: Color("LL_blue")
 //                    onOK: {print("OK pressed")}

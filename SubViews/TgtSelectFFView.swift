@@ -28,6 +28,7 @@ struct TgtSelectFFView: View {
                     openPanel.allowsMultipleSelection = true
                     openPanel.canChooseDirectories = true
                     openPanel.canChooseFiles = true
+                    openPanel.showsHiddenFiles = true
                     
                     if openPanel.runModal() == .OK {
 //                        stillWorking = true

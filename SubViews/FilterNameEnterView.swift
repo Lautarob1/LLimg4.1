@@ -39,7 +39,7 @@ struct FilterNameEnterView: View {
 
             Button("OK") {
                 showAlert = false
-//                onOK()
+                print("name entered: \(profileName)")
             }
             .background(Color.blue)
             .foregroundColor(.white)
